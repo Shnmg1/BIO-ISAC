@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body>
+    <div class="header-bar">
+        <div class="logo-section">
+            <div>
+                <div class="logo-text">24/7</div>
+                <div class="logo-subtext">GIFT BANK</div>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">IMS</a></li>
+            <li><a href="#">Conversations</a></li>
+            <li><a href="#" class="active">Tasks</a></li>
+        </ul>
+        <div class="header-icons">
+            <button class="icon-btn"><i class="fas fa-comment"></i></button>
+            <div class="user-icon">EG</div>
+        </div>
+    </div>
+
+    <div class="sub-header">
+        <ul class="sub-nav">
+            <li><a href="#" class="active">24/7 Tasks</a></li>
+            <li><a href="#">Event Tasks</a></li>
+        </ul>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <i class="fas fa-angle-down"></i>
+                <span>Tasks Dashboard</span>
+            </div>
+            <button class="config-btn"><i class="fas fa-cog"></i></button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">158</div>
+                <div class="stat-label">Running Event Tasks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">11</div>
+                <div class="stat-label">Running 24/7 Tasks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">189</div>
+                <div class="stat-label">Total Tasks in Past 30 Days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">811</div>
+                <div class="stat-label">Total Tasks</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="widget-card">
+                <div class="widget-header">
+                    <div class="widget-title">My Tasks</div>
+                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+                </div>
+                <div class="chart-container">
+                    <div class="donut-chart">
+                        <div class="chart-number">23</div>
+                    </div>
+                    <div class="task-list" style="flex: 1;">
+                        <div class="task-item">
+                            <div class="task-status status-closed"></div>
+                            <a href="#" class="task-id">#00239</a>
+                            <span class="task-name">Help close presidents/Ivory/Founder...</span>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-status status-closed"></div>
+                            <a href="#" class="task-id">#00215</a>
+                            <span class="task-name">Remove South Drain Covers</span>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-status status-closed"></div>
+                            <a href="#" class="task-id">#00214</a>
+                            <span class="task-name">Remove and Store PIE Banners and R...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color status-new"></div>
+                        <span>New (0)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color status-suspended"></div>
+                        <span>Suspended (0)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color status-due"></div>
+                        <span>Due (1)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color status-in-progress"></div>
+                        <span>In Progress (0)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color status-closed"></div>
+                        <span>Closed (22)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget-card">
+                <div class="widget-header">
+                    <div class="widget-title">24/7 Tasks Due</div>
+                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00801</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">11/02/2025 07:00:00 PM</div>
+                            <div class="task-name">N. Dakota MBB Practice</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00800</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">11/02/2025 05:30:00 PM</div>
+                            <div class="task-name">Stetson WBB Practice</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00799</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">11/02/2025 03:00:00 PM</div>
+                            <div class="task-name">MBB Practice</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00798</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">11/02/2025 12:00:00 PM</div>
+                            <div class="task-name">WBB Practice</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="widget-card weather-widget">
+                <div class="weather-time">02:45 PM, Monday, Nov 03</div>
+                <div class="weather-main">
+                    <i class="fas fa-sun" style="font-size: 24px; color: #FFA500;"></i>
+                    <div class="weather-temp">64°F</div>
+                    <div>
+                        <div class="weather-location">Tuscaloosa, US</div>
+                        <div style="font-size: 12px; color: #666;">Clear Sky</div>
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <span>High: 65°F</span>
+                    <span>Low: 62°F</span>
+                    <span>Wind: 3.44</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="widget-card">
+                <div class="widget-header">
+                    <div class="widget-title">Event Tasks Due</div>
+                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00213</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">10/18/2025 10:30:00 PM</div>
+                            <div class="task-name">Pull Cup Sleeves from water monsters</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00160</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">10/18/2025 10:30:00 PM</div>
+                            <div class="task-name">All windows closed</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00158</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">10/04/2025 07:30:38 PM</div>
+                            <div class="task-name">Clean and reorganize radio room</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00160</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">10/04/2025 06:45:00 PM</div>
+                            <div class="task-name">All windows closed</div>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00410</a>
+                        <div style="flex: 1;">
+                            <div class="task-time">105 minutes before event start</div>
+                            <div class="task-name">Notify Carla Barksdale when Presiden...</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="widget-card">
+                <div class="widget-header">
+                    <div class="widget-title">Last Viewed</div>
+                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="task-status status-new"></div>
+                        <a href="#" class="task-id">#00126</a>
+                        <span class="task-name">Visiting team bus turnaround</span>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-new"></div>
+                        <a href="#" class="task-id">#00151</a>
+                        <span class="task-name">Prep for officials exit</span>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-new"></div>
+                        <a href="#" class="task-id">#00210</a>
+                        <span class="task-name">Unlock east / north gates for ingress</span>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-new"></div>
+                        <a href="#" class="task-id">#00240</a>
+                        <span class="task-name">East Credential Board Pickup</span>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-new"></div>
+                        <a href="#" class="task-id">#00009</a>
+                        <span class="task-name">Shuttles Begin Running</span>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-status status-due"></div>
+                        <a href="#" class="task-id">#00010</a>
+                        <span class="task-name">K-9 Sweeps Begin</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="widget-card">
+                <div class="widget-header">
+                    <div class="widget-title">Recently Closed Tasks</div>
+                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="task-status status-closed"></div>
+                        <a href="#" class="task-id">#00010</a>
+                        <span class="task-name">K-9 Sweeps Begin</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
