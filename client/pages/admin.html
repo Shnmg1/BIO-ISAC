@@ -3,24 +3,987 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks Dashboard</title>
+    <title>Alerts Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        /* BIO-ISAC Color Scheme - Professional Green Theme */
+        /* Colors inspired by BIO-ISAC website: dark and light green palette */
+        :root {
+            --bio-primary-green: #1e4d2b;
+            --bio-dark-green: #0f2817;
+            --bio-medium-green: #2d6a3f;
+            --bio-light-green: #4aad6a;
+            --bio-bright-green: #6bcf8f;
+            --bio-accent-green: #3d8a56;
+            --bio-text-light: #f0f9f4;
+        }
+
+        /* Logo styling */
+        .bio-isac-logo {
+            height: 64.69px;
+            width: auto;
+            max-width: 288px;
+            object-fit: contain;
+            margin-top: 20px;
+        }
+
+        /* Update header bar to match BIO-ISAC theme */
+        .header-bar {
+            background: #000000;
+            border-bottom: none;
+            position: relative;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 20px 5px 20px;
+            min-height: 95px;
+        }
+
+        /* Center and align navigation links with logo */
+        .nav-links {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 20px;
+            z-index: 10;
+        }
+
+        /* Update navigation links */
+        .nav-links a {
+            color: var(--bio-text-light);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background-color: rgba(106, 207, 143, 0.25);
+            color: #ffffff;
+            border-radius: 4px;
+        }
+
+        /* Update sub-header */
+        .sub-header {
+            background-color: var(--bio-medium-green);
+            border-bottom: 1px solid var(--bio-light-green);
+        }
+
+        .sub-nav a {
+            color: var(--bio-text-light);
+        }
+
+        .sub-nav a.active {
+            border-bottom-color: var(--bio-bright-green);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* Update action colors - align with logo */
+        .header-icons {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icons .icon-btn {
+            color: var(--bio-text-light);
+        }
+
+        .header-icons .icon-btn:hover {
+            color: #ffffff;
+        }
+
+        .user-icon {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            font-weight: 600;
+        }
+
+        /* Update stat cards and widgets */
+        .stat-card {
+            border: 1px solid var(--bio-light-green);
+        }
+
+        .stat-number {
+            color: var(--bio-bright-green);
+        }
+
+        .widget-card {
+            border: 1px solid var(--bio-light-green);
+        }
+
+        .widget-header {
+            border-bottom: 1px solid var(--bio-light-green);
+        }
+
+        /* Update task status colors to work with green theme */
+        .task-id {
+            color: var(--bio-light-green);
+        }
+
+        .task-id:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .status-in-progress {
+            background-color: var(--bio-bright-green);
+        }
+
+        /* Update buttons and interactive elements */
+        .config-btn:hover,
+        .filter-btn:hover {
+            color: var(--bio-bright-green);
+        }
+
+        /* Update chart colors */
+        .donut-chart {
+            background: conic-gradient(
+                var(--bio-bright-green) 0% 4%,
+                var(--wst-color-fill-base-shade-2) 4% 100%
+            );
+        }
+
+        .chart-number {
+            color: var(--bio-bright-green);
+        }
+
+        /* Update legend colors */
+        .legend-color.status-in-progress {
+            background-color: var(--bio-bright-green);
+        }
+
+        /* Dashboard title styling */
+        .dashboard-title {
+            color: var(--bio-text-light);
+        }
+
+        .dashboard-title span {
+            color: var(--bio-text-light);
+        }
+
+        /* Dashboard header layout - three columns */
+        .dashboard-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .dashboard-header .config-btn {
+            justify-self: end;
+        }
+
+        /* First dashboard grid - 3 columns */
+        .dashboard-grid:first-of-type {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        /* Weather info in center of header - all on one horizontal line */
+        .weather-info-center {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-self: center;
+            gap: 25px;
+            flex-wrap: nowrap;
+        }
+
+        .weather-info-center .weather-time {
+            font-size: 13px;
+            color: var(--bio-text-light);
+            opacity: 0.9;
+            white-space: nowrap;
+        }
+
+        .weather-separator {
+            color: var(--bio-text-light);
+            opacity: 0.4;
+            font-size: 14px;
+        }
+
+        .weather-icon {
+            display: flex;
+            align-items: center;
+        }
+
+        .weather-info-center .weather-temp {
+            font-size: 18px;
+            color: var(--bio-text-light);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .weather-info-center .weather-location {
+            font-size: 13px;
+            color: var(--bio-text-light);
+            white-space: nowrap;
+        }
+
+        .weather-condition {
+            font-size: 12px;
+            color: var(--bio-text-light);
+            opacity: 0.85;
+            white-space: nowrap;
+        }
+
+        .weather-detail-item {
+            font-size: 12px;
+            color: var(--bio-text-light);
+            opacity: 0.85;
+            white-space: nowrap;
+        }
+
+        /* Change all gray backgrounds to flat black */
+        body {
+            background-color: #000000 !important;
+        }
+
+        .dashboard-container {
+            background-color: #000000;
+        }
+
+        .stat-card {
+            background: #000000 !important;
+            border: 1px solid var(--bio-light-green);
+        }
+
+        .widget-card {
+            background: #000000 !important;
+            border: 1px solid var(--bio-light-green);
+        }
+
+        /* Ensure text remains visible on black background */
+        .stat-label,
+        .task-name,
+        .task-time,
+        .widget-title,
+        .legend-item,
+        .weather-time,
+        .weather-location,
+        .weather-details {
+            color: var(--bio-text-light);
+        }
+
+        /* Update chart inner circle to be black */
+        .donut-chart::before {
+            background: #000000;
+        }
+
+        /* Create Alert Form Styles */
+        .create-alert-form {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .create-alert-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .create-alert-form .form-label {
+            color: var(--bio-text-light);
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .create-alert-form .form-control {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .create-alert-form .form-control:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        .create-alert-form .form-control::placeholder {
+            color: var(--bio-text-light);
+            opacity: 0.5;
+        }
+
+        .create-alert-form textarea.form-control {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .create-alert-form select.form-control {
+            cursor: pointer;
+        }
+
+        .create-alert-btn {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .create-alert-btn:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .create-alert-btn i {
+            font-size: 16px;
+        }
+
+        /* Conversations Page Styles */
+        #conversations-page {
+            display: none;
+            padding: 0;
+            max-width: 100%;
+            height: calc(100vh - 60px);
+        }
+
+        #conversations-page.active {
+            display: block;
+        }
+
+        #home-page {
+            display: block;
+        }
+
+        #home-page.hidden {
+            display: none;
+        }
+
+        .conversations-layout {
+            display: flex;
+            height: 100%;
+            gap: 0;
+        }
+
+        .conversations-sidebar {
+            width: 350px;
+            background-color: #000000;
+            border-right: 1px solid var(--bio-light-green);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .conversations-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--bio-light-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .conversations-header h2 {
+            color: var(--bio-text-light);
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .new-conversation-btn {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .new-conversation-btn:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .conversation-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--bio-medium-green);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .conversation-item:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        .conversation-item.active {
+            background-color: rgba(74, 173, 106, 0.2);
+            border-left: 3px solid var(--bio-bright-green);
+        }
+
+        .conversation-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .conversation-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .conversation-name {
+            color: var(--bio-text-light);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .conversation-preview {
+            color: var(--bio-text-light);
+            font-size: 12px;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .conversation-time {
+            color: var(--bio-text-light);
+            font-size: 11px;
+            opacity: 0.6;
+        }
+
+        .conversation-unread {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .conversation-messages {
+            flex: 1;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--bio-light-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .messages-header-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .messages-header-name {
+            color: var(--bio-text-light);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .messages-header-status {
+            color: var(--bio-text-light);
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 70%;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--bio-text-light);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.sent .message-bubble {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.received .message-bubble {
+            background-color: var(--bio-medium-green);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-time {
+            color: var(--bio-text-light);
+            font-size: 11px;
+            opacity: 0.6;
+            padding: 0 4px;
+        }
+
+        .message.sent .message-time {
+            text-align: right;
+        }
+
+        .message-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--bio-light-green);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        .message-input::placeholder {
+            color: var(--bio-text-light);
+            opacity: 0.5;
+        }
+
+        .send-btn {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 50px;
+        }
+
+        .send-btn:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .empty-conversation {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bio-text-light);
+            opacity: 0.5;
+            font-size: 16px;
+        }
+
+        .conversations-search {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--bio-medium-green);
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        .search-input::placeholder {
+            color: var(--bio-text-light);
+            opacity: 0.5;
+        }
+
+        /* Alert Modal Styles */
+        .alert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .alert-modal.active {
+            display: flex;
+        }
+
+        .alert-modal-content {
+            background-color: #000000;
+            border: 2px solid var(--bio-light-green);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+
+        .alert-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bio-light-green);
+        }
+
+        .alert-modal-header h2 {
+            color: var(--bio-text-light);
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .alert-modal-close {
+            background: none;
+            border: none;
+            color: var(--bio-text-light);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .alert-modal-close:hover {
+            background-color: rgba(74, 173, 106, 0.2);
+            color: var(--bio-bright-green);
+        }
+
+        .alert-modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .alert-modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .alert-modal-label {
+            color: var(--bio-text-light);
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .alert-modal-value {
+            color: var(--bio-text-light);
+            font-size: 14px;
+            padding: 10px 12px;
+            background-color: rgba(74, 173, 106, 0.1);
+            border: 1px solid var(--bio-light-green);
+            border-radius: 4px;
+            min-height: 20px;
+        }
+
+        .alert-modal-value.readonly {
+            background-color: rgba(74, 173, 106, 0.05);
+            opacity: 0.8;
+            border: 1px solid var(--bio-medium-green);
+        }
+
+        .alert-modal-textarea {
+            min-height: 80px;
+            resize: vertical;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Priority Selection Boxes */
+        .priority-selection {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .priority-option {
+            position: relative;
+        }
+
+        .priority-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .priority-box {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 2px solid var(--bio-light-green);
+            border-radius: 4px;
+            background-color: #000000;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+            text-align: center;
+            min-width: 100px;
+            user-select: none;
+        }
+
+        .priority-option:hover .priority-box {
+            border-color: var(--bio-bright-green);
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        .priority-option input[type="radio"]:focus + .priority-box {
+            outline: 2px solid var(--bio-bright-green);
+            outline-offset: 2px;
+        }
+
+        .priority-box.priority-low {
+            border-color: #6bcf8f;
+        }
+
+        .priority-box.priority-medium {
+            border-color: #ffaa00;
+        }
+
+        .priority-box.priority-high {
+            border-color: #ff6600;
+        }
+
+        .priority-box.priority-critical {
+            border-color: #ff0000;
+        }
+
+        .priority-option input[type="radio"]:checked + .priority-box.priority-low {
+            background-color: #6bcf8f !important;
+            border-color: #6bcf8f !important;
+            color: var(--bio-primary-green) !important;
+        }
+
+        .priority-option input[type="radio"]:checked + .priority-box.priority-medium {
+            background-color: #ffaa00 !important;
+            border-color: #ffaa00 !important;
+            color: #000000 !important;
+        }
+
+        .priority-option input[type="radio"]:checked + .priority-box.priority-high {
+            background-color: #ff6600 !important;
+            border-color: #ff6600 !important;
+            color: #ffffff !important;
+        }
+
+        .priority-option input[type="radio"]:checked + .priority-box.priority-critical {
+            background-color: #ff0000 !important;
+            border-color: #ff0000 !important;
+            color: #ffffff !important;
+        }
+
+        /* Modal Action Buttons */
+        .alert-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--bio-light-green);
+            flex-wrap: wrap;
+        }
+
+        .alert-modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .alert-modal-btn-primary {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+        }
+
+        .alert-modal-btn-primary:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .alert-modal-btn-secondary {
+            background-color: var(--bio-medium-green);
+            color: var(--bio-text-light);
+        }
+
+        .alert-modal-btn-secondary:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .alert-modal-btn-danger {
+            background-color: #ff4444;
+            color: #ffffff;
+        }
+
+        .alert-modal-btn-danger:hover {
+            background-color: #ff6666;
+        }
+
+        .alert-modal-btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+        }
+
+        .alert-modal-btn-outline:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+            border-color: var(--bio-bright-green);
+        }
+
+        /* Make alert items clickable */
+        .alert-item {
+            cursor: pointer;
+        }
+
+        .alert-item:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        .alert-item .task-id {
+            pointer-events: none;
+        }
+
+        /* Status styling in modal */
+        #modalAlertStatus {
+            font-weight: 600;
+        }
+
+        .status-pending {
+            color: #ffaa00 !important;
+        }
+
+        .status-resolved {
+            color: var(--bio-bright-green) !important;
+        }
+
+        .status-in-progress {
+            color: var(--bio-light-green) !important;
+        }
+    </style>
 </head>
 <body>
     <div class="header-bar">
         <div class="logo-section">
-            <div>
-                <div class="logo-text">24/7</div>
-                <div class="logo-subtext">GIFT BANK</div>
-            </div>
+            <img src="../images/image.png" alt="BIO-ISAC Logo" class="bio-isac-logo">
         </div>
         <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">IMS</a></li>
-            <li><a href="#">Conversations</a></li>
-            <li><a href="#" class="active">Tasks</a></li>
+            <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+            <li><a href="#" class="nav-link" data-page="conversations">Conversations</a></li>
         </ul>
         <div class="header-icons">
             <button class="icon-btn"><i class="fas fa-comment"></i></button>
@@ -28,18 +991,28 @@
         </div>
     </div>
 
-    <div class="sub-header">
-        <ul class="sub-nav">
-            <li><a href="#" class="active">24/7 Tasks</a></li>
-            <li><a href="#">Event Tasks</a></li>
-        </ul>
-    </div>
-
-    <div class="dashboard-container">
+    <!-- Home Page Content -->
+    <div class="dashboard-container" id="home-page">
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <i class="fas fa-angle-down"></i>
-                <span>Tasks Dashboard</span>
+                <span>Alerts Dashboard</span>
+            </div>
+            <div class="weather-info-center">
+                <div class="weather-time">02:45 PM, Monday, Nov 03</div>
+                <div class="weather-separator">|</div>
+                <i class="fas fa-sun weather-icon" style="font-size: 20px; color: #FFA500;"></i>
+                <div class="weather-temp">64°F</div>
+                <div class="weather-separator">|</div>
+                <div class="weather-location">Tuscaloosa, US</div>
+                <div class="weather-separator">|</div>
+                <div class="weather-condition">Clear Sky</div>
+                <div class="weather-separator">|</div>
+                <div class="weather-detail-item">High: 65°F</div>
+                <div class="weather-separator">|</div>
+                <div class="weather-detail-item">Low: 62°F</div>
+                <div class="weather-separator">|</div>
+                <div class="weather-detail-item">Wind: 3.44</div>
             </div>
             <button class="config-btn"><i class="fas fa-cog"></i></button>
         </div>
@@ -47,26 +1020,26 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number">158</div>
-                <div class="stat-label">Running Event Tasks</div>
+                <div class="stat-label">Running Event Alerts</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">11</div>
-                <div class="stat-label">Running 24/7 Tasks</div>
+                <div class="stat-label">Running 24/7 Alerts</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">189</div>
-                <div class="stat-label">Total Tasks in Past 30 Days</div>
+                <div class="stat-label">Total Alerts in Past 30 Days</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">811</div>
-                <div class="stat-label">Total Tasks</div>
+                <div class="stat-label">Total Alerts</div>
             </div>
         </div>
 
         <div class="dashboard-grid">
             <div class="widget-card">
                 <div class="widget-header">
-                    <div class="widget-title">My Tasks</div>
+                    <div class="widget-title">My Alerts</div>
                     <button class="filter-btn"><i class="fas fa-filter"></i></button>
                 </div>
                 <div class="chart-container">
@@ -117,11 +1090,11 @@
 
             <div class="widget-card">
                 <div class="widget-header">
-                    <div class="widget-title">24/7 Tasks Due</div>
+                    <div class="widget-title">Incoming Alerts</div>
                     <button class="filter-btn"><i class="fas fa-filter"></i></button>
                 </div>
                 <ul class="task-list">
-                    <li class="task-item">
+                    <li class="task-item alert-item" data-alert-id="00801" data-alert-title="N. Dakota MBB Practice" data-alert-desc="Security alert detected during MBB practice session. Unauthorized access attempt from external IP address. System logs show multiple failed login attempts." data-alert-priority="High" data-alert-industry="Healthcare" data-alert-type="Security Breach" data-alert-time="11/02/2025 07:00:00 PM" data-alert-status="Pending" data-alert-assigned="Unassigned">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00801</a>
                         <div style="flex: 1;">
@@ -129,7 +1102,7 @@
                             <div class="task-name">N. Dakota MBB Practice</div>
                         </div>
                     </li>
-                    <li class="task-item">
+                    <li class="task-item alert-item" data-alert-id="00800" data-alert-title="Stetson WBB Practice" data-alert-desc="Network connectivity issues reported during practice session. System logs show multiple connection timeouts and packet loss. Backup systems functioning normally." data-alert-priority="Medium" data-alert-industry="Biotechnology" data-alert-type="Network Issue" data-alert-time="11/02/2025 05:30:00 PM" data-alert-status="In Progress" data-alert-assigned="Sarah Miller">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00800</a>
                         <div style="flex: 1;">
@@ -137,7 +1110,7 @@
                             <div class="task-name">Stetson WBB Practice</div>
                         </div>
                     </li>
-                    <li class="task-item">
+                    <li class="task-item alert-item" data-alert-id="00799" data-alert-title="MBB Practice" data-alert-desc="Data breach attempt detected. Malware signature identified in network traffic. System automatically quarantined affected files. No data loss reported." data-alert-priority="Critical" data-alert-industry="Pharmaceutical" data-alert-type="Malware" data-alert-time="11/02/2025 03:00:00 PM" data-alert-status="Pending" data-alert-assigned="John Doe">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00799</a>
                         <div style="flex: 1;">
@@ -145,7 +1118,7 @@
                             <div class="task-name">MBB Practice</div>
                         </div>
                     </li>
-                    <li class="task-item">
+                    <li class="task-item alert-item" data-alert-id="00798" data-alert-title="WBB Practice" data-alert-desc="System failure reported in laboratory equipment monitoring system. Backup systems activated successfully. All critical operations restored within 15 minutes." data-alert-priority="Low" data-alert-industry="Research" data-alert-type="System Failure" data-alert-time="11/02/2025 12:00:00 PM" data-alert-status="Resolved" data-alert-assigned="Robert Martinez">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00798</a>
                         <div style="flex: 1;">
@@ -156,130 +1129,484 @@
                 </ul>
             </div>
 
-            <div class="widget-card weather-widget">
-                <div class="weather-time">02:45 PM, Monday, Nov 03</div>
-                <div class="weather-main">
-                    <i class="fas fa-sun" style="font-size: 24px; color: #FFA500;"></i>
-                    <div class="weather-temp">64°F</div>
-                    <div>
-                        <div class="weather-location">Tuscaloosa, US</div>
-                        <div style="font-size: 12px; color: #666;">Clear Sky</div>
-                    </div>
+            <div class="widget-card">
+                <div class="widget-header">
+                    <div class="widget-title">Create Alerts</div>
+                    <button class="filter-btn"><i class="fas fa-plus"></i></button>
                 </div>
-                <div class="weather-details">
-                    <span>High: 65°F</span>
-                    <span>Low: 62°F</span>
-                    <span>Wind: 3.44</span>
+                <div class="create-alert-form">
+                    <div class="form-group">
+                        <label class="form-label">Alert Title</label>
+                        <input type="text" class="form-control" placeholder="Enter alert title...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="3" placeholder="Enter alert description..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select class="form-control">
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High</option>
+                            <option>Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Industry</label>
+                        <select class="form-control">
+                            <option>Healthcare</option>
+                            <option>Biotechnology</option>
+                            <option>Pharmaceutical</option>
+                            <option>Agriculture</option>
+                            <option>Research</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Incident Type</label>
+                        <select class="form-control">
+                            <option>Security Breach</option>
+                            <option>Data Breach</option>
+                            <option>System Failure</option>
+                            <option>Network Issue</option>
+                            <option>Malware</option>
+                            <option>Unauthorized Access</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <button class="create-alert-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        Create Alert
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="dashboard-grid">
-            <div class="widget-card">
-                <div class="widget-header">
-                    <div class="widget-title">Event Tasks Due</div>
-                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+    <!-- Conversations Page Content -->
+    <div class="dashboard-container" id="conversations-page">
+        <div class="conversations-layout">
+            <!-- Conversations Sidebar -->
+            <div class="conversations-sidebar">
+                <div class="conversations-header">
+                    <h2>Conversations</h2>
+                    <button class="new-conversation-btn">
+                        <i class="fas fa-plus"></i>
+                        New
+                    </button>
                 </div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="task-status status-due"></div>
-                        <a href="#" class="task-id">#00213</a>
-                        <div style="flex: 1;">
-                            <div class="task-time">10/18/2025 10:30:00 PM</div>
-                            <div class="task-name">Pull Cup Sleeves from water monsters</div>
+                <div class="conversations-search">
+                    <input type="text" class="search-input" placeholder="Search conversations...">
+                </div>
+                <div class="conversations-list">
+                    <div class="conversation-item active" data-conversation="1">
+                        <div class="conversation-avatar">JD</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">John Doe</div>
+                            <div class="conversation-preview">Thanks for the update on the security alert...</div>
                         </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-due"></div>
-                        <a href="#" class="task-id">#00160</a>
-                        <div style="flex: 1;">
-                            <div class="task-time">10/18/2025 10:30:00 PM</div>
-                            <div class="task-name">All windows closed</div>
+                        <div class="conversation-meta">
+                            <div class="conversation-time">2:30 PM</div>
+                            <div class="conversation-unread">2</div>
                         </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-due"></div>
-                        <a href="#" class="task-id">#00158</a>
-                        <div style="flex: 1;">
-                            <div class="task-time">10/04/2025 07:30:38 PM</div>
-                            <div class="task-name">Clean and reorganize radio room</div>
+                    </div>
+                    <div class="conversation-item" data-conversation="2">
+                        <div class="conversation-avatar">SM</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">Sarah Miller</div>
+                            <div class="conversation-preview">I have a question about the new protocol...</div>
                         </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-due"></div>
-                        <a href="#" class="task-id">#00160</a>
-                        <div style="flex: 1;">
-                            <div class="task-time">10/04/2025 06:45:00 PM</div>
-                            <div class="task-name">All windows closed</div>
+                        <div class="conversation-meta">
+                            <div class="conversation-time">1:15 PM</div>
                         </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-due"></div>
-                        <a href="#" class="task-id">#00410</a>
-                        <div style="flex: 1;">
-                            <div class="task-time">105 minutes before event start</div>
-                            <div class="task-name">Notify Carla Barksdale when Presiden...</div>
+                    </div>
+                    <div class="conversation-item" data-conversation="3">
+                        <div class="conversation-avatar">RM</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">Robert Martinez</div>
+                            <div class="conversation-preview">The system update is working great!</div>
                         </div>
-                    </li>
-                </ul>
+                        <div class="conversation-meta">
+                            <div class="conversation-time">11:45 AM</div>
+                        </div>
+                    </div>
+                    <div class="conversation-item" data-conversation="4">
+                        <div class="conversation-avatar">EJ</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">Emily Johnson</div>
+                            <div class="conversation-preview">Can you help me with access permissions?</div>
+                        </div>
+                        <div class="conversation-meta">
+                            <div class="conversation-time">10:20 AM</div>
+                            <div class="conversation-unread">1</div>
+                        </div>
+                    </div>
+                    <div class="conversation-item" data-conversation="5">
+                        <div class="conversation-avatar">DW</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">David Wilson</div>
+                            <div class="conversation-preview">Received the report, reviewing now...</div>
+                        </div>
+                        <div class="conversation-meta">
+                            <div class="conversation-time">Yesterday</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="widget-card">
-                <div class="widget-header">
-                    <div class="widget-title">Last Viewed</div>
-                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+            <!-- Messages Area -->
+            <div class="conversation-messages">
+                <div class="messages-header">
+                    <div class="messages-header-user">
+                        <div class="conversation-avatar">JD</div>
+                        <div>
+                            <div class="messages-header-name">John Doe</div>
+                            <div class="messages-header-status">Active now</div>
+                        </div>
+                    </div>
+                    <button class="icon-btn"><i class="fas fa-ellipsis-v"></i></button>
                 </div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="task-status status-new"></div>
-                        <a href="#" class="task-id">#00126</a>
-                        <span class="task-name">Visiting team bus turnaround</span>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-new"></div>
-                        <a href="#" class="task-id">#00151</a>
-                        <span class="task-name">Prep for officials exit</span>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-new"></div>
-                        <a href="#" class="task-id">#00210</a>
-                        <span class="task-name">Unlock east / north gates for ingress</span>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-new"></div>
-                        <a href="#" class="task-id">#00240</a>
-                        <span class="task-name">East Credential Board Pickup</span>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-new"></div>
-                        <a href="#" class="task-id">#00009</a>
-                        <span class="task-name">Shuttles Begin Running</span>
-                    </li>
-                    <li class="task-item">
-                        <div class="task-status status-due"></div>
-                        <a href="#" class="task-id">#00010</a>
-                        <span class="task-name">K-9 Sweeps Begin</span>
-                    </li>
-                </ul>
+                <div class="messages-container">
+                    <div class="message received">
+                        <div class="message-avatar">JD</div>
+                        <div class="message-content">
+                            <div class="message-bubble">Hi, I wanted to follow up on the security alert from earlier today. Can you provide more details about the incident?</div>
+                            <div class="message-time">11:30 AM</div>
+                        </div>
+                    </div>
+                    <div class="message sent">
+                        <div class="message-avatar">EG</div>
+                        <div class="message-content">
+                            <div class="message-bubble">Of course! The alert was triggered by an unauthorized access attempt. Our system automatically blocked it and no data was compromised. I can send you a detailed report if you'd like.</div>
+                            <div class="message-time">11:32 AM</div>
+                        </div>
+                    </div>
+                    <div class="message received">
+                        <div class="message-avatar">JD</div>
+                        <div class="message-content">
+                            <div class="message-bubble">Thanks for the quick response! Yes, please send the report. Also, should we be concerned about any potential follow-up attempts?</div>
+                            <div class="message-time">11:35 AM</div>
+                        </div>
+                    </div>
+                    <div class="message sent">
+                        <div class="message-avatar">EG</div>
+                        <div class="message-content">
+                            <div class="message-bubble">I'll send the report right away. We've implemented additional monitoring for your account and haven't detected any further suspicious activity. I'll keep you updated if anything changes.</div>
+                            <div class="message-time">11:36 AM</div>
+                        </div>
+                    </div>
+                    <div class="message received">
+                        <div class="message-avatar">JD</div>
+                        <div class="message-content">
+                            <div class="message-bubble">Perfect, thank you for your help!</div>
+                            <div class="message-time">2:30 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-input-area">
+                    <textarea class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                    <button class="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send
+                    </button>
+                </div>
             </div>
+        </div>
+    </div>
 
-            <div class="widget-card">
-                <div class="widget-header">
-                    <div class="widget-title">Recently Closed Tasks</div>
-                    <button class="filter-btn"><i class="fas fa-filter"></i></button>
+    <!-- Alert Detail Modal -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-header">
+                <h2>Alert Details</h2>
+                <button class="alert-modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body">
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Alert ID</label>
+                    <div class="alert-modal-value readonly" id="modalAlertId"></div>
                 </div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="task-status status-closed"></div>
-                        <a href="#" class="task-id">#00010</a>
-                        <span class="task-name">K-9 Sweeps Begin</span>
-                    </li>
-                </ul>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Title</label>
+                    <div class="alert-modal-value readonly" id="modalAlertTitle"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Description</label>
+                    <div class="alert-modal-value readonly alert-modal-textarea" id="modalAlertDesc"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Priority</label>
+                    <div class="priority-selection" id="modalPriority">
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="Low">
+                            <span class="priority-box priority-low">Low</span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="Medium">
+                            <span class="priority-box priority-medium">Medium</span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="High">
+                            <span class="priority-box priority-high">High</span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="Critical">
+                            <span class="priority-box priority-critical">Critical</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Industry</label>
+                    <div class="alert-modal-value readonly" id="modalAlertIndustry"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Incident Type</label>
+                    <div class="alert-modal-value readonly" id="modalAlertType"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Timestamp</label>
+                    <div class="alert-modal-value readonly" id="modalAlertTime"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Status</label>
+                    <div class="alert-modal-value readonly" id="modalAlertStatus"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Assigned To</label>
+                    <div class="alert-modal-value readonly" id="modalAlertAssigned"></div>
+                </div>
+            </div>
+            <div class="alert-modal-actions">
+                <button class="alert-modal-btn alert-modal-btn-primary" id="saveAlertBtn">
+                    <i class="fas fa-save"></i>
+                    Save/Update
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-secondary" id="assignIndustryBtn">
+                    <i class="fas fa-users"></i>
+                    Assign to Industry
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-danger" id="markResolvedBtn">
+                    <i class="fas fa-check-circle"></i>
+                    Mark as Resolved
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-outline" id="cancelModalBtn">
+                    <i class="fas fa-times"></i>
+                    Close/Cancel
+                </button>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Page Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const homePage = document.getElementById('home-page');
+            const conversationsPage = document.getElementById('conversations-page');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+
+                    // Update active nav link
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Show/hide pages
+                    if (page === 'home') {
+                        homePage.classList.remove('hidden');
+                        conversationsPage.classList.remove('active');
+                    } else if (page === 'conversations') {
+                        homePage.classList.add('hidden');
+                        conversationsPage.classList.add('active');
+                    }
+                });
+            });
+
+            // Conversation item click handler
+            const conversationItems = document.querySelectorAll('.conversation-item');
+            conversationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    conversationItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    // Here you would load the conversation messages
+                    // For now, we'll just update the UI
+                });
+            });
+
+            // Auto-resize textarea
+            const messageInput = document.querySelector('.message-input');
+            if (messageInput) {
+                messageInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                });
+            }
+
+            // Send button handler
+            const sendBtn = document.querySelector('.send-btn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function() {
+                    const input = document.querySelector('.message-input');
+                    if (input.value.trim()) {
+                        // Here you would send the message
+                        console.log('Sending message:', input.value);
+                        input.value = '';
+                        input.style.height = 'auto';
+                    }
+                });
+            }
+
+            // Enter key to send (Shift+Enter for new line)
+            if (messageInput) {
+                messageInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendBtn.click();
+                    }
+                });
+            }
+
+            // Alert Modal Functionality
+            const alertModal = document.getElementById('alertModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            const cancelModalBtn = document.getElementById('cancelModalBtn');
+            const saveAlertBtn = document.getElementById('saveAlertBtn');
+            const assignIndustryBtn = document.getElementById('assignIndustryBtn');
+            const markResolvedBtn = document.getElementById('markResolvedBtn');
+            const alertItems = document.querySelectorAll('.alert-item');
+
+            // Open modal when clicking on an alert item
+            alertItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const alertId = this.getAttribute('data-alert-id');
+                    const alertTitle = this.getAttribute('data-alert-title');
+                    const alertDesc = this.getAttribute('data-alert-desc');
+                    const alertPriority = this.getAttribute('data-alert-priority');
+                    const alertIndustry = this.getAttribute('data-alert-industry');
+                    const alertType = this.getAttribute('data-alert-type');
+                    const alertTime = this.getAttribute('data-alert-time');
+                    const alertStatus = this.getAttribute('data-alert-status');
+                    const alertAssigned = this.getAttribute('data-alert-assigned');
+
+                    // Populate modal with alert data
+                    document.getElementById('modalAlertId').textContent = '#' + alertId;
+                    document.getElementById('modalAlertTitle').textContent = alertTitle;
+                    document.getElementById('modalAlertDesc').textContent = alertDesc;
+                    document.getElementById('modalAlertIndustry').textContent = alertIndustry;
+                    document.getElementById('modalAlertType').textContent = alertType;
+                    document.getElementById('modalAlertTime').textContent = alertTime;
+                    const statusElement = document.getElementById('modalAlertStatus');
+                    statusElement.textContent = alertStatus;
+                    // Remove existing status classes
+                    statusElement.classList.remove('status-pending', 'status-resolved', 'status-in-progress');
+                    // Add appropriate status class
+                    if (alertStatus === 'Pending') {
+                        statusElement.classList.add('status-pending');
+                    } else if (alertStatus === 'Resolved') {
+                        statusElement.classList.add('status-resolved');
+                    } else if (alertStatus === 'In Progress') {
+                        statusElement.classList.add('status-in-progress');
+                    }
+                    document.getElementById('modalAlertAssigned').textContent = alertAssigned;
+
+                    // Set priority radio button
+                    const priorityRadios = document.querySelectorAll('input[name="priority"]');
+                    priorityRadios.forEach(radio => {
+                        if (radio.value === alertPriority) {
+                            radio.checked = true;
+                        }
+                    });
+
+                    // Show modal
+                    alertModal.classList.add('active');
+                });
+            });
+
+            // Close modal functions
+            function closeModal() {
+                alertModal.classList.remove('active');
+            }
+
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeModal);
+            }
+
+            if (cancelModalBtn) {
+                cancelModalBtn.addEventListener('click', closeModal);
+            }
+
+            // Close modal when clicking outside
+            alertModal.addEventListener('click', function(e) {
+                if (e.target === alertModal) {
+                    closeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && alertModal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // Save/Update button
+            if (saveAlertBtn) {
+                saveAlertBtn.addEventListener('click', function() {
+                    const selectedPriority = document.querySelector('input[name="priority"]:checked');
+                    if (selectedPriority) {
+                        const priority = selectedPriority.value;
+                        const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
+                        
+                        // Update the alert item's data attribute
+                        const alertItem = document.querySelector(`[data-alert-id="${alertId}"]`);
+                        if (alertItem) {
+                            alertItem.setAttribute('data-alert-priority', priority);
+                            // Here you would typically send the update to the server
+                            console.log('Updating alert', alertId, 'with priority', priority);
+                        }
+                        
+                        alert('Alert updated successfully!');
+                        closeModal();
+                    }
+                });
+            }
+
+            // Assign to Industry button
+            if (assignIndustryBtn) {
+                assignIndustryBtn.addEventListener('click', function() {
+                    const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
+                    // Here you would typically open an industry assignment dialog or update
+                    console.log('Assigning alert', alertId, 'to industry');
+                    alert('Assigning alert to industry...');
+                });
+            }
+
+            // Mark as Resolved button
+            if (markResolvedBtn) {
+                markResolvedBtn.addEventListener('click', function() {
+                    const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
+                    const alertItem = document.querySelector(`[data-alert-id="${alertId}"]`);
+                    const statusElement = document.getElementById('modalAlertStatus');
+                    if (alertItem) {
+                        alertItem.setAttribute('data-alert-status', 'Resolved');
+                        statusElement.textContent = 'Resolved';
+                        statusElement.classList.remove('status-pending', 'status-in-progress');
+                        statusElement.classList.add('status-resolved');
+                        // Here you would typically send the update to the server
+                        console.log('Marking alert', alertId, 'as resolved');
+                    }
+                    alert('Alert marked as resolved!');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 
