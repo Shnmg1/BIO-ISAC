@@ -7,181 +7,414 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        /* BIO-ISAC Color Scheme - Professional Green Theme */
+        /* Colors inspired by BIO-ISAC website: dark and light green palette */
+        :root {
+            --bio-primary-green: #1e4d2b;
+            --bio-dark-green: #0f2817;
+            --bio-medium-green: #2d6a3f;
+            --bio-light-green: #4aad6a;
+            --bio-bright-green: #6bcf8f;
+            --bio-accent-green: #3d8a56;
+            --bio-text-light: #f0f9f4;
+        }
+
+        /* Logo styling */
+        .bio-isac-logo {
+            height: 64.69px;
+            width: auto;
+            max-width: 288px;
+            object-fit: contain;
+            margin-top: 20px;
+        }
+
+        /* Update header bar to match BIO-ISAC theme */
+        .header-bar {
+            background: #000000;
+            border-bottom: none;
+            position: relative;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 20px 5px 20px;
+            min-height: 95px;
+        }
+
+        /* Change all gray backgrounds to flat black */
+        body {
+            background-color: #000000 !important;
+        }
+
+        .main-container {
+            background-color: #000000;
+        }
+
+        .sidebar {
+            background-color: #000000;
+            border-right: 1px solid var(--bio-light-green);
+        }
+
+        .main-content {
+            background-color: #000000;
+        }
+
+        .content-section {
+            background-color: #000000;
+        }
+
+        .incident-queue {
+            background-color: #000000;
+            border-top: 1px solid var(--bio-light-green);
+        }
+
+        /* Ensure text remains visible on black background */
+        .section-title,
+        .form-label,
+        .inbox-title,
+        .inbox-date,
+        .message-contact-name,
+        .message-contact-phone,
+        .queue-header,
+        .queue-table {
+            color: var(--bio-text-light);
+        }
+
+        /* Form controls */
+        .form-control {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        .textarea {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+            border-color: var(--bio-bright-green);
+        }
+
+        /* Radio buttons and checkboxes */
+        .radio-option label,
+        .checkbox-item label {
+            color: var(--bio-text-light);
+        }
+
+        /* Inbox items */
+        .inbox-item {
+            border-bottom: 1px solid var(--bio-medium-green);
+        }
+
+        .inbox-item:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        /* Message bubbles */
+        .message-bubble {
+            background-color: var(--bio-medium-green);
+            color: var(--bio-text-light);
+        }
+
+        .message-sent {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+        }
+
+        /* Queue table */
+        .queue-table {
+            border-color: var(--bio-light-green);
+        }
+
+        .queue-table th,
+        .queue-table td {
+            border-color: var(--bio-light-green);
+        }
+
+        /* Status colors */
+        .status-created {
+            background-color: var(--bio-bright-green);
+        }
+
+        .status-dispatched {
+            background-color: var(--bio-light-green);
+        }
+
+        .status-onscene {
+            background-color: #ffaa00;
+        }
+
+        .status-closed {
+            background-color: var(--bio-medium-green);
+        }
+
+        /* Icon buttons */
+        .icon-btn-small {
+            color: var(--bio-text-light);
+        }
+
+        .icon-btn-small:hover {
+            color: var(--bio-bright-green);
+        }
+
+        /* Send button */
+        .send-btn {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+        }
+
+        .send-btn:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        /* Message input */
+        .message-input {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        /* Queue controls */
+        .queue-controls button {
+            color: var(--bio-text-light);
+        }
+
+        .queue-controls button:hover {
+            color: var(--bio-bright-green);
+        }
+
+        /* Resize handles */
+        .resize-handle {
+            background-color: var(--bio-medium-green);
+        }
+
+        .resize-handle:hover {
+            background-color: var(--bio-light-green);
+        }
+    </style>
 </head>
 <body class="dashboard-body">
     <div class="header-bar dashboard">
-        <div class="logo">K 24/7</div>
-        <div class="header-center">
-            <select class="header-dropdown">
-                <option>Bryant-Denny Stadium</option>
-            </select>
-            <select class="header-dropdown">
-                <option>2025 FB vs LSU</option>
-            </select>
-        </div>
-        <div class="header-icons">
-            <button class="icon-btn"><i class="far fa-calendar"></i></button>
-            <button class="icon-btn"><i class="fas fa-paperclip"></i></button>
-            <button class="icon-btn"><i class="far fa-clock"></i></button>
-            <button class="icon-btn"><i class="far fa-comment"></i></button>
-            <button class="icon-btn"><i class="fas fa-cog"></i></button>
+        <div class="logo-section">
+            <img src="../images/image.png" alt="BIO-ISAC Logo" class="bio-isac-logo">
         </div>
     </div>
 
     <div class="main-container">
-        <div class="sidebar">
-            <div class="sidebar-header">Inbox 1</div>
-            <div class="sidebar-nav">
-                <div class="nav-item active">
-                    <i class="far fa-envelope"></i>
-                    <span>Inbox</span>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-controls-header">
+                <button class="icon-btn-small"><i class="fas fa-search"></i></button>
+                <button class="icon-btn-small"><i class="fas fa-filter"></i></button>
+                <button class="icon-btn-small traffic-light">
+                    <span class="traffic-dot" style="background: #ff4444;"></span>
+                    <span class="traffic-dot" style="background: #ffaa00;"></span>
+                    <span class="traffic-dot" style="background: #71b53f;"></span>
+                    <i class="fas fa-caret-down" style="font-size: 10px; margin-left: 4px;"></i>
+                </button>
+                <button class="icon-btn-small plus-btn"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="sidebar-content inbox-list" id="inboxList">
+                <div class="inbox-item priority" data-message-id="1" data-contact="Dr. Sarah Chen" data-phone="(205) 283-1526">
+                    <div class="inbox-item-header">
+                        <span class="inbox-title">Ransomware attack detected...</span>
+                        <span class="inbox-date">11/08/2025</span>
+                    </div>
+                    <div class="inbox-item-footer">
+                        <i class="far fa-comment"></i>
+                        <span>Dr. Sarah Chen</span>
+                    </div>
                 </div>
-                <div class="nav-item">
-                    <i class="far fa-trash-alt"></i>
-                    <span>Deleted</span>
+                <div class="inbox-item priority" data-message-id="2" data-contact="Michael Torres" data-phone="(205) 977-0243">
+                    <div class="inbox-item-header">
+                        <span class="inbox-title">Unauthorized access alert...</span>
+                        <span class="inbox-date">11/08/2025</span>
+                    </div>
+                    <div class="inbox-item-footer">
+                        <i class="far fa-comment"></i>
+                        <span>Michael Torres</span>
+                    </div>
+                </div>
+                <div class="inbox-item" data-message-id="3" data-contact="Jennifer Park" data-phone="(256) 522-9490">
+                    <div class="inbox-item-header">
+                        <span class="inbox-title">Data breach notification...</span>
+                        <span class="inbox-date">11/08/2025</span>
+                    </div>
+                    <div class="inbox-item-footer">
+                        <i class="far fa-comment"></i>
+                        <span>Jennifer Park</span>
+                    </div>
                 </div>
             </div>
-            <div class="sidebar-controls">
-                <button><i class="fas fa-bars"></i></button>
-                <button><i class="fas fa-search"></i></button>
-                <button><i class="fas fa-filter"></i></button>
-                <button class="bug-icon"><i class="fas fa-bug"></i></button>
-                <button><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="sidebar-content">
-                No Records Found
-            </div>
-            <div class="sidebar-footer">
-                Select a conversation
+            
+            <div class="message-view" id="messageView" style="display: none;">
+                <div class="message-header">
+                    <button class="back-btn" id="backBtn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="message-contact-info">
+                        <div class="message-contact-name" id="messageContactName"></div>
+                        <div class="message-contact-phone" id="messageContactPhone"></div>
+                    </div>
+                </div>
+                <div class="message-content" id="messageContent">
+                    <!-- Messages will be displayed here -->
+                </div>
+                <div class="message-input-area">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
+        <div class="resize-handle resize-handle-vertical" id="sidebar-resize"></div>
 
         <div class="main-content">
-            <div class="content-section">
-                <div class="section-title">Incident</div>
+            <div class="content-section" id="content-section">
+                <div class="section-title">BioISAC Incident Report</div>
                 
-                <div class="form-grid">
+                <div class="form-grid bioisac-form">
                     <div class="form-group">
                         <label class="form-label">Incident Type</label>
-                        <select class="form-control">
-                            <option>Select...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Location</label>
-                        <select class="form-control">
-                            <option>Select...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Section</label>
-                        <select class="form-control">
-                            <option>Select...</option>
+                        <select class="form-control" id="incidentType">
+                            <option value="">Select...</option>
+                            <option value="Data Breach">Data Breach</option>
+                            <option value="Ransomware / Malware">Ransomware / Malware</option>
+                            <option value="Unauthorized Access">Unauthorized Access</option>
+                            <option value="Supply Chain Vulnerability">Supply Chain Vulnerability</option>
+                            <option value="System Outage / Disruption">System Outage / Disruption</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Assigned To</label>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="text" class="form-control" placeholder="Enter name...">
-                            <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-plus"></i></button>
-                        </div>
+                        <input type="text" class="form-control" id="assignedTo" placeholder="Enter name...">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Priority</label>
-                        <select class="form-control">
-                            <option>Select...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Alcohol Related</label>
+                        <label class="form-label">Severity Level</label>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" name="alcohol" id="alcohol-yes">
-                                <label for="alcohol-yes">Yes</label>
+                                <input type="radio" name="severity" id="severity-low" value="Low">
+                                <label for="severity-low">Low</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" name="alcohol" id="alcohol-no">
-                                <label for="alcohol-no">No</label>
+                                <input type="radio" name="severity" id="severity-moderate" value="Moderate">
+                                <label for="severity-moderate">Moderate</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="severity" id="severity-high" value="High">
+                                <label for="severity-high">High</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="severity" id="severity-critical" value="Critical">
+                                <label for="severity-critical">Critical</label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="dispatched">
-                                <label for="dispatched">Dispatched</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="onscene">
-                                <label for="onscene">On Scene</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="closed">
-                                <label for="closed">Closed</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Customer Complaint</label>
+                        <label class="form-label">Was any sensitive data affected?</label>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" name="complaint" id="complaint-yes">
-                                <label for="complaint-yes">Yes</label>
+                                <input type="radio" name="sensitiveData" id="sensitive-yes" value="Yes">
+                                <label for="sensitive-yes">Yes</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" name="complaint" id="complaint-no">
-                                <label for="complaint-no">No</label>
+                                <input type="radio" name="sensitiveData" id="sensitive-no" value="No">
+                                <label for="sensitive-no">No</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="sensitiveData" id="sensitive-unknown" value="Unknown">
+                                <label for="sensitive-unknown">Unknown</label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Event Marker</label>
-                        <select class="form-control">
-                            <option>Select...</option>
+                        <label class="form-label">Date & Time of Incident</label>
+                        <input type="datetime-local" class="form-control" id="incidentDateTime">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Industry</label>
+                        <select class="form-control" id="industry">
+                            <option value="">Select...</option>
+                            <option value="Biotechnology">Biotechnology</option>
+                            <option value="Life Sciences">Life Sciences</option>
+                            <option value="Research Laboratory">Research Laboratory</option>
+                            <option value="Manufacturing / Supply Chain">Manufacturing / Supply Chain</option>
+                            <option value="Healthcare / Clinical Data">Healthcare / Clinical Data</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="form-group full-width">
-                        <label class="form-label">Tags</label>
-                        <div class="tag-list">
-                            <span class="tag">
-                                Radio X
-                                <span class="tag-remove"><i class="fas fa-times"></i></span>
-                            </span>
-                            <select class="form-control" style="width: auto; display: inline-block;">
-                                <option>EFO Students</option>
-                            </select>
-                            <span class="tag">
-                                Emily Garcia X
-                                <span class="tag-remove"><i class="fas fa-times"></i></span>
-                            </span>
+                        <label class="form-label">Estimated Impact</label>
+                        <div class="checkbox-group estimated-impact-group">
+                            <div class="checkbox-item impact-checkbox">
+                                <input type="checkbox" id="impact-internal" value="Internal systems only">
+                                <label for="impact-internal">Internal systems only</label>
+                            </div>
+                            <div class="checkbox-item impact-checkbox">
+                                <input type="checkbox" id="impact-partners" value="Partners / Vendors affected">
+                                <label for="impact-partners">Partners / Vendors affected</label>
+                            </div>
+                            <div class="checkbox-item impact-checkbox">
+                                <input type="checkbox" id="impact-public" value="Public disclosure possible">
+                                <label for="impact-public">Public disclosure possible</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Resolution</label>
-                        <select class="form-control">
-                            <option>Select...</option>
-                        </select>
                     </div>
                     <div class="form-group full-width">
                         <label class="form-label">Summary</label>
-                        <textarea class="textarea" placeholder="Enter summary..."></textarea>
+                        <textarea class="textarea bioisac-summary" id="summary" placeholder="Enter summary (2-3 lines max)..." rows="3"></textarea>
                     </div>
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-outline">Reset</button>
-                    <button class="btn btn-primary">+ Add Incident</button>
+                    <button class="btn btn-outline" id="resetBtn">Reset</button>
+                    <button class="btn btn-primary" id="saveBtn">Save Report</button>
+                    <button class="btn btn-primary" id="submitBtn">Submit for Review</button>
                     <button class="btn btn-outline">Link To <i class="fas fa-caret-down"></i></button>
-                    <button class="btn btn-primary">Save</button>
                 </div>
             </div>
+            <div class="resize-handle resize-handle-horizontal" id="content-resize"></div>
 
-            <div class="incident-queue">
+            <div class="incident-queue" id="incident-queue">
                 <div class="queue-header">
                     <div>
-                        <div class="section-title" style="margin: 0; display: inline;">Incidents</div>
-                        <div style="font-size: 14px; color: var(--wst-color-text-secondary); margin-top: 5px;">Incident Queue</div>
+                        <div class="section-title" style="margin: 0; display: inline;">Reports</div>
+                        <div style="font-size: 14px; color: var(--wst-color-text-secondary); margin-top: 5px;">Reports Queue</div>
                     </div>
                     <div class="queue-controls">
                         <span style="font-size: 12px; color: var(--wst-color-text-secondary); margin-right: 10px;">ADVANCED</span>
@@ -191,25 +424,27 @@
                         <button><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
-                <table class="queue-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Actions</th>
-                            <th>Incident ...</th>
-                            <th>Departm...</th>
-                            <th>Created By</th>
-                            <th>Dispatch...</th>
-                            <th>On Scene</th>
-                            <th>C</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="8" class="queue-empty">No Records Found</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="queue-table-wrapper">
+                    <table class="queue-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Actions</th>
+                                <th>Incident ...</th>
+                                <th>Departm...</th>
+                                <th>Created By</th>
+                                <th>Dispatch...</th>
+                                <th>On Scene</th>
+                                <th>C</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="queue-empty">No Records Found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="queue-footer">
                     <div class="status-legend">
                         <div class="legend-item">
@@ -244,6 +479,244 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Form data collection
+        function collectFormData() {
+            const sensitiveData = document.querySelector('input[name="sensitiveData"]:checked');
+            const severity = document.querySelector('input[name="severity"]:checked');
+            
+            // Collect estimated impact from checkboxes
+            const estimatedImpact = Array.from(document.querySelectorAll('input[type="checkbox"][id^="impact-"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            return {
+                incidentType: document.getElementById('incidentType').value,
+                assignedTo: document.getElementById('assignedTo').value,
+                severityLevel: severity ? severity.value : '',
+                sensitiveDataAffected: sensitiveData ? sensitiveData.value : '',
+                incidentDateTime: document.getElementById('incidentDateTime').value,
+                industry: document.getElementById('industry').value,
+                estimatedImpact: estimatedImpact,
+                summary: document.getElementById('summary').value,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // Reset form
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('incidentType').value = '';
+            document.getElementById('assignedTo').value = '';
+            document.querySelectorAll('input[name="severity"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[name="sensitiveData"]').forEach(radio => radio.checked = false);
+            document.getElementById('incidentDateTime').value = '';
+            document.getElementById('industry').value = '';
+            // Reset estimated impact checkboxes
+            document.querySelectorAll('input[type="checkbox"][id^="impact-"]').forEach(checkbox => checkbox.checked = false);
+            document.getElementById('summary').value = '';
+        });
+
+        // Save report
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const formData = collectFormData();
+            console.log('Form Data (Save):', JSON.stringify(formData, null, 2));
+            showToast('Report saved successfully.');
+        });
+
+        // Submit for review
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const formData = collectFormData();
+            console.log('Form Data (Submit):', JSON.stringify(formData, null, 2));
+            showToast('Incident report submitted. Pending BioISAC admin review.');
+        });
+
+        // Message functionality
+        const messages = {
+            1: [
+                { text: "URGENT: We've detected a ransomware attack on our research database. Multiple systems are encrypted and we're unable to access critical biological data. Requesting immediate assistance.", sender: 'contact', time: '10:30 AM' },
+                { text: "Thank you for reporting this. I'm escalating this to our incident response team immediately. Can you provide the affected system IPs?", sender: 'user', time: '10:32 AM' },
+                { text: "Affected systems: 192.168.1.45, 192.168.1.67, and 192.168.1.89. The attack started approximately 30 minutes ago. We've isolated the network segment.", sender: 'contact', time: '10:33 AM' },
+                { text: "Understood. Our team is on it. Please maintain network isolation and do not pay any ransom demands. We'll coordinate containment procedures.", sender: 'user', time: '10:35 AM' }
+            ],
+            2: [
+                { text: "Alert: Unauthorized access detected on our patient data server. Multiple failed login attempts from IP 203.45.67.89 followed by successful access. Sensitive data may have been compromised.", sender: 'contact', time: '2:15 PM' },
+                { text: "This is a critical security incident. I'm initiating our breach response protocol. Have you disabled the compromised accounts?", sender: 'user', time: '2:16 PM' },
+                { text: "Yes, all affected accounts have been disabled. We've also blocked the source IP. Logs show access to approximately 1,200 patient records.", sender: 'contact', time: '2:18 PM' },
+                { text: "We need to notify affected patients per HIPAA requirements. I'll prepare the breach notification documentation. Please preserve all logs for forensic analysis.", sender: 'user', time: '2:20 PM' }
+            ],
+            3: [
+                { text: "Reporting a potential data breach. Our email system was compromised and we've identified suspicious outbound traffic containing research data. Approximately 500MB of data was exfiltrated.", sender: 'contact', time: '3:45 PM' },
+                { text: "Thank you for the report. This is being classified as a high-severity incident. Can you confirm what type of research data was involved?", sender: 'user', time: '3:46 PM' },
+                { text: "The data includes genomic sequences and experimental protocols. No patient identifiers were included, but the research data is proprietary and sensitive.", sender: 'contact', time: '3:48 PM' },
+                { text: "Understood. We'll need to assess the impact and determine if this requires notification to regulatory bodies. I'll coordinate with our legal team.", sender: 'user', time: '3:50 PM' }
+            ]
+        };
+
+        let currentMessageId = null;
+
+        // Handle inbox item clicks
+        document.querySelectorAll('.inbox-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const messageId = item.getAttribute('data-message-id');
+                const contact = item.getAttribute('data-contact');
+                const phone = item.getAttribute('data-phone');
+                
+                showMessageView(messageId, contact, phone);
+            });
+        });
+
+        // Show message view
+        function showMessageView(messageId, contact, phone) {
+            currentMessageId = messageId;
+            document.getElementById('inboxList').style.display = 'none';
+            document.getElementById('messageView').style.display = 'flex';
+            
+            document.getElementById('messageContactName').textContent = contact;
+            document.getElementById('messageContactPhone').textContent = phone;
+            
+            const messageContent = document.getElementById('messageContent');
+            messageContent.innerHTML = '';
+            
+            const messageList = messages[messageId] || [];
+            messageList.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message-bubble ${msg.sender === 'user' ? 'message-sent' : 'message-received'}`;
+                messageDiv.innerHTML = `
+                    <div class="message-text">${msg.text}</div>
+                    <div class="message-time">${msg.time}</div>
+                `;
+                messageContent.appendChild(messageDiv);
+            });
+            
+            messageContent.scrollTop = messageContent.scrollHeight;
+        }
+
+        // Back button
+        document.getElementById('backBtn').addEventListener('click', () => {
+            document.getElementById('inboxList').style.display = 'block';
+            document.getElementById('messageView').style.display = 'none';
+            currentMessageId = null;
+        });
+
+        // Send message
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentMessageId) return;
+            
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            
+            // Add to messages object
+            if (!messages[currentMessageId]) {
+                messages[currentMessageId] = [];
+            }
+            messages[currentMessageId].push({
+                text: text,
+                sender: 'user',
+                time: time
+            });
+            
+            // Add to UI
+            const messageContent = document.getElementById('messageContent');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-bubble message-sent';
+            messageDiv.innerHTML = `
+                <div class="message-text">${text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            messageContent.appendChild(messageDiv);
+            
+            input.value = '';
+            messageContent.scrollTop = messageContent.scrollHeight;
+        }
+
+        // Sidebar resize functionality
+        const sidebar = document.getElementById('sidebar');
+        const sidebarResize = document.getElementById('sidebar-resize');
+        let isResizingSidebar = false;
+        let startX = 0;
+        let startWidth = 0;
+
+        sidebarResize.addEventListener('mousedown', (e) => {
+            isResizingSidebar = true;
+            startX = e.clientX;
+            startWidth = sidebar.offsetWidth;
+            document.addEventListener('mousemove', handleSidebarResize);
+            document.addEventListener('mouseup', stopSidebarResize);
+            e.preventDefault();
+        });
+
+        function handleSidebarResize(e) {
+            if (!isResizingSidebar) return;
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(200, Math.min(600, startWidth + diff));
+            sidebar.style.width = newWidth + 'px';
+        }
+
+        function stopSidebarResize() {
+            isResizingSidebar = false;
+            document.removeEventListener('mousemove', handleSidebarResize);
+            document.removeEventListener('mouseup', stopSidebarResize);
+        }
+
+        // Content section resize functionality
+        const contentSection = document.getElementById('content-section');
+        const incidentQueue = document.getElementById('incident-queue');
+        const contentResize = document.getElementById('content-resize');
+        let isResizingContent = false;
+        let startY = 0;
+        let startHeight = 0;
+
+        contentResize.addEventListener('mousedown', (e) => {
+            isResizingContent = true;
+            startY = e.clientY;
+            startHeight = contentSection.offsetHeight;
+            document.addEventListener('mousemove', handleContentResize);
+            document.addEventListener('mouseup', stopContentResize);
+            e.preventDefault();
+        });
+
+        function handleContentResize(e) {
+            if (!isResizingContent) return;
+            const diff = e.clientY - startY;
+            const newHeight = Math.max(300, startHeight + diff);
+            contentSection.style.height = newHeight + 'px';
+            contentSection.style.flexShrink = '0';
+        }
+
+        function stopContentResize() {
+            isResizingContent = false;
+            document.removeEventListener('mousemove', handleContentResize);
+            document.removeEventListener('mouseup', stopContentResize);
+        }
+    </script>
 </body>
 </html>
 
