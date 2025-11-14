@@ -500,81 +500,308 @@ body.dashboard-body {
     border-right: 1px solid var(--wst-color-line);
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
 }
 
-.sidebar-header {
-    padding: 15px;
+.resize-handle {
+    background-color: var(--wst-color-fill-background-secondary);
+    position: relative;
+    z-index: 10;
+    transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+    background-color: var(--wst-color-action);
+}
+
+.resize-handle-vertical {
+    width: 4px;
+    cursor: col-resize;
+    border-right: 1px solid var(--wst-color-line);
+}
+
+.resize-handle-vertical:hover {
+    width: 6px;
+    margin-left: -1px;
+    margin-right: -1px;
+}
+
+.resize-handle-horizontal {
+    height: 4px;
+    cursor: row-resize;
+    border-top: 1px solid var(--wst-color-line);
     border-bottom: 1px solid var(--wst-color-line);
-    font-weight: bold;
-    font-size: 16px;
-    color: var(--wst-color-title);
 }
 
-.sidebar-nav {
-    padding: 10px;
+.resize-handle-horizontal:hover {
+    height: 6px;
+    margin-top: -1px;
+    margin-bottom: -1px;
+}
+
+.sidebar-controls-header {
+    padding: 12px 15px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
     border-bottom: 1px solid var(--wst-color-line);
+    background-color: var(--wst-color-fill-background-secondary);
 }
 
-.nav-item {
+.icon-btn-small {
+    background: none;
+    border: none;
+    color: var(--wst-color-text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
-    color: var(--wst-color-text-primary);
-    text-decoration: none;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    cursor: pointer;
+    justify-content: center;
+    transition: color 0.2s ease;
 }
 
-.nav-item.active {
-    background-color: rgba(113, 181, 63, 0.2);
-    color: var(--wst-color-action);
+.icon-btn-small:hover {
+    color: #3b82f6;
 }
 
-.nav-item:hover {
-    background-color: rgba(113, 181, 63, 0.15);
+.plus-btn {
+    background-color: var(--wst-color-fill-base-shade-2);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin-left: auto;
 }
 
-.sidebar-controls {
-    padding: 10px;
+.plus-btn:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.traffic-light {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 3px;
+}
+
+.traffic-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.inbox-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    display: block;
+}
+
+.inbox-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--wst-color-line);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.inbox-item:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.inbox-item.priority::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #ff4444;
+}
+
+.inbox-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.inbox-title {
+    color: var(--wst-color-text-primary);
+    font-size: 13px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inbox-date {
+    color: var(--wst-color-text-secondary);
+    font-size: 12px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.inbox-item-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--wst-color-text-secondary);
+    font-size: 12px;
+}
+
+.inbox-item-footer i {
+    font-size: 12px;
+    color: var(--wst-color-text-secondary);
+}
+
+.inbox-separator {
+    height: 1px;
+    background-color: var(--wst-color-line);
+    margin: 0 15px;
     border-bottom: 1px solid var(--wst-color-line);
 }
 
-.sidebar-controls button {
+/* Message View */
+.message-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--wst-color-fill-background-secondary);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--wst-color-line);
+    background-color: var(--wst-color-fill-background-secondary);
+    gap: 12px;
+}
+
+.back-btn {
     background: none;
     border: none;
     color: var(--wst-color-text-primary);
     font-size: 16px;
     cursor: pointer;
-    padding: 5px;
-}
-
-.sidebar-controls button:hover {
-    color: var(--wst-color-action);
-}
-
-.sidebar-controls .bug-icon {
-    color: #ff4444;
-}
-
-.sidebar-content {
-    flex: 1;
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--wst-color-text-secondary);
-    font-size: 14px;
+    transition: color 0.2s ease;
 }
 
-.sidebar-footer {
-    padding: 15px;
-    text-align: center;
+.back-btn:hover {
+    color: #3b82f6;
+}
+
+.message-contact-info {
+    flex: 1;
+}
+
+.message-contact-name {
+    color: var(--wst-color-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.message-contact-phone {
     color: var(--wst-color-text-secondary);
     font-size: 12px;
+    margin-top: 2px;
+}
+
+.message-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    word-wrap: break-word;
+}
+
+.message-received {
+    background-color: var(--wst-color-fill-background-primary);
+    border: 1px solid var(--wst-color-line);
+    align-self: flex-start;
+}
+
+.message-sent {
+    background-color: #3b82f6;
+    color: white;
+    align-self: flex-end;
+}
+
+.message-text {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.message-time {
+    font-size: 11px;
+    opacity: 0.7;
+    text-align: right;
+}
+
+.message-sent .message-time {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.message-received .message-time {
+    color: var(--wst-color-text-secondary);
+}
+
+.message-input-area {
+    display: flex;
+    gap: 8px;
+    padding: 12px 15px;
     border-top: 1px solid var(--wst-color-line);
+    background-color: var(--wst-color-fill-background-secondary);
+    align-items: center;
+}
+
+.message-input {
+    flex: 1;
+    background-color: var(--wst-color-fill-background-primary);
+    border: 1px solid var(--wst-color-line);
+    color: var(--wst-color-text-primary);
+    padding: 10px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    outline: none;
+}
+
+.message-input:focus {
+    border-color: #3b82f6;
+}
+
+.send-btn {
+    background-color: #3b82f6;
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.send-btn:hover {
+    background-color: #2563eb;
 }
 
 .main-content {
@@ -582,18 +809,22 @@ body.dashboard-body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 0;
 }
 
 .content-section {
-    padding: 20px;
+    padding: 24px 28px;
     overflow-y: auto;
+    flex: 1;
+    min-height: 300px;
 }
 
 .section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: var(--wst-color-title);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--wst-color-text-primary);
+    letter-spacing: 0.3px;
 }
 
 .form-grid {
@@ -601,6 +832,26 @@ body.dashboard-body {
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     margin-bottom: 20px;
+}
+
+.bioisac-form {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.bioisac-form .form-group {
+    margin-bottom: 0;
+}
+
+.bioisac-form .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.bioisac-summary {
+    min-height: 60px;
+    max-height: 80px;
+    resize: vertical;
 }
 
 .form-group {
@@ -613,23 +864,51 @@ body.dashboard-body {
 }
 
 .form-label {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-size: 13px;
-    color: var(--wst-color-text-secondary);
+    font-weight: 500;
+    color: var(--wst-color-text-primary);
+    letter-spacing: 0.2px;
 }
 
 .form-control {
     background-color: var(--wst-color-fill-background-secondary);
-    border: 1px solid var(--wst-color-line);
+    border: 1.5px solid var(--wst-color-line);
     color: var(--wst-color-text-primary);
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border-radius: 6px;
     font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.form-control:hover {
+    border-color: rgba(59, 130, 246, 0.4);
 }
 
 .form-control:focus {
     outline: none;
-    border-color: var(--wst-color-action);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background-color: var(--wst-color-fill-background-secondary);
+}
+
+.form-control[type="datetime-local"] {
+    font-size: 13px;
+}
+
+.form-control[multiple] {
+    min-height: 80px;
+    padding: 6px;
+}
+
+.form-control[multiple] option {
+    padding: 4px 8px;
+    margin: 2px 0;
+}
+
+.form-control[multiple] option:checked {
+    background-color: #3b82f6;
+    color: white;
 }
 
 .form-control::placeholder {
@@ -638,19 +917,36 @@ body.dashboard-body {
 
 .radio-group {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     align-items: center;
+    flex-wrap: wrap;
+    padding: 4px 0;
 }
 
 .radio-option {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+}
+
+.radio-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+    margin: 0;
 }
 
 .radio-option label {
     color: var(--wst-color-text-primary);
     cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.radio-option:hover label {
+    color: #3b82f6;
 }
 
 .checkbox-group {
@@ -698,19 +994,26 @@ body.dashboard-body {
 
 .textarea {
     background-color: var(--wst-color-fill-background-secondary);
-    border: 1px solid var(--wst-color-line);
+    border: 1.5px solid var(--wst-color-line);
     color: var(--wst-color-text-primary);
-    padding: 10px;
-    border-radius: 4px;
+    padding: 12px 14px;
+    border-radius: 6px;
     min-height: 100px;
     resize: vertical;
     font-family: inherit;
     font-size: 14px;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+}
+
+.textarea:hover {
+    border-color: rgba(59, 130, 246, 0.4);
 }
 
 .textarea:focus {
     outline: none;
-    border-color: var(--wst-color-action);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .textarea::placeholder {
@@ -719,30 +1022,33 @@ body.dashboard-body {
 
 .button-group {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--wst-color-line);
 }
 
 .btn {
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 10px 20px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.3s;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
 }
 
 .btn-primary {
-    background-color: var(--wst-button-color-fill-primary);
-    border: 1px solid var(--wst-button-color-border-primary);
-    color: var(--wst-button-color-text-primary);
+    background-color: #3b82f6;
+    border: 1px solid #2563eb;
+    color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--wst-button-color-fill-primary-hover);
-    border-color: var(--wst-button-color-border-primary-hover);
-    color: var(--wst-button-color-text-primary-hover);
+    background-color: #2563eb;
+    border-color: #1d4ed8;
+    color: white;
 }
 
 .btn-secondary {
@@ -772,6 +1078,11 @@ body.dashboard-body {
 .incident-queue {
     background-color: var(--wst-color-fill-background-primary);
     border-top: 1px solid var(--wst-color-line);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    overflow: hidden;
 }
 
 .queue-header {
@@ -800,6 +1111,12 @@ body.dashboard-body {
     color: var(--wst-color-action);
 }
 
+.queue-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
 .queue-table {
     width: 100%;
     border-collapse: collapse;
@@ -807,6 +1124,9 @@ body.dashboard-body {
 
 .queue-table thead {
     background-color: var(--wst-color-fill-background-secondary);
+    position: sticky;
+    top: 0;
+    z-index: 5;
 }
 
 .queue-table th {
@@ -1086,6 +1406,101 @@ body.login-page {
 .login-footer a:hover {
     color: var(--wst-color-fill-accent-2);
     text-decoration: underline;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background-color: var(--wst-color-fill-accent-1);
+    color: var(--wst-color-text-primary);
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    font-size: 14px;
+    max-width: 350px;
+    border: 1px solid var(--wst-color-fill-accent-2);
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* BioISAC Form Enhancements */
+.bioisac-form .radio-group {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.bioisac-form .radio-option {
+    font-size: 13px;
+}
+
+.bioisac-form .form-label {
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.bioisac-form .form-control {
+    font-size: 14px;
+    padding: 10px 14px;
+}
+
+/* Estimated Impact styling */
+.estimated-impact-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.impact-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--wst-color-fill-background-secondary);
+    border: 1px solid var(--wst-color-line);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.impact-checkbox:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+}
+
+.impact-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+    margin: 0;
+}
+
+.impact-checkbox input[type="checkbox"]:checked {
+    accent-color: #3b82f6;
+}
+
+.impact-checkbox label {
+    color: var(--wst-color-text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    margin: 0;
+    user-select: none;
+}
+
+.impact-checkbox input[type="checkbox"]:checked + label {
+    color: var(--wst-color-text-primary);
+    font-weight: 500;
 }
 
 @media (max-width: 480px) {
