@@ -97,10 +97,21 @@
             color: #ffffff;
         }
 
-        .user-icon {
-            background-color: var(--bio-bright-green);
-            color: var(--bio-primary-green);
-            font-weight: 600;
+        .header-icons .config-btn {
+            color: var(--bio-text-light);
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .header-icons .config-btn:hover {
+            color: var(--bio-bright-green);
         }
 
         /* Update stat cards and widgets */
@@ -140,6 +151,92 @@
             color: var(--bio-bright-green);
         }
 
+        /* Settings Dropdown Styles */
+        .settings-container {
+            position: relative;
+        }
+
+        .settings-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            border-radius: 6px;
+            min-width: 220px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .header-icons .settings-dropdown {
+            margin-top: 5px;
+        }
+
+        .settings-dropdown.active {
+            display: block;
+        }
+
+        .settings-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--bio-medium-green);
+        }
+
+        .settings-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-dropdown-item:hover {
+            background-color: rgba(74, 173, 106, 0.2);
+        }
+
+        .settings-dropdown-item i {
+            width: 20px;
+            color: var(--bio-bright-green);
+        }
+
+        .settings-dropdown-item span {
+            flex: 1;
+        }
+
+        .settings-dropdown-divider {
+            height: 1px;
+            background-color: var(--bio-medium-green);
+            margin: 4px 0;
+        }
+
+        .download-options {
+            display: none;
+            flex-direction: column;
+            padding: 8px 16px;
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        .download-options.active {
+            display: flex;
+        }
+
+        .download-option {
+            padding: 8px 12px;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            font-size: 13px;
+        }
+
+        .download-option:hover {
+            background-color: rgba(74, 173, 106, 0.3);
+        }
+
         /* Update chart colors */
         .donut-chart {
             background: conic-gradient(
@@ -166,7 +263,7 @@
             color: var(--bio-text-light);
         }
 
-        /* Dashboard header layout - three columns */
+        /* Dashboard header layout - three columns for centering */
         .dashboard-header {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -174,8 +271,13 @@
             gap: 20px;
         }
 
-        .dashboard-header .config-btn {
-            justify-self: end;
+        .dashboard-header .dashboard-title {
+            justify-self: start;
+        }
+
+        .dashboard-header .weather-info-center {
+            justify-self: center;
+            grid-column: 2;
         }
 
         /* First dashboard grid - 3 columns */
@@ -958,6 +1060,193 @@
         .status-in-progress {
             color: var(--bio-light-green) !important;
         }
+
+        /* Audit Log Page Styles */
+        #audit-log-page {
+            display: none;
+            padding: 20px;
+            max-width: 100%;
+            height: calc(100vh - 95px);
+            overflow-y: auto;
+        }
+
+        #audit-log-page.active {
+            display: block;
+        }
+
+        .audit-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bio-light-green);
+        }
+
+        .audit-log-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .download-pdf-btn {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .download-pdf-btn:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .download-pdf-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            border-radius: 6px;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .download-pdf-dropdown.active {
+            display: block;
+        }
+
+        .download-pdf-option {
+            padding: 10px 16px;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--bio-medium-green);
+            font-size: 13px;
+        }
+
+        .download-pdf-option:last-child {
+            border-bottom: none;
+        }
+
+        .download-pdf-option:hover {
+            background-color: rgba(74, 173, 106, 0.2);
+        }
+
+        .audit-log-header h2 {
+            color: var(--bio-text-light);
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .audit-log-filters {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .audit-log-filters select,
+        .audit-log-filters input {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .audit-log-filters select:focus,
+        .audit-log-filters input:focus {
+            outline: none;
+            border-color: var(--bio-bright-green);
+        }
+
+        .audit-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #000000;
+        }
+
+        .audit-log-table thead {
+            background-color: var(--bio-medium-green);
+        }
+
+        .audit-log-table th {
+            color: var(--bio-text-light);
+            font-weight: 600;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid var(--bio-light-green);
+            font-size: 14px;
+        }
+
+        .audit-log-table td {
+            color: var(--bio-text-light);
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--bio-medium-green);
+            font-size: 13px;
+        }
+
+        .audit-log-table tbody tr:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        .audit-action {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .audit-action.created {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+        }
+
+        .audit-action.updated {
+            background-color: #ffaa00;
+            color: #000000;
+        }
+
+        .audit-action.deleted {
+            background-color: #ff4444;
+            color: #ffffff;
+        }
+
+        .audit-action.status-changed {
+            background-color: var(--bio-light-green);
+            color: var(--bio-primary-green);
+        }
+
+        .audit-action.assigned {
+            background-color: #4a90e2;
+            color: #ffffff;
+        }
+
+        .audit-changes {
+            color: var(--bio-text-light);
+            opacity: 0.8;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .audit-changes strong {
+            color: var(--bio-bright-green);
+        }
     </style>
 </head>
 <body>
@@ -971,7 +1260,15 @@
         </ul>
         <div class="header-icons">
             <button class="icon-btn"><i class="fas fa-comment"></i></button>
-            <div class="user-icon">EG</div>
+            <div class="settings-container">
+                <button class="config-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
+                <div class="settings-dropdown" id="settingsDropdown">
+                    <div class="settings-dropdown-item" id="auditLogMenuItem">
+                        <i class="fas fa-history"></i>
+                        <span>Audit Log</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -987,7 +1284,6 @@
                 <div class="weather-separator">|</div>
                 <div class="clock-display" id="clockDisplay"></div>
             </div>
-            <button class="config-btn"><i class="fas fa-cog"></i></button>
         </div>
 
         <div class="stats-grid">
@@ -1155,6 +1451,61 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Audit Log Page Content -->
+    <div class="dashboard-container" id="audit-log-page">
+        <div class="audit-log-header">
+            <h2><i class="fas fa-history"></i> Audit Log</h2>
+            <div class="audit-log-header-actions">
+                <div style="position: relative;">
+                    <button class="download-pdf-btn" id="downloadPdfBtn">
+                        <i class="fas fa-file-pdf"></i>
+                        Download PDF
+                        <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                    </button>
+                    <div class="download-pdf-dropdown" id="downloadPdfDropdown">
+                        <div class="download-pdf-option" data-hours="1">Last 1 Hour</div>
+                        <div class="download-pdf-option" data-hours="4">Last 4 Hours</div>
+                        <div class="download-pdf-option" data-hours="24">Last 24 Hours</div>
+                        <div class="download-pdf-option" data-hours="168">Last 7 Days</div>
+                        <div class="download-pdf-option" data-hours="720">Last 30 Days</div>
+                    </div>
+                </div>
+                <div class="audit-log-filters">
+                <select id="auditFilterAction">
+                    <option value="">All Actions</option>
+                    <option value="created">Created</option>
+                    <option value="updated">Updated</option>
+                    <option value="deleted">Deleted</option>
+                    <option value="status-changed">Status Changed</option>
+                    <option value="assigned">Assigned</option>
+                </select>
+                <select id="auditFilterAlert">
+                    <option value="">All Alerts</option>
+                    <option value="00801">#00801</option>
+                    <option value="00800">#00800</option>
+                    <option value="00799">#00799</option>
+                    <option value="00798">#00798</option>
+                </select>
+                <input type="text" id="auditSearch" placeholder="Search audit log...">
+                </div>
+            </div>
+        </div>
+        <table class="audit-log-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                    <th>Alert ID</th>
+                    <th>User</th>
+                    <th>Changes</th>
+                </tr>
+            </thead>
+            <tbody id="auditLogBody">
+                <!-- Sample audit entries will be populated by JavaScript -->
+            </tbody>
+        </table>
     </div>
 
     <!-- Conversations Page Content -->
@@ -1374,6 +1725,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // Page Navigation
         document.addEventListener('DOMContentLoaded', function() {
@@ -1413,6 +1765,7 @@
             const navLinks = document.querySelectorAll('.nav-link');
             const homePage = document.getElementById('home-page');
             const conversationsPage = document.getElementById('conversations-page');
+            const auditLogPage = document.getElementById('audit-log-page');
 
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -1427,12 +1780,75 @@
                     if (page === 'home') {
                         homePage.classList.remove('hidden');
                         conversationsPage.classList.remove('active');
+                        auditLogPage.classList.remove('active');
                     } else if (page === 'conversations') {
                         homePage.classList.add('hidden');
                         conversationsPage.classList.add('active');
+                        auditLogPage.classList.remove('active');
                     }
                 });
             });
+
+            // Settings Dropdown Functionality
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsDropdown = document.getElementById('settingsDropdown');
+            const auditLogMenuItem = document.getElementById('auditLogMenuItem');
+            const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            const settingsContainer = document.querySelector('.settings-container');
+
+            // Toggle settings dropdown
+            if (settingsBtn && settingsDropdown) {
+                settingsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    settingsDropdown.classList.toggle('active');
+                });
+
+                // Close dropdown when clicking outside
+                if (settingsContainer) {
+                    document.addEventListener('click', function(e) {
+                        if (!settingsContainer.contains(e.target)) {
+                            settingsDropdown.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Open audit log page
+                if (auditLogMenuItem) {
+                    auditLogMenuItem.addEventListener('click', function() {
+                        homePage.classList.add('hidden');
+                        conversationsPage.classList.remove('active');
+                        auditLogPage.classList.add('active');
+                        settingsDropdown.classList.remove('active');
+                    });
+                }
+            }
+
+            // Download PDF from audit log page button
+            const downloadPdfDropdown = document.getElementById('downloadPdfDropdown');
+            const downloadPdfContainer = downloadPdfBtn?.parentElement;
+            if (downloadPdfBtn && downloadPdfDropdown && downloadPdfContainer) {
+                downloadPdfBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    downloadPdfDropdown.classList.toggle('active');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!downloadPdfContainer.contains(e.target)) {
+                        downloadPdfDropdown.classList.remove('active');
+                    }
+                });
+
+                // Handle download option clicks
+                const downloadPdfOptions = downloadPdfDropdown.querySelectorAll('.download-pdf-option');
+                downloadPdfOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const hours = parseInt(this.getAttribute('data-hours'));
+                        downloadAuditLogPDF(hours);
+                        downloadPdfDropdown.classList.remove('active');
+                    });
+                });
+            }
 
             // Conversation item click handler
             const conversationItems = document.querySelectorAll('.conversation-item');
@@ -1610,6 +2026,336 @@
                     }
                     alert('Alert marked as resolved!');
                 });
+            }
+
+            // Sample Audit Log Data
+            const sampleAuditLogs = [
+                {
+                    timestamp: 'Nov 2, 2024 7:15 PM',
+                    action: 'created',
+                    alertId: '00801',
+                    user: 'System',
+                    changes: 'Alert created: Malware Detection Alert'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 6:45 PM',
+                    action: 'status-changed',
+                    alertId: '00800',
+                    user: 'Sarah Miller',
+                    changes: 'Status changed from Pending to In Progress'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 5:30 PM',
+                    action: 'created',
+                    alertId: '00800',
+                    user: 'System',
+                    changes: 'Alert created: Unauthorized Login Attempt'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 4:20 PM',
+                    action: 'updated',
+                    alertId: '00799',
+                    user: 'John Doe',
+                    changes: 'Priority changed from High to Critical'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 3:45 PM',
+                    action: 'assigned',
+                    alertId: '00799',
+                    user: 'Admin',
+                    changes: 'Alert assigned to John Doe'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 3:00 PM',
+                    action: 'created',
+                    alertId: '00799',
+                    user: 'System',
+                    changes: 'Alert created: Suspicious Network Activity'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 1:30 PM',
+                    action: 'status-changed',
+                    alertId: '00798',
+                    user: 'Robert Martinez',
+                    changes: 'Status changed from In Progress to Resolved'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 12:15 PM',
+                    action: 'updated',
+                    alertId: '00798',
+                    user: 'Robert Martinez',
+                    changes: 'Description updated with resolution details'
+                },
+                {
+                    timestamp: 'Nov 2, 2024 12:00 PM',
+                    action: 'created',
+                    alertId: '00798',
+                    user: 'System',
+                    changes: 'Alert created: Intrusion Detection Alert'
+                },
+                {
+                    timestamp: 'Nov 1, 2024 11:30 PM',
+                    action: 'status-changed',
+                    alertId: '00797',
+                    user: 'Emily Johnson',
+                    changes: 'Status changed from Pending to In Progress'
+                },
+                {
+                    timestamp: 'Nov 1, 2024 10:15 PM',
+                    action: 'assigned',
+                    alertId: '00797',
+                    user: 'Admin',
+                    changes: 'Alert assigned to Emily Johnson'
+                },
+                {
+                    timestamp: 'Nov 1, 2024 9:45 PM',
+                    action: 'updated',
+                    alertId: '00796',
+                    user: 'David Wilson',
+                    changes: 'Priority changed from Medium to High'
+                },
+                {
+                    timestamp: 'Nov 1, 2024 8:20 PM',
+                    action: 'created',
+                    alertId: '00797',
+                    user: 'System',
+                    changes: 'Alert created: Data Breach Attempt'
+                },
+                {
+                    timestamp: 'Nov 1, 2024 7:00 PM',
+                    action: 'status-changed',
+                    alertId: '00795',
+                    user: 'Sarah Miller',
+                    changes: 'Status changed from In Progress to Resolved'
+                },
+                {
+                    timestamp: 'Nov 1, 2024 6:30 PM',
+                    action: 'updated',
+                    alertId: '00795',
+                    user: 'Sarah Miller',
+                    changes: 'Industry changed from Healthcare to Biotechnology'
+                }
+            ];
+
+            // Render Audit Log
+            function renderAuditLog(auditLogs = sampleAuditLogs) {
+                const auditLogBody = document.getElementById('auditLogBody');
+                if (!auditLogBody) return;
+
+                auditLogBody.innerHTML = '';
+
+                auditLogs.forEach(log => {
+                    const row = document.createElement('tr');
+                    
+                    const actionClass = log.action.replace(' ', '-');
+                    const actionLabels = {
+                        'created': 'Created',
+                        'updated': 'Updated',
+                        'deleted': 'Deleted',
+                        'status-changed': 'Status Changed',
+                        'assigned': 'Assigned'
+                    };
+
+                    row.innerHTML = `
+                        <td>${log.timestamp}</td>
+                        <td><span class="audit-action ${actionClass}">${actionLabels[log.action] || log.action}</span></td>
+                        <td><a href="#" class="task-id">#${log.alertId}</a></td>
+                        <td>${log.user}</td>
+                        <td>
+                            ${log.changes}
+                        </td>
+                    `;
+
+                    auditLogBody.appendChild(row);
+                });
+            }
+
+            // Filter Audit Log
+            function filterAuditLog() {
+                const actionFilter = document.getElementById('auditFilterAction')?.value || '';
+                const alertFilter = document.getElementById('auditFilterAlert')?.value || '';
+                const searchTerm = document.getElementById('auditSearch')?.value.toLowerCase() || '';
+
+                let filteredLogs = sampleAuditLogs;
+
+                if (actionFilter) {
+                    filteredLogs = filteredLogs.filter(log => log.action === actionFilter);
+                }
+
+                if (alertFilter) {
+                    filteredLogs = filteredLogs.filter(log => log.alertId === alertFilter);
+                }
+
+                if (searchTerm) {
+                    filteredLogs = filteredLogs.filter(log => 
+                        log.user.toLowerCase().includes(searchTerm) ||
+                        log.changes.toLowerCase().includes(searchTerm) ||
+                        log.alertId.includes(searchTerm)
+                    );
+                }
+
+                renderAuditLog(filteredLogs);
+            }
+
+            // Initialize audit log
+            renderAuditLog();
+
+            // Add filter event listeners
+            const auditFilterAction = document.getElementById('auditFilterAction');
+            const auditFilterAlert = document.getElementById('auditFilterAlert');
+            const auditSearch = document.getElementById('auditSearch');
+
+            if (auditFilterAction) {
+                auditFilterAction.addEventListener('change', filterAuditLog);
+            }
+
+            if (auditFilterAlert) {
+                auditFilterAlert.addEventListener('change', filterAuditLog);
+            }
+
+            if (auditSearch) {
+                auditSearch.addEventListener('input', filterAuditLog);
+            }
+
+            // Helper function to parse timestamp to Date
+            function parseTimestamp(timestamp) {
+                // Format: "Nov 2, 2024 7:15 PM"
+                const months = {
+                    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                };
+                
+                const parts = timestamp.split(' ');
+                const month = months[parts[0]];
+                const day = parseInt(parts[1].replace(',', ''));
+                const year = parseInt(parts[2]);
+                
+                let timeParts = parts.slice(3);
+                let timeStr = timeParts.join(' ');
+                const [time, period] = timeStr.split(' ');
+                const [hours, minutes] = time.split(':');
+                let hour24 = parseInt(hours);
+                if (period === 'PM' && hour24 !== 12) hour24 += 12;
+                if (period === 'AM' && hour24 === 12) hour24 = 0;
+                
+                return new Date(year, month, day, hour24, parseInt(minutes));
+            }
+
+            // Download Audit Log as PDF
+            function downloadAuditLogPDF(hours) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Calculate cutoff time
+                const now = new Date();
+                const cutoffTime = new Date(now.getTime() - (hours * 60 * 60 * 1000));
+                
+                // Filter logs by time range
+                let filteredLogs = sampleAuditLogs.filter(log => {
+                    const logDate = parseTimestamp(log.timestamp);
+                    return logDate >= cutoffTime;
+                });
+
+                // Sort by timestamp (newest first)
+                filteredLogs.sort((a, b) => {
+                    return parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp);
+                });
+
+                // PDF Header
+                doc.setFontSize(18);
+                doc.setTextColor(107, 207, 143); // BIO-ISAC green
+                doc.text('BIO-ISAC Audit Log', 14, 20);
+                
+                // Time range info
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                const timeRangeText = hours === 1 ? 'Last 1 Hour' :
+                                    hours === 4 ? 'Last 4 Hours' :
+                                    hours === 24 ? 'Last 24 Hours' :
+                                    hours === 168 ? 'Last 7 Days' :
+                                    hours === 720 ? 'Last 30 Days' : 'All Logs';
+                doc.text(`Time Range: ${timeRangeText}`, 14, 28);
+                doc.text(`Generated: ${now.toLocaleString()}`, 14, 33);
+                doc.text(`Total Entries: ${filteredLogs.length}`, 14, 38);
+
+                // Table headers
+                let yPos = 50;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.setFillColor(45, 106, 63); // BIO-ISAC medium green
+                doc.rect(14, yPos, 182, 8, 'F');
+                doc.setTextColor(240, 249, 244);
+                doc.setFont(undefined, 'bold');
+                doc.text('Timestamp', 16, yPos + 6);
+                doc.text('Action', 60, yPos + 6);
+                doc.text('Alert ID', 90, yPos + 6);
+                doc.text('User', 120, yPos + 6);
+                doc.text('Changes', 150, yPos + 6);
+
+                // Table rows
+                yPos += 12;
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+                const actionLabels = {
+                    'created': 'Created',
+                    'updated': 'Updated',
+                    'deleted': 'Deleted',
+                    'status-changed': 'Status Changed',
+                    'assigned': 'Assigned'
+                };
+
+                filteredLogs.forEach((log, index) => {
+                    // Check if we need a new page
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    // Alternate row colors
+                    if (index % 2 === 0) {
+                        doc.setFillColor(245, 245, 245);
+                        doc.rect(14, yPos - 6, 182, 8, 'F');
+                    }
+
+                    // Row data
+                    doc.setFontSize(8);
+                    doc.text(log.timestamp.substring(0, 18), 16, yPos);
+                    doc.text(actionLabels[log.action] || log.action, 60, yPos);
+                    doc.text('#' + log.alertId, 90, yPos);
+                    doc.text(log.user, 120, yPos);
+                    
+                    // Wrap changes text if too long
+                    const changesText = doc.splitTextToSize(log.changes, 50);
+                    doc.text(changesText, 150, yPos);
+                    
+                    yPos += Math.max(8, changesText.length * 4);
+                });
+
+                // Footer
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text(
+                        `Page ${i} of ${pageCount}`,
+                        105,
+                        doc.internal.pageSize.height - 10,
+                        { align: 'center' }
+                    );
+                }
+
+                // Generate filename
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = hours === 1 ? '1hr' :
+                              hours === 4 ? '4hrs' :
+                              hours === 24 ? '24hrs' :
+                              hours === 168 ? '7days' :
+                              hours === 720 ? '30days' : 'all';
+                const filename = `audit-log-${timeStr}-${dateStr}.pdf`;
+
+                // Save PDF
+                doc.save(filename);
             }
         });
     </script>
