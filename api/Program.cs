@@ -1,3 +1,6 @@
+using MyApp.Namespace.Services;
+using api.DataAccess;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Register Database class as singleton (connection info doesn't change)
+builder.Services.AddSingleton<Database>();
+
+// Register database service
+builder.Services.AddScoped<DatabaseService>();
 
 var app = builder.Build();
 

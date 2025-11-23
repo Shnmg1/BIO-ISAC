@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Namespace.Services;
 
 namespace MyApp.Namespace
 {
@@ -7,11 +8,29 @@ namespace MyApp.Namespace
     [ApiController]
     public class ToDoController : ControllerBase
     {
+        private readonly DatabaseService _db;
+
+        public ToDoController(DatabaseService db)
+        {
+            _db = db;
+        }
+
         // GET: api/<ToDoController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                // Example: Query all todos
+                // var todos = await _db.QueryAsync("SELECT * FROM todos");
+                // return Ok(todos);
+                
+                return Ok(new string[] { "value1", "value2" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         // GET api/<ToDoController>/5
