@@ -664,7 +664,6 @@ body.dashboard-body {
     border-bottom: 1px solid var(--wst-color-line);
 }
 
-/* Message View */
 .message-view {
     display: flex;
     flex-direction: column;
@@ -724,7 +723,7 @@ body.dashboard-body {
 }
 
 .message-bubble {
-    max-width: 75%;
+    max-width: 300px;
     padding: 10px 14px;
     border-radius: 12px;
     word-wrap: break-word;
@@ -874,7 +873,7 @@ body.dashboard-body {
 .form-control {
     background-color: var(--wst-color-fill-background-secondary);
     border: 1.5px solid var(--wst-color-line);
-    color: var(--wst-color-text-primary);
+    color: #ffffff !important;
     padding: 10px 14px;
     border-radius: 6px;
     font-size: 14px;
@@ -904,11 +903,45 @@ body.dashboard-body {
 .form-control[multiple] option {
     padding: 4px 8px;
     margin: 2px 0;
+    background-color: #000000;
+    color: #ffffff;
 }
 
 .form-control[multiple] option:checked {
     background-color: #3b82f6;
     color: white;
+}
+
+select.form-control,
+select {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+}
+
+select.form-control option,
+select option {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="time"],
+input[type="date"],
+input[type="datetime-local"],
+textarea {
+    color: #ffffff !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="time"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus {
+    color: #ffffff !important;
 }
 
 .form-control::placeholder {
@@ -1209,7 +1242,7 @@ body.login-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--wst-color-fill-background-primary) 0%, var(--wst-color-fill-background-secondary) 100%);
+    background: #000000;
     padding: 20px;
 }
 
@@ -1219,7 +1252,7 @@ body.login-page {
 }
 
 .login-card {
-    background: var(--wst-color-fill-background-secondary);
+    background: #000000;
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     padding: 40px;
@@ -1232,17 +1265,17 @@ body.login-page {
 }
 
 .login-logo {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    background: var(--wst-color-action);
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
-    color: var(--wst-color-text-primary);
-    box-shadow: 0 4px 12px rgba(113, 181, 63, 0.3);
+    margin: 0 auto 20px;
+}
+
+.login-logo .bio-isac-logo {
+    height: 120px;
+    width: auto;
+    max-width: 400px;
+    object-fit: contain;
 }
 
 .login-title {
@@ -1278,7 +1311,7 @@ body.login-page {
 }
 
 .login-form .form-label i {
-    color: var(--wst-color-action);
+    color: #6bcf8f;
     font-size: 14px;
 }
 
@@ -1286,7 +1319,7 @@ body.login-page {
     width: 100%;
     background-color: var(--wst-color-fill-background-primary);
     border: 1px solid var(--wst-color-line);
-    color: var(--wst-color-text-primary);
+    color: #ffffff;
     padding: 12px 16px;
     border-radius: 6px;
     font-size: 14px;
@@ -1295,8 +1328,8 @@ body.login-page {
 
 .login-input:focus {
     outline: none;
-    border-color: var(--wst-color-action);
-    box-shadow: 0 0 0 3px rgba(113, 181, 63, 0.1);
+    border-color: #6bcf8f;
+    box-shadow: 0 0 0 3px rgba(107, 207, 143, 0.1);
 }
 
 .login-input::placeholder {
@@ -1324,7 +1357,7 @@ body.login-page {
 }
 
 .password-toggle:hover {
-    color: var(--wst-color-action);
+    color: #4aad6a;
 }
 
 .form-options {
@@ -1345,7 +1378,7 @@ body.login-page {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: var(--wst-color-action);
+    accent-color: #6bcf8f;
 }
 
 .remember-me label {
@@ -1355,13 +1388,13 @@ body.login-page {
 }
 
 .forgot-password {
-    color: var(--wst-color-action);
+    color: #6bcf8f;
     text-decoration: none;
     transition: color 0.3s;
 }
 
 .forgot-password:hover {
-    color: var(--wst-color-fill-accent-2);
+    color: #4aad6a;
     text-decoration: underline;
 }
 
@@ -1375,12 +1408,18 @@ body.login-page {
     justify-content: center;
     gap: 10px;
     border-radius: 6px;
+    border: none;
+    background: #6bcf8f;
+    color: #000000;
+    cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(107, 207, 143, 0.3);
 }
 
 .btn-login:hover {
+    background: #4aad6a;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(113, 181, 63, 0.3);
+    box-shadow: 0 4px 12px rgba(107, 207, 143, 0.3);
 }
 
 .login-footer {
@@ -1397,18 +1436,17 @@ body.login-page {
 }
 
 .login-footer a {
-    color: var(--wst-color-action);
+    color: #6bcf8f;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
 }
 
 .login-footer a:hover {
-    color: var(--wst-color-fill-accent-2);
+    color: #4aad6a;
     text-decoration: underline;
 }
 
-/* Toast Notification */
 .toast-notification {
     position: fixed;
     top: 70px;
@@ -1432,7 +1470,6 @@ body.login-page {
     transform: translateX(0);
 }
 
-/* BioISAC Form Enhancements */
 .bioisac-form .radio-group {
     gap: 12px;
     flex-wrap: wrap;
@@ -1453,7 +1490,6 @@ body.login-page {
     padding: 10px 14px;
 }
 
-/* Estimated Impact styling */
 .estimated-impact-group {
     display: flex;
     gap: 15px;
@@ -1512,10 +1548,9 @@ body.login-page {
         font-size: 28px;
     }
     
-    .login-logo {
-        width: 70px;
-        height: 70px;
-        font-size: 30px;
+    .login-logo .bio-isac-logo {
+        height: 100px;
+        max-width: 300px;
     }
 }
 

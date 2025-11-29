@@ -225,12 +225,252 @@
         .resize-handle:hover {
             background-color: var(--bio-light-green);
         }
+
+        /* Settings Dropdown Styles */
+        .header-icons {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .settings-container {
+            position: relative;
+        }
+
+        .settings-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            border-radius: 6px;
+            min-width: 220px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .settings-dropdown.active {
+            display: block;
+        }
+
+        .settings-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--bio-medium-green);
+        }
+
+        .settings-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-dropdown-item:hover {
+            background-color: rgba(74, 173, 106, 0.2);
+        }
+
+        .settings-dropdown-item i {
+            width: 20px;
+            color: var(--bio-bright-green);
+        }
+
+        .settings-dropdown-item span {
+            flex: 1;
+        }
+
+        .config-btn {
+            color: var(--bio-text-light);
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .config-btn:hover {
+            color: var(--bio-bright-green);
+        }
+
+        .alert-modal-value.readonly {
+            background-color: rgba(74, 173, 106, 0.05);
+            opacity: 0.8;
+            border: 1px solid var(--bio-medium-green);
+            padding: 10px 12px;
+            border-radius: 4px;
+            min-height: 20px;
+        }
+
+        /* Alert Modal Styles */
+        .alert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .alert-modal.active {
+            display: flex;
+        }
+
+        .alert-modal-content {
+            background-color: #000000;
+            border: 2px solid var(--bio-light-green);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+
+        .alert-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bio-light-green);
+        }
+
+        .alert-modal-header h2 {
+            color: var(--bio-text-light);
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .alert-modal-close {
+            background: none;
+            border: none;
+            color: var(--bio-text-light);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .alert-modal-close:hover {
+            background-color: rgba(74, 173, 106, 0.2);
+            color: var(--bio-bright-green);
+        }
+
+        .alert-modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .alert-modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .alert-modal-label {
+            color: var(--bio-text-light);
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .alert-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--bio-light-green);
+            flex-wrap: wrap;
+        }
+
+        .alert-modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .alert-modal-btn-primary {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+        }
+
+        .alert-modal-btn-primary:hover {
+            background-color: var(--bio-light-green);
+        }
+
+        .alert-modal-btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--bio-light-green);
+            color: var(--bio-text-light);
+        }
+
+        .alert-modal-btn-outline:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+            border-color: var(--bio-bright-green);
+        }
+
+        .alert-modal select,
+        .alert-modal input[type="text"],
+        .alert-modal textarea,
+        .alert-modal .form-control {
+            color: #ffffff !important;
+            background-color: #000000 !important;
+        }
+
+        .alert-modal select option {
+            background-color: #000000;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="dashboard-body">
     <div class="header-bar dashboard">
         <div class="logo-section">
             <img src="../images/image.png" alt="BIO-ISAC Logo" class="bio-isac-logo">
+        </div>
+        <div class="header-icons">
+            <div class="settings-container">
+                <button class="config-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
+                <div class="settings-dropdown" id="settingsDropdown">
+                    <div class="settings-dropdown-item" id="accountSettingsMenuItem">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Account Settings</span>
+                    </div>
+                </div>
+            </div>
+            <button class="config-btn" id="logoutBtn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
     </div>
 
@@ -248,36 +488,7 @@
                 <button class="icon-btn-small plus-btn"><i class="fas fa-plus"></i></button>
             </div>
             <div class="sidebar-content inbox-list" id="inboxList">
-                <div class="inbox-item priority" data-message-id="1" data-contact="Dr. Sarah Chen" data-phone="(205) 283-1526">
-                    <div class="inbox-item-header">
-                        <span class="inbox-title">Ransomware attack detected...</span>
-                        <span class="inbox-date">11/08/2025</span>
-                    </div>
-                    <div class="inbox-item-footer">
-                        <i class="far fa-comment"></i>
-                        <span>Dr. Sarah Chen</span>
-                    </div>
-                </div>
-                <div class="inbox-item priority" data-message-id="2" data-contact="Michael Torres" data-phone="(205) 977-0243">
-                    <div class="inbox-item-header">
-                        <span class="inbox-title">Unauthorized access alert...</span>
-                        <span class="inbox-date">11/08/2025</span>
-                    </div>
-                    <div class="inbox-item-footer">
-                        <i class="far fa-comment"></i>
-                        <span>Michael Torres</span>
-                    </div>
-                </div>
-                <div class="inbox-item" data-message-id="3" data-contact="Jennifer Park" data-phone="(256) 522-9490">
-                    <div class="inbox-item-header">
-                        <span class="inbox-title">Data breach notification...</span>
-                        <span class="inbox-date">11/08/2025</span>
-                    </div>
-                    <div class="inbox-item-footer">
-                        <i class="far fa-comment"></i>
-                        <span>Jennifer Park</span>
-                    </div>
-                </div>
+                <!-- Messages will be loaded from database -->
             </div>
             
             <div class="message-view" id="messageView" style="display: none;">
@@ -301,6 +512,155 @@
                 </div>
             </div>
         </div>
+
+        <!-- Account Settings Modal -->
+        <div class="alert-modal" id="accountSettingsModal">
+            <div class="alert-modal-content" style="max-width: 600px;">
+                <div class="alert-modal-header">
+                    <h2><i class="fas fa-user-cog"></i> Account Settings</h2>
+                    <button class="alert-modal-close" id="closeAccountSettingsModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="alert-modal-body">
+                    <form id="accountSettingsForm">
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Full Name</label>
+                            <div class="alert-modal-value readonly" id="accountFullName"></div>
+                        </div>
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Email</label>
+                            <div class="alert-modal-value readonly" id="accountEmail"></div>
+                        </div>
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Facility Name</label>
+                            <div class="alert-modal-value readonly" id="accountFacilityName"></div>
+                        </div>
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Industry / Facility Type</label>
+                            <select class="form-control" id="accountFacilityType" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                                <option value="Hospital" style="background-color: #000000; color: #ffffff;">Hospital</option>
+                                <option value="Lab" style="background-color: #000000; color: #ffffff;">Lab</option>
+                                <option value="Biomanufacturing" style="background-color: #000000; color: #ffffff;">Biomanufacturing</option>
+                                <option value="Agriculture" style="background-color: #000000; color: #ffffff;">Agriculture</option>
+                                <option value="Biotechnology" style="background-color: #000000; color: #ffffff;">Biotechnology</option>
+                                <option value="Life Sciences" style="background-color: #000000; color: #ffffff;">Life Sciences</option>
+                                <option value="Research Laboratory" style="background-color: #000000; color: #ffffff;">Research Laboratory</option>
+                                <option value="Manufacturing / Supply Chain" style="background-color: #000000; color: #ffffff;">Manufacturing / Supply Chain</option>
+                                <option value="Healthcare / Clinical Data" style="background-color: #000000; color: #ffffff;">Healthcare / Clinical Data</option>
+                                <option value="Other" style="background-color: #000000; color: #ffffff;">Other</option>
+                            </select>
+                        </div>
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Contact Information</label>
+                            <input type="text" class="form-control" id="accountContactInfo" placeholder="Phone number or contact info" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                            <small style="color: #999; font-size: 12px; margin-top: 5px; display: block;">Optional: Add your contact information</small>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--bio-medium-green);">
+                            <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--bio-text-light);">Notification Preferences</h3>
+                            
+                            <div class="alert-modal-field">
+                                <label class="alert-modal-label">Delivery Mode</label>
+                                <select class="form-control" id="notificationDeliveryMode" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                                    <option value="Immediate" style="background-color: #000000; color: #ffffff;">Immediate</option>
+                                    <option value="DailyDigest" style="background-color: #000000; color: #ffffff;">Daily Digest</option>
+                                    <option value="WeeklyDigest" style="background-color: #000000; color: #ffffff;">Weekly Digest</option>
+                                </select>
+                            </div>
+                            
+                            <div class="alert-modal-field" id="dailyDigestTimeField" style="display: none;">
+                                <label class="alert-modal-label">Daily Digest Time</label>
+                                <input type="time" class="form-control" id="dailyDigestTime" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                            </div>
+                            
+                            <div class="alert-modal-field" id="weeklyDigestDayField" style="display: none;">
+                                <label class="alert-modal-label">Weekly Digest Day</label>
+                                <select class="form-control" id="weeklyDigestDay" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                                    <option value="Monday" style="background-color: #000000; color: #ffffff;">Monday</option>
+                                    <option value="Tuesday" style="background-color: #000000; color: #ffffff;">Tuesday</option>
+                                    <option value="Wednesday" style="background-color: #000000; color: #ffffff;">Wednesday</option>
+                                    <option value="Thursday" style="background-color: #000000; color: #ffffff;">Thursday</option>
+                                    <option value="Friday" style="background-color: #000000; color: #ffffff;">Friday</option>
+                                    <option value="Saturday" style="background-color: #000000; color: #ffffff;">Saturday</option>
+                                    <option value="Sunday" style="background-color: #000000; color: #ffffff;">Sunday</option>
+                                </select>
+                            </div>
+                            
+                            <div class="alert-modal-field">
+                                <label style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                                    <input type="checkbox" id="receiveHighTier" style="width: 18px; height: 18px;">
+                                    <span>Receive High Tier Alerts</span>
+                                </label>
+                            </div>
+                            <div class="alert-modal-field">
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="receiveMediumTier" style="width: 18px; height: 18px;">
+                                    <span>Receive Medium Tier Alerts</span>
+                                </label>
+                            </div>
+                            <div class="alert-modal-field">
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="receiveLowTier" style="width: 18px; height: 18px;">
+                                    <span>Receive Low Tier Alerts</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="alert-modal-actions">
+                    <button class="alert-modal-btn alert-modal-btn-primary" id="saveAccountSettingsBtn">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                    <button class="alert-modal-btn alert-modal-btn-outline" id="cancelAccountSettingsBtn">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Conversation Modal -->
+        <div class="alert-modal" id="newConversationModal">
+            <div class="alert-modal-content">
+                <div class="alert-modal-header">
+                    <h2><i class="fas fa-plus"></i> New Conversation</h2>
+                    <button class="alert-modal-close" id="closeNewConversationModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="alert-modal-body">
+                    <form id="newConversationForm">
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Subject</label>
+                            <input type="text" class="form-control" id="newConversationSubject" placeholder="Enter subject..." required style="width: 100%; padding: 8px; margin-top: 5px;">
+                        </div>
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Message</label>
+                            <textarea class="form-control" id="newConversationMessage" placeholder="Enter your message..." rows="5" required style="width: 100%; padding: 8px; margin-top: 5px; resize: vertical;"></textarea>
+                        </div>
+                        <div style="margin-top: 10px; padding: 12px; background-color: rgba(74, 173, 106, 0.1); border: 1px solid var(--bio-light-green); border-radius: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: var(--bio-text-light);">
+                                <i class="fas fa-info-circle" style="color: var(--bio-bright-green);"></i>
+                                <span style="font-size: 13px;">This message will be sent to BIO-ISAC administrators</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="alert-modal-actions">
+                    <button class="alert-modal-btn alert-modal-btn-primary" id="sendNewConversationBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                    <button class="alert-modal-btn alert-modal-btn-outline" id="cancelNewConversationBtn">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="resize-handle resize-handle-vertical" id="sidebar-resize"></div>
 
         <div class="main-content">
@@ -479,6 +839,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script>
+        // Access control - redirect admins to admin page, unauthenticated users to login
+        // Regular users (non-admins) can access this reports dashboard
+        (function() {
+            const user = apiClient.getCurrentUserSync();
+            if (!user) {
+                window.location.href = 'index.html';
+            } else if (user.role === 'Admin') {
+                window.location.href = 'admin.html';
+            }
+            // Regular users (non-admins) stay on this page - they can access the reports dashboard
+        })();
+    </script>
     <script>
         // Toast notification function
         function showToast(message) {
@@ -521,6 +895,50 @@
             };
         }
 
+        // Convert form data to threat submission format
+        function convertToThreatSubmission(formData) {
+            // Map incident type to category
+            const category = formData.incidentType || 'Other';
+            
+            // Map severity level to impact level
+            const impactLevel = formData.severityLevel || 'Unknown';
+            
+            // Build description from form data
+            let description = formData.summary || '';
+            if (formData.sensitiveDataAffected) {
+                description += `\n\nSensitive Data Affected: ${formData.sensitiveDataAffected}`;
+            }
+            if (formData.estimatedImpact && formData.estimatedImpact.length > 0) {
+                description += `\n\nEstimated Impact: ${formData.estimatedImpact.join(', ')}`;
+            }
+            if (formData.industry) {
+                description += `\n\nIndustry: ${formData.industry}`;
+            }
+            if (formData.assignedTo) {
+                description += `\n\nAssigned To: ${formData.assignedTo}`;
+            }
+            
+            // Parse date/time
+            let dateObserved = null;
+            if (formData.incidentDateTime) {
+                dateObserved = new Date(formData.incidentDateTime);
+            }
+            
+            // Use summary as title, or generate from incident type
+            const title = formData.summary 
+                ? (formData.summary.length > 100 ? formData.summary.substring(0, 100) + '...' : formData.summary)
+                : `${formData.incidentType || 'Incident'} - ${new Date().toLocaleDateString()}`;
+            
+            return {
+                title: title,
+                description: description.trim(),
+                category: category,
+                source: 'Incident Report Form',
+                dateObserved: dateObserved,
+                impactLevel: impactLevel
+            };
+        }
+
         // Reset form
         document.getElementById('resetBtn').addEventListener('click', () => {
             document.getElementById('incidentType').value = '';
@@ -534,127 +952,625 @@
             document.getElementById('summary').value = '';
         });
 
-        // Save report
-        document.getElementById('saveBtn').addEventListener('click', () => {
+        // Save report (saves as draft - for now, same as submit)
+        document.getElementById('saveBtn').addEventListener('click', async () => {
             const formData = collectFormData();
-            console.log('Form Data (Save):', JSON.stringify(formData, null, 2));
-            showToast('Report saved successfully.');
+            
+            // Validate required fields
+            if (!formData.incidentType) {
+                showToast('Please select an incident type');
+                return;
+            }
+            if (!formData.summary || formData.summary.trim().length === 0) {
+                showToast('Please enter a summary');
+                return;
+            }
+            if (!formData.severityLevel) {
+                showToast('Please select a severity level');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('saveBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            try {
+                const threatData = convertToThreatSubmission(formData);
+                const response = await apiClient.submitThreat(threatData);
+                
+                showToast('Report saved successfully. Threat ID: ' + response.id);
+                
+                // Reset form after successful save
+                document.getElementById('resetBtn').click();
+            } catch (error) {
+                console.error('Error saving report:', error);
+                showToast('Error saving report: ' + (error.message || 'Unknown error'));
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
         });
 
         // Submit for review
-        document.getElementById('submitBtn').addEventListener('click', () => {
+        document.getElementById('submitBtn').addEventListener('click', async () => {
             const formData = collectFormData();
-            console.log('Form Data (Submit):', JSON.stringify(formData, null, 2));
-            showToast('Incident report submitted. Pending BioISAC admin review.');
-        });
-
-        // Message functionality
-        const messages = {
-            1: [
-                { text: "URGENT: We've detected a ransomware attack on our research database. Multiple systems are encrypted and we're unable to access critical biological data. Requesting immediate assistance.", sender: 'contact', time: '10:30 AM' },
-                { text: "Thank you for reporting this. I'm escalating this to our incident response team immediately. Can you provide the affected system IPs?", sender: 'user', time: '10:32 AM' },
-                { text: "Affected systems: 192.168.1.45, 192.168.1.67, and 192.168.1.89. The attack started approximately 30 minutes ago. We've isolated the network segment.", sender: 'contact', time: '10:33 AM' },
-                { text: "Understood. Our team is on it. Please maintain network isolation and do not pay any ransom demands. We'll coordinate containment procedures.", sender: 'user', time: '10:35 AM' }
-            ],
-            2: [
-                { text: "Alert: Unauthorized access detected on our patient data server. Multiple failed login attempts from IP 203.45.67.89 followed by successful access. Sensitive data may have been compromised.", sender: 'contact', time: '2:15 PM' },
-                { text: "This is a critical security incident. I'm initiating our breach response protocol. Have you disabled the compromised accounts?", sender: 'user', time: '2:16 PM' },
-                { text: "Yes, all affected accounts have been disabled. We've also blocked the source IP. Logs show access to approximately 1,200 patient records.", sender: 'contact', time: '2:18 PM' },
-                { text: "We need to notify affected patients per HIPAA requirements. I'll prepare the breach notification documentation. Please preserve all logs for forensic analysis.", sender: 'user', time: '2:20 PM' }
-            ],
-            3: [
-                { text: "Reporting a potential data breach. Our email system was compromised and we've identified suspicious outbound traffic containing research data. Approximately 500MB of data was exfiltrated.", sender: 'contact', time: '3:45 PM' },
-                { text: "Thank you for the report. This is being classified as a high-severity incident. Can you confirm what type of research data was involved?", sender: 'user', time: '3:46 PM' },
-                { text: "The data includes genomic sequences and experimental protocols. No patient identifiers were included, but the research data is proprietary and sensitive.", sender: 'contact', time: '3:48 PM' },
-                { text: "Understood. We'll need to assess the impact and determine if this requires notification to regulatory bodies. I'll coordinate with our legal team.", sender: 'user', time: '3:50 PM' }
-            ]
-        };
-
-        let currentMessageId = null;
-
-        // Handle inbox item clicks
-        document.querySelectorAll('.inbox-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const messageId = item.getAttribute('data-message-id');
-                const contact = item.getAttribute('data-contact');
-                const phone = item.getAttribute('data-phone');
+            
+            // Validate required fields
+            if (!formData.incidentType) {
+                showToast('Please select an incident type');
+                return;
+            }
+            if (!formData.summary || formData.summary.trim().length === 0) {
+                showToast('Please enter a summary');
+                return;
+            }
+            if (!formData.severityLevel) {
+                showToast('Please select a severity level');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            try {
+                const threatData = convertToThreatSubmission(formData);
+                const response = await apiClient.submitThreat(threatData);
                 
-                showMessageView(messageId, contact, phone);
-            });
+                showToast('Incident report submitted successfully. Threat ID: ' + response.id + '. Pending BioISAC admin review.');
+                
+                // Reset form after successful submission
+                document.getElementById('resetBtn').click();
+            } catch (error) {
+                console.error('Error submitting report:', error);
+                showToast('Error submitting report: ' + (error.message || 'Unknown error'));
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
         });
 
-        // Show message view
-        function showMessageView(messageId, contact, phone) {
-            currentMessageId = messageId;
+        // Message functionality - load from database
+        let conversations = {}; // Key: otherUserId, Value: array of messages
+        let currentConversationUserId = null;
+        let allMessages = [];
+
+        // Load messages from database
+        async function loadMessages() {
+            try {
+                const user = apiClient.getCurrentUserSync();
+                if (!user) return;
+
+                allMessages = await apiClient.getMessages();
+                
+                // Group messages into conversations by the other user
+                conversations = {};
+                const currentUserId = user.id;
+                
+                allMessages.forEach(msg => {
+                    const otherUserId = msg.fromUserId === currentUserId ? msg.toUserId : msg.fromUserId;
+                    const otherUserName = msg.fromUserId === currentUserId ? msg.toUserName : msg.fromUserName;
+                    
+                    if (!conversations[otherUserId]) {
+                        conversations[otherUserId] = {
+                            userId: otherUserId,
+                            userName: otherUserName || 'Unknown User',
+                            messages: [],
+                            lastMessage: null,
+                            unreadCount: 0
+                        };
+                    }
+                    
+                    conversations[otherUserId].messages.push(msg);
+                    
+                    // Track last message and unread count
+                    if (!conversations[otherUserId].lastMessage || 
+                        new Date(msg.createdAt) > new Date(conversations[otherUserId].lastMessage.createdAt)) {
+                        conversations[otherUserId].lastMessage = msg;
+                    }
+                    
+                    if (!msg.isRead && msg.toUserId === currentUserId) {
+                        conversations[otherUserId].unreadCount++;
+                    }
+                });
+                
+                // Sort conversations by last message time
+                const sortedConversations = Object.values(conversations).sort((a, b) => {
+                    if (!a.lastMessage) return 1;
+                    if (!b.lastMessage) return -1;
+                    return new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt);
+                });
+                
+                // Render inbox
+                renderInbox(sortedConversations);
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showToast('Error loading messages: ' + error.message);
+            }
+        }
+
+        function renderInbox(conversationsList) {
+            const inboxList = document.getElementById('inboxList');
+            inboxList.innerHTML = '';
+            
+            if (conversationsList.length === 0) {
+                inboxList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--bio-text-light); opacity: 0.7;">No messages</div>';
+                return;
+            }
+            
+            conversationsList.forEach(conv => {
+                const lastMsg = conv.lastMessage;
+                const subject = lastMsg?.subject || 'No subject';
+                const preview = lastMsg?.body?.substring(0, 50) || '';
+                const date = lastMsg ? formatMessageDate(lastMsg.createdAt) : '';
+                const isPriority = conv.unreadCount > 0;
+                
+                const inboxItem = document.createElement('div');
+                inboxItem.className = `inbox-item ${isPriority ? 'priority' : ''}`;
+                inboxItem.setAttribute('data-user-id', conv.userId);
+                inboxItem.setAttribute('data-user-name', conv.userName);
+                inboxItem.innerHTML = `
+                    <div class="inbox-item-header">
+                        <span class="inbox-title">${subject}${preview ? ' - ' + preview + '...' : ''}</span>
+                        <span class="inbox-date">${date}</span>
+                    </div>
+                    <div class="inbox-item-footer">
+                        <i class="far fa-comment"></i>
+                        <span>${conv.userName}</span>
+                        ${conv.unreadCount > 0 ? `<span style="margin-left: auto; background: var(--bio-bright-green); color: var(--bio-primary-green); padding: 2px 6px; border-radius: 10px; font-size: 11px; font-weight: 600;">${conv.unreadCount}</span>` : ''}
+                    </div>
+                `;
+                
+                inboxItem.addEventListener('click', () => {
+                    showConversation(conv.userId, conv.userName);
+                });
+                
+                inboxList.appendChild(inboxItem);
+            });
+        }
+
+        function formatMessageDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+        }
+
+        // Show conversation view
+        async function showConversation(otherUserId, otherUserName) {
+            currentConversationUserId = otherUserId;
             document.getElementById('inboxList').style.display = 'none';
             document.getElementById('messageView').style.display = 'flex';
             
-            document.getElementById('messageContactName').textContent = contact;
-            document.getElementById('messageContactPhone').textContent = phone;
+            document.getElementById('messageContactName').textContent = otherUserName;
+            document.getElementById('messageContactPhone').textContent = '';
             
             const messageContent = document.getElementById('messageContent');
             messageContent.innerHTML = '';
             
-            const messageList = messages[messageId] || [];
-            messageList.forEach(msg => {
+            // Get messages for this conversation
+            const user = apiClient.getCurrentUserSync();
+            const currentUserId = user.id;
+            
+            const conversationMessages = allMessages.filter(msg => 
+                (msg.fromUserId === currentUserId && msg.toUserId === otherUserId) ||
+                (msg.fromUserId === otherUserId && msg.toUserId === currentUserId)
+            ).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            
+            // Mark unread messages as read
+            for (const msg of conversationMessages) {
+                if (!msg.isRead && msg.toUserId === currentUserId) {
+                    try {
+                        await apiClient.markMessageAsRead(msg.id);
+                        msg.isRead = true;
+                    } catch (error) {
+                        console.error('Error marking message as read:', error);
+                    }
+                }
+            }
+            
+            // Render messages
+            conversationMessages.forEach(msg => {
+                const isSent = msg.fromUserId === currentUserId;
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `message-bubble ${msg.sender === 'user' ? 'message-sent' : 'message-received'}`;
+                messageDiv.className = `message-bubble ${isSent ? 'message-sent' : 'message-received'}`;
+                
+                const time = new Date(msg.createdAt).toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit' 
+                });
+                
                 messageDiv.innerHTML = `
-                    <div class="message-text">${msg.text}</div>
-                    <div class="message-time">${msg.time}</div>
+                    <div class="message-text">${escapeHtml(msg.body)}</div>
+                    <div class="message-time">${time}</div>
                 `;
                 messageContent.appendChild(messageDiv);
             });
             
             messageContent.scrollTop = messageContent.scrollHeight;
+            
+            // Reload messages to update unread counts
+            await loadMessages();
         }
 
-        // Back button
-        document.getElementById('backBtn').addEventListener('click', () => {
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentConversationUserId) return;
+            
+            const user = apiClient.getCurrentUserSync();
+            if (!user) {
+                showToast('You must be logged in to send messages');
+                return;
+        }
+
+            // Get the last message to use its subject, or create a new one
+            const conversation = conversations[currentConversationUserId];
+            const lastMessage = conversation?.lastMessage;
+            const subject = lastMessage?.subject || 'New Message';
+            
+            try {
+                const messageData = {
+                    toUserId: currentConversationUserId,
+                    subject: subject,
+                    body: text
+                };
+                
+                await apiClient.sendMessage(messageData);
+                
+                // Reload messages to show the new one
+                await loadMessages();
+                
+                // Show the conversation again with updated messages
+                await showConversation(currentConversationUserId, conversation?.userName || 'Unknown User');
+                
+                input.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('Error sending message: ' + error.message);
+            }
+        }
+        
+        // New Conversation Modal Functions
+        function openNewConversationModal() {
+            const modal = document.getElementById('newConversationModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.getElementById('newConversationSubject').value = '';
+                document.getElementById('newConversationMessage').value = '';
+            }
+        }
+
+        function closeNewConversationModal() {
+            const modal = document.getElementById('newConversationModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        async function sendNewConversation() {
+            const subjectEl = document.getElementById('newConversationSubject');
+            const messageEl = document.getElementById('newConversationMessage');
+            
+            if (!subjectEl || !messageEl) {
+                showToast('Error: Form elements not found');
+                return;
+            }
+            
+            const subject = subjectEl.value.trim();
+            const message = messageEl.value.trim();
+            
+            if (!subject || !message) {
+                showToast('Please fill in both subject and message');
+                return;
+            }
+            
+            const user = apiClient.getCurrentUserSync();
+            if (!user) {
+                showToast('You must be logged in to send messages');
+                return;
+            }
+            
+            const sendBtn = document.getElementById('sendNewConversationBtn');
+            if (!sendBtn) {
+                showToast('Error: Send button not found');
+                return;
+            }
+            
+            const originalText = sendBtn.innerHTML;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            try {
+                // Send message without toUserId - it will go to admins
+                const messageData = {
+                    subject: subject,
+                    body: message
+                };
+                
+                await apiClient.sendMessage(messageData);
+                
+                showToast('Message sent successfully!');
+                closeNewConversationModal();
+                
+                // Reload messages to show the new conversation
+                await loadMessages();
+            } catch (error) {
+                console.error('Error sending new conversation:', error);
+                const errorMessage = error?.message || error?.toString() || 'Unknown error occurred';
+                showToast('Error sending message: ' + errorMessage);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalText;
+            }
+        }
+
+        // Initialize on page load
+        (function init() {
+            // Set up event listeners
+            const backBtn = document.getElementById('backBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const messageInput = document.getElementById('messageInput');
+            const plusBtn = document.querySelector('.plus-btn');
+            
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
             document.getElementById('inboxList').style.display = 'block';
             document.getElementById('messageView').style.display = 'none';
-            currentMessageId = null;
+                    currentConversationUserId = null;
         });
-
-        // Send message
-        document.getElementById('sendBtn').addEventListener('click', sendMessage);
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            }
+            
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendMessage);
+            }
+            
+            if (messageInput) {
+                messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            
-            if (!text || !currentMessageId) return;
-            
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            
-            // Add to messages object
-            if (!messages[currentMessageId]) {
-                messages[currentMessageId] = [];
             }
-            messages[currentMessageId].push({
-                text: text,
-                sender: 'user',
-                time: time
+            
+            // New conversation button
+            if (plusBtn) {
+                plusBtn.addEventListener('click', openNewConversationModal);
+            }
+            
+            // New conversation modal handlers
+            const closeNewConversationBtn = document.getElementById('closeNewConversationModal');
+            const cancelNewConversationBtn = document.getElementById('cancelNewConversationBtn');
+            const sendNewConversationBtn = document.getElementById('sendNewConversationBtn');
+            const newConversationModal = document.getElementById('newConversationModal');
+            
+            if (closeNewConversationBtn) {
+                closeNewConversationBtn.addEventListener('click', closeNewConversationModal);
+            }
+            
+            if (cancelNewConversationBtn) {
+                cancelNewConversationBtn.addEventListener('click', closeNewConversationModal);
+            }
+            
+            if (sendNewConversationBtn) {
+                sendNewConversationBtn.addEventListener('click', sendNewConversation);
+            }
+            
+            // Close modal when clicking outside
+            if (newConversationModal) {
+                newConversationModal.addEventListener('click', function(e) {
+                    if (e.target === newConversationModal) {
+                        closeNewConversationModal();
+                    }
+                });
+            }
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && newConversationModal && newConversationModal.classList.contains('active')) {
+                    closeNewConversationModal();
+                }
             });
             
-            // Add to UI
-            const messageContent = document.getElementById('messageContent');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message-bubble message-sent';
-            messageDiv.innerHTML = `
-                <div class="message-text">${text}</div>
-                <div class="message-time">${time}</div>
-            `;
-            messageContent.appendChild(messageDiv);
+            // Load messages
+            loadMessages();
+        })();
+
+        // Settings Dropdown Functionality
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsDropdown = document.getElementById('settingsDropdown');
+        const accountSettingsMenuItem = document.getElementById('accountSettingsMenuItem');
+        const settingsContainer = document.querySelector('.settings-container');
+
+        // Toggle settings dropdown
+        if (settingsBtn && settingsDropdown) {
+            settingsBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                settingsDropdown.classList.toggle('active');
+            });
             
-            input.value = '';
-            messageContent.scrollTop = messageContent.scrollHeight;
+            // Close dropdown when clicking outside
+            if (settingsContainer) {
+                document.addEventListener('click', function (e) {
+                    if (!settingsContainer.contains(e.target)) {
+                        settingsDropdown.classList.remove('active');
+                    }
+                });
+            }
+
+            // Open account settings modal
+            if (accountSettingsMenuItem) {
+                accountSettingsMenuItem.addEventListener('click', async function () {
+                    settingsDropdown.classList.remove('active');
+                    await openAccountSettingsModal();
+                });
+            }
+        }
+
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async function() {
+                try {
+                    await apiClient.logout();
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    // Still redirect even if logout API call fails
+                    window.location.href = 'index.html';
+            }
+            });
+        }
+
+        // Account Settings Modal Functions
+        async function openAccountSettingsModal() {
+            const modal = document.getElementById('accountSettingsModal');
+            if (!modal) return;
+
+            try {
+                // Load user profile
+                const profile = await apiClient.getProfile();
+                
+                // Populate profile fields
+                document.getElementById('accountFullName').textContent = profile.fullName || '';
+                document.getElementById('accountEmail').textContent = profile.email || '';
+                document.getElementById('accountFacilityName').textContent = profile.facilityName || '';
+                document.getElementById('accountFacilityType').value = profile.facilityType || 'Hospital';
+            
+                // Load notification preferences
+                const preferences = await apiClient.getNotificationPreferences();
+                
+                document.getElementById('notificationDeliveryMode').value = preferences.deliveryMode || 'Immediate';
+                document.getElementById('receiveHighTier').checked = preferences.receiveHighTier !== false;
+                document.getElementById('receiveMediumTier').checked = preferences.receiveMediumTier !== false;
+                document.getElementById('receiveLowTier').checked = preferences.receiveLowTier === true;
+                
+                if (preferences.dailyDigestTime) {
+                    document.getElementById('dailyDigestTime').value = preferences.dailyDigestTime;
+                }
+                if (preferences.weeklyDigestDay) {
+                    document.getElementById('weeklyDigestDay').value = preferences.weeklyDigestDay;
+                }
+                
+                // Show/hide digest fields based on delivery mode
+                updateDigestFields();
+                
+                // Show modal
+                modal.classList.add('active');
+            } catch (error) {
+                console.error('Error loading account settings:', error);
+                showToast('Error loading account settings: ' + error.message);
+            }
+        }
+
+        function updateDigestFields() {
+            const deliveryMode = document.getElementById('notificationDeliveryMode')?.value;
+            const dailyField = document.getElementById('dailyDigestTimeField');
+            const weeklyField = document.getElementById('weeklyDigestDayField');
+            
+            if (deliveryMode === 'DailyDigest') {
+                if (dailyField) dailyField.style.display = 'block';
+                if (weeklyField) weeklyField.style.display = 'none';
+            } else if (deliveryMode === 'WeeklyDigest') {
+                if (dailyField) dailyField.style.display = 'none';
+                if (weeklyField) weeklyField.style.display = 'block';
+            } else {
+                if (dailyField) dailyField.style.display = 'none';
+                if (weeklyField) weeklyField.style.display = 'none';
+            }
+        }
+
+        // Delivery mode change handler
+        const deliveryModeSelect = document.getElementById('notificationDeliveryMode');
+        if (deliveryModeSelect) {
+            deliveryModeSelect.addEventListener('change', updateDigestFields);
+        }
+
+        // Close modal handlers
+        const closeAccountSettingsBtn = document.getElementById('closeAccountSettingsModal');
+        if (closeAccountSettingsBtn) {
+            closeAccountSettingsBtn.addEventListener('click', function() {
+                const modal = document.getElementById('accountSettingsModal');
+                if (modal) modal.classList.remove('active');
+            });
+        }
+
+        const cancelAccountSettingsBtn = document.getElementById('cancelAccountSettingsBtn');
+        if (cancelAccountSettingsBtn) {
+            cancelAccountSettingsBtn.addEventListener('click', function() {
+                const modal = document.getElementById('accountSettingsModal');
+                if (modal) modal.classList.remove('active');
+            });
+        }
+
+        // Save account settings
+        const saveAccountSettingsBtn = document.getElementById('saveAccountSettingsBtn');
+        if (saveAccountSettingsBtn) {
+            saveAccountSettingsBtn.addEventListener('click', async function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                try {
+                    // Update profile (facility type)
+                    const facilityType = document.getElementById('accountFacilityType')?.value;
+                    const profile = await apiClient.getProfile();
+                    
+                    await apiClient.updateProfile({
+                        fullName: profile.fullName,
+                        facilityName: profile.facilityName,
+                        facilityType: facilityType
+                    });
+
+                    // Update notification preferences
+                    const deliveryMode = document.getElementById('notificationDeliveryMode')?.value;
+                    const preferences = {
+                        deliveryMode: deliveryMode,
+                        receiveHighTier: document.getElementById('receiveHighTier')?.checked || false,
+                        receiveMediumTier: document.getElementById('receiveMediumTier')?.checked || false,
+                        receiveLowTier: document.getElementById('receiveLowTier')?.checked || false
+                    };
+
+                    if (deliveryMode === 'DailyDigest') {
+                        preferences.dailyDigestTime = document.getElementById('dailyDigestTime')?.value;
+                    }
+                    if (deliveryMode === 'WeeklyDigest') {
+                        preferences.weeklyDigestDay = document.getElementById('weeklyDigestDay')?.value;
+                    }
+
+                    await apiClient.updateNotificationPreferences(preferences);
+
+                    showToast('Account settings saved successfully!');
+                    const modal = document.getElementById('accountSettingsModal');
+                    if (modal) modal.classList.remove('active');
+                } catch (error) {
+                    console.error('Error saving account settings:', error);
+                    showToast('Error saving account settings: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
         }
 
         // Sidebar resize functionality

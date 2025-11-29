@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,8 @@
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/ds-digital" rel="stylesheet">
     <style>
         /* BIO-ISAC Color Scheme - Professional Green Theme */
@@ -145,6 +147,22 @@
             background-color: var(--bio-bright-green);
         }
 
+        .status-priority-low {
+            background-color: #6bcf8f;
+        }
+
+        .status-priority-medium {
+            background-color: #ffaa00;
+        }
+
+        .status-priority-high {
+            background-color: #ff6600;
+        }
+
+        .status-priority-critical {
+            background-color: #ff0000;
+        }
+
         /* Update buttons and interactive elements */
         .config-btn:hover,
         .filter-btn:hover {
@@ -239,10 +257,8 @@
 
         /* Update chart colors */
         .donut-chart {
-            background: conic-gradient(
-                var(--bio-bright-green) 0% 4%,
-                var(--wst-color-fill-base-shade-2) 4% 100%
-            );
+            background: conic-gradient(var(--bio-bright-green) 0% 4%,
+                    var(--wst-color-fill-base-shade-2) 4% 100%);
         }
 
         .chart-number {
@@ -405,6 +421,29 @@
 
         .create-alert-form select.form-control {
             cursor: pointer;
+            color: #ffffff !important;
+        }
+
+        .create-alert-form select.form-control option {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        /* Global styles for all form controls to ensure white text */
+        select,
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="time"],
+        input[type="date"],
+        input[type="datetime-local"],
+        textarea {
+            color: #ffffff !important;
+        }
+
+        select option {
+            background-color: #000000 !important;
+            color: #ffffff !important;
         }
 
         .create-alert-btn {
@@ -630,7 +669,7 @@
         .message {
             display: flex;
             gap: 10px;
-            max-width: 70%;
+            max-width: 85%;
         }
 
         .message.sent {
@@ -668,6 +707,26 @@
             color: var(--bio-text-light);
             font-size: 14px;
             line-height: 1.4;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+        
+        .message-subject {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            opacity: 0.9;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .message-body {
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .message.sent .message-bubble {
@@ -887,6 +946,42 @@
             word-wrap: break-word;
         }
 
+        /* Ensure all form controls have white text */
+        .alert-modal select,
+        .alert-modal input[type="text"],
+        .alert-modal input[type="time"],
+        .alert-modal input[type="email"],
+        .alert-modal input[type="password"],
+        .alert-modal textarea,
+        .alert-modal .form-control {
+            color: #ffffff !important;
+            background-color: #000000 !important;
+        }
+
+        .alert-modal select option {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        /* For select dropdowns - ensure text is white when opened */
+        .alert-modal select:focus {
+            color: #ffffff !important;
+        }
+
+        /* Account settings modal specific styles */
+        #accountSettingsModal select,
+        #accountSettingsModal input[type="text"],
+        #accountSettingsModal input[type="time"],
+        #accountSettingsModal .form-control {
+            color: #ffffff !important;
+            background-color: #000000 !important;
+        }
+
+        #accountSettingsModal select option {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
         /* Priority Selection Boxes */
         .priority-selection {
             display: flex;
@@ -925,7 +1020,7 @@
             background-color: rgba(74, 173, 106, 0.1);
         }
 
-        .priority-option input[type="radio"]:focus + .priority-box {
+        .priority-option input[type="radio"]:focus+.priority-box {
             outline: 2px solid var(--bio-bright-green);
             outline-offset: 2px;
         }
@@ -946,25 +1041,25 @@
             border-color: #ff0000;
         }
 
-        .priority-option input[type="radio"]:checked + .priority-box.priority-low {
+        .priority-option input[type="radio"]:checked+.priority-box.priority-low {
             background-color: #6bcf8f !important;
             border-color: #6bcf8f !important;
             color: var(--bio-primary-green) !important;
         }
 
-        .priority-option input[type="radio"]:checked + .priority-box.priority-medium {
+        .priority-option input[type="radio"]:checked+.priority-box.priority-medium {
             background-color: #ffaa00 !important;
             border-color: #ffaa00 !important;
             color: #000000 !important;
         }
 
-        .priority-option input[type="radio"]:checked + .priority-box.priority-high {
+        .priority-option input[type="radio"]:checked+.priority-box.priority-high {
             background-color: #ff6600 !important;
             border-color: #ff6600 !important;
             color: #ffffff !important;
         }
 
-        .priority-option input[type="radio"]:checked + .priority-box.priority-critical {
+        .priority-option input[type="radio"]:checked+.priority-box.priority-critical {
             background-color: #ff0000 !important;
             border-color: #ff0000 !important;
             color: #ffffff !important;
@@ -1249,6 +1344,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header-bar">
         <div class="logo-section">
@@ -1263,12 +1359,20 @@
             <div class="settings-container">
                 <button class="config-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
                 <div class="settings-dropdown" id="settingsDropdown">
+                    <div class="settings-dropdown-item" id="accountSettingsMenuItem">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Account Settings</span>
+                    </div>
+                    <div class="settings-dropdown-divider"></div>
                     <div class="settings-dropdown-item" id="auditLogMenuItem">
                         <i class="fas fa-history"></i>
                         <span>Audit Log</span>
                     </div>
                 </div>
             </div>
+            <button class="config-btn" id="logoutBtn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
     </div>
 
@@ -1363,7 +1467,10 @@
                     <button class="filter-btn"><i class="fas fa-filter"></i></button>
                 </div>
                 <ul class="task-list">
-                    <li class="task-item alert-item" data-alert-id="00801" data-alert-title="Malware Detection Alert" data-alert-desc="Security alert detected during MBB practice session. Unauthorized access attempt from external IP address. System logs show multiple failed login attempts." data-alert-priority="High" data-alert-industry="Healthcare" data-alert-type="Security Breach" data-alert-time="Nov 2, 7:00 PM" data-alert-status="Pending" data-alert-assigned="Unassigned">
+                    <li class="task-item alert-item" data-alert-id="00801" data-alert-title="Malware Detection Alert"
+                        data-alert-desc="Security alert detected during MBB practice session. Unauthorized access attempt from external IP address. System logs show multiple failed login attempts."
+                        data-alert-priority="High" data-alert-industry="Healthcare" data-alert-type="Security Breach"
+                        data-alert-time="Nov 2, 7:00 PM" data-alert-status="Pending" data-alert-assigned="Unassigned">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00801</a>
                         <div style="flex: 1;">
@@ -1371,7 +1478,11 @@
                             <div class="task-name">Malware Detection Alert</div>
                         </div>
                     </li>
-                    <li class="task-item alert-item" data-alert-id="00800" data-alert-title="Unauthorized Login Attempt" data-alert-desc="Network connectivity issues reported during practice session. System logs show multiple connection timeouts and packet loss. Backup systems functioning normally." data-alert-priority="Medium" data-alert-industry="Biotechnology" data-alert-type="Network Issue" data-alert-time="Nov 2, 5:30 PM" data-alert-status="In Progress" data-alert-assigned="Sarah Miller">
+                    <li class="task-item alert-item" data-alert-id="00800" data-alert-title="Unauthorized Login Attempt"
+                        data-alert-desc="Network connectivity issues reported during practice session. System logs show multiple connection timeouts and packet loss. Backup systems functioning normally."
+                        data-alert-priority="Medium" data-alert-industry="Biotechnology" data-alert-type="Network Issue"
+                        data-alert-time="Nov 2, 5:30 PM" data-alert-status="In Progress"
+                        data-alert-assigned="Sarah Miller">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00800</a>
                         <div style="flex: 1;">
@@ -1379,7 +1490,11 @@
                             <div class="task-name">Unauthorized Login Attempt</div>
                         </div>
                     </li>
-                    <li class="task-item alert-item" data-alert-id="00799" data-alert-title="Suspicious Network Activity" data-alert-desc="Data breach attempt detected. Malware signature identified in network traffic. System automatically quarantined affected files. No data loss reported." data-alert-priority="Critical" data-alert-industry="Pharmaceutical" data-alert-type="Malware" data-alert-time="Nov 2, 3:00 PM" data-alert-status="Pending" data-alert-assigned="John Doe">
+                    <li class="task-item alert-item" data-alert-id="00799"
+                        data-alert-title="Suspicious Network Activity"
+                        data-alert-desc="Data breach attempt detected. Malware signature identified in network traffic. System automatically quarantined affected files. No data loss reported."
+                        data-alert-priority="Critical" data-alert-industry="Pharmaceutical" data-alert-type="Malware"
+                        data-alert-time="Nov 2, 3:00 PM" data-alert-status="Pending" data-alert-assigned="John Doe">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00799</a>
                         <div style="flex: 1;">
@@ -1387,7 +1502,11 @@
                             <div class="task-name">Suspicious Network Activity</div>
                         </div>
                     </li>
-                    <li class="task-item alert-item" data-alert-id="00798" data-alert-title="Intrusion Detection Alert" data-alert-desc="System failure reported in laboratory equipment monitoring system. Backup systems activated successfully. All critical operations restored within 15 minutes." data-alert-priority="Low" data-alert-industry="Research" data-alert-type="System Failure" data-alert-time="Nov 2, 12:00 PM" data-alert-status="Resolved" data-alert-assigned="Robert Martinez">
+                    <li class="task-item alert-item" data-alert-id="00798" data-alert-title="Intrusion Detection Alert"
+                        data-alert-desc="System failure reported in laboratory equipment monitoring system. Backup systems activated successfully. All critical operations restored within 15 minutes."
+                        data-alert-priority="Low" data-alert-industry="Research" data-alert-type="System Failure"
+                        data-alert-time="Nov 2, 12:00 PM" data-alert-status="Resolved"
+                        data-alert-assigned="Robert Martinez">
                         <div class="task-status status-due"></div>
                         <a href="#" class="task-id">#00798</a>
                         <div style="flex: 1;">
@@ -1406,45 +1525,47 @@
                 <div class="create-alert-form">
                     <div class="form-group">
                         <label class="form-label">Alert Title</label>
-                        <input type="text" class="form-control" placeholder="Enter alert title...">
+                        <input type="text" class="form-control" id="alertTitle" placeholder="Enter alert title...">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="3" placeholder="Enter alert description..."></textarea>
+                        <textarea class="form-control" rows="3" id="alertDescription" placeholder="Enter alert description..."></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Priority</label>
-                        <select class="form-control">
-                            <option>Low</option>
-                            <option>Medium</option>
-                            <option>High</option>
-                            <option>Critical</option>
+                        <select class="form-control" id="alertPriority">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Industry</label>
-                        <select class="form-control">
-                            <option>Healthcare</option>
-                            <option>Biotechnology</option>
-                            <option>Pharmaceutical</option>
-                            <option>Agriculture</option>
-                            <option>Research</option>
-                            <option>Other</option>
+                        <select class="form-control" id="alertIndustry">
+                            <option value="">Select...</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Biotechnology">Biotechnology</option>
+                            <option value="Pharmaceutical">Pharmaceutical</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Research">Research</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Incident Type</label>
-                        <select class="form-control">
-                            <option>Security Breach</option>
-                            <option>Data Breach</option>
-                            <option>System Failure</option>
-                            <option>Network Issue</option>
-                            <option>Malware</option>
-                            <option>Unauthorized Access</option>
-                            <option>Other</option>
+                        <select class="form-control" id="alertIncidentType">
+                            <option value="">Select...</option>
+                            <option value="Security Breach">Security Breach</option>
+                            <option value="Data Breach">Data Breach</option>
+                            <option value="System Failure">System Failure</option>
+                            <option value="Network Issue">Network Issue</option>
+                            <option value="Malware">Malware</option>
+                            <option value="Unauthorized Access">Unauthorized Access</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
-                    <button class="create-alert-btn">
+                    <button class="create-alert-btn" id="createAlertBtn">
                         <i class="fas fa-plus-circle"></i>
                         Create Alert
                     </button>
@@ -1473,22 +1594,22 @@
                     </div>
                 </div>
                 <div class="audit-log-filters">
-                <select id="auditFilterAction">
-                    <option value="">All Actions</option>
-                    <option value="created">Created</option>
-                    <option value="updated">Updated</option>
-                    <option value="deleted">Deleted</option>
-                    <option value="status-changed">Status Changed</option>
-                    <option value="assigned">Assigned</option>
-                </select>
-                <select id="auditFilterAlert">
-                    <option value="">All Alerts</option>
-                    <option value="00801">#00801</option>
-                    <option value="00800">#00800</option>
-                    <option value="00799">#00799</option>
-                    <option value="00798">#00798</option>
-                </select>
-                <input type="text" id="auditSearch" placeholder="Search audit log...">
+                    <select id="auditFilterAction">
+                        <option value="">All Actions</option>
+                        <option value="created">Created</option>
+                        <option value="updated">Updated</option>
+                        <option value="deleted">Deleted</option>
+                        <option value="status-changed">Status Changed</option>
+                        <option value="assigned">Assigned</option>
+                    </select>
+                    <select id="auditFilterAlert">
+                        <option value="">All Alerts</option>
+                        <option value="00801">#00801</option>
+                        <option value="00800">#00800</option>
+                        <option value="00799">#00799</option>
+                        <option value="00798">#00798</option>
+                    </select>
+                    <input type="text" id="auditSearch" placeholder="Search audit log...">
                 </div>
             </div>
         </div>
@@ -1524,115 +1645,26 @@
                     <input type="text" class="search-input" placeholder="Search conversations...">
                 </div>
                 <div class="conversations-list">
-                    <div class="conversation-item active" data-conversation="1">
-                        <div class="conversation-avatar">JD</div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">John Doe</div>
-                            <div class="conversation-preview">Thanks for the update on the security alert...</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time">2:30 PM</div>
-                            <div class="conversation-unread">2</div>
-                        </div>
-                    </div>
-                    <div class="conversation-item" data-conversation="2">
-                        <div class="conversation-avatar">SM</div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">Sarah Miller</div>
-                            <div class="conversation-preview">I have a question about the new protocol...</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time">1:15 PM</div>
-                        </div>
-                    </div>
-                    <div class="conversation-item" data-conversation="3">
-                        <div class="conversation-avatar">RM</div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">Robert Martinez</div>
-                            <div class="conversation-preview">The system update is working great!</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time">11:45 AM</div>
-                        </div>
-                    </div>
-                    <div class="conversation-item" data-conversation="4">
-                        <div class="conversation-avatar">EJ</div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">Emily Johnson</div>
-                            <div class="conversation-preview">Can you help me with access permissions?</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time">10:20 AM</div>
-                            <div class="conversation-unread">1</div>
-                        </div>
-                    </div>
-                    <div class="conversation-item" data-conversation="5">
-                        <div class="conversation-avatar">DW</div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">David Wilson</div>
-                            <div class="conversation-preview">Received the report, reviewing now...</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time">Yesterday</div>
-                        </div>
-                    </div>
+                    <!-- Conversations will be loaded here -->
                 </div>
             </div>
-
-            <!-- Messages Area -->
             <div class="conversation-messages">
                 <div class="messages-header">
                     <div class="messages-header-user">
-                        <div class="conversation-avatar">JD</div>
+                        <div class="conversation-avatar"></div>
                         <div>
-                            <div class="messages-header-name">John Doe</div>
-                            <div class="messages-header-status">Active now</div>
+                            <div class="messages-header-name">Select a conversation</div>
+                            <div class="messages-header-status"></div>
                         </div>
                     </div>
-                    <button class="icon-btn"><i class="fas fa-ellipsis-v"></i></button>
                 </div>
                 <div class="messages-container">
-                    <div class="message received">
-                        <div class="message-avatar">JD</div>
-                        <div class="message-content">
-                            <div class="message-bubble">Hi, I wanted to follow up on the security alert from earlier today. Can you provide more details about the incident?</div>
-                            <div class="message-time">11:30 AM</div>
-                        </div>
-                    </div>
-                    <div class="message sent">
-                        <div class="message-avatar">EG</div>
-                        <div class="message-content">
-                            <div class="message-bubble">Of course! The alert was triggered by an unauthorized access attempt. Our system automatically blocked it and no data was compromised. I can send you a detailed report if you'd like.</div>
-                            <div class="message-time">11:32 AM</div>
-                        </div>
-                    </div>
-                    <div class="message received">
-                        <div class="message-avatar">JD</div>
-                        <div class="message-content">
-                            <div class="message-bubble">Thanks for the quick response! Yes, please send the report. Also, should we be concerned about any potential follow-up attempts?</div>
-                            <div class="message-time">11:35 AM</div>
-                        </div>
-                    </div>
-                    <div class="message sent">
-                        <div class="message-avatar">EG</div>
-                        <div class="message-content">
-                            <div class="message-bubble">I'll send the report right away. We've implemented additional monitoring for your account and haven't detected any further suspicious activity. I'll keep you updated if anything changes.</div>
-                            <div class="message-time">11:36 AM</div>
-                        </div>
-                    </div>
-                    <div class="message received">
-                        <div class="message-avatar">JD</div>
-                        <div class="message-content">
-                            <div class="message-bubble">Perfect, thank you for your help!</div>
-                            <div class="message-time">2:30 PM</div>
-                        </div>
-                    </div>
+                    <!-- Messages will be displayed here -->
                 </div>
                 <div class="message-input-area">
-                    <textarea class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                    <textarea class="message-input" placeholder="Type a message..."></textarea>
                     <button class="send-btn">
                         <i class="fas fa-paper-plane"></i>
-                        Send
                     </button>
                 </div>
             </div>
@@ -1724,23 +1756,140 @@
         </div>
     </div>
 
+    <!-- Account Settings Modal -->
+    <div class="alert-modal" id="accountSettingsModal">
+        <div class="alert-modal-content" style="max-width: 600px;">
+            <div class="alert-modal-header">
+                <h2><i class="fas fa-user-cog"></i> Account Settings</h2>
+                <button class="alert-modal-close" id="closeAccountSettingsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body">
+                <form id="accountSettingsForm">
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Full Name</label>
+                        <div class="alert-modal-value readonly" id="accountFullName"></div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Email</label>
+                        <div class="alert-modal-value readonly" id="accountEmail"></div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Facility Name</label>
+                        <div class="alert-modal-value readonly" id="accountFacilityName"></div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Industry / Facility Type</label>
+                        <select class="form-control" id="accountFacilityType" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                            <option value="Hospital" style="background-color: #000000; color: #ffffff;">Hospital</option>
+                            <option value="Lab" style="background-color: #000000; color: #ffffff;">Lab</option>
+                            <option value="Biomanufacturing" style="background-color: #000000; color: #ffffff;">Biomanufacturing</option>
+                            <option value="Agriculture" style="background-color: #000000; color: #ffffff;">Agriculture</option>
+                        </select>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Contact Information</label>
+                        <input type="text" class="form-control" id="accountContactInfo" placeholder="Phone number or contact info" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                        <small style="color: #999; font-size: 12px; margin-top: 5px; display: block;">Optional: Add your contact information</small>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--bio-medium-green);">
+                        <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--bio-text-light);">Notification Preferences</h3>
+                        
+                        <div class="alert-modal-field">
+                            <label class="alert-modal-label">Delivery Mode</label>
+                            <select class="form-control" id="notificationDeliveryMode" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                                <option value="Immediate" style="background-color: #000000; color: #ffffff;">Immediate</option>
+                                <option value="DailyDigest" style="background-color: #000000; color: #ffffff;">Daily Digest</option>
+                                <option value="WeeklyDigest" style="background-color: #000000; color: #ffffff;">Weekly Digest</option>
+                            </select>
+                        </div>
+                        
+                        <div class="alert-modal-field" id="dailyDigestTimeField" style="display: none;">
+                            <label class="alert-modal-label">Daily Digest Time</label>
+                            <input type="time" class="form-control" id="dailyDigestTime" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                        </div>
+                        
+                        <div class="alert-modal-field" id="weeklyDigestDayField" style="display: none;">
+                            <label class="alert-modal-label">Weekly Digest Day</label>
+                            <select class="form-control" id="weeklyDigestDay" style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000;">
+                                <option value="Monday" style="background-color: #000000; color: #ffffff;">Monday</option>
+                                <option value="Tuesday" style="background-color: #000000; color: #ffffff;">Tuesday</option>
+                                <option value="Wednesday" style="background-color: #000000; color: #ffffff;">Wednesday</option>
+                                <option value="Thursday" style="background-color: #000000; color: #ffffff;">Thursday</option>
+                                <option value="Friday" style="background-color: #000000; color: #ffffff;">Friday</option>
+                                <option value="Saturday" style="background-color: #000000; color: #ffffff;">Saturday</option>
+                                <option value="Sunday" style="background-color: #000000; color: #ffffff;">Sunday</option>
+                            </select>
+                        </div>
+                        
+                        <div class="alert-modal-field">
+                            <label style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                                <input type="checkbox" id="receiveHighTier" style="width: 18px; height: 18px;">
+                                <span>Receive High Tier Alerts</span>
+                            </label>
+                        </div>
+                        <div class="alert-modal-field">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="receiveMediumTier" style="width: 18px; height: 18px;">
+                                <span>Receive Medium Tier Alerts</span>
+                            </label>
+                        </div>
+                        <div class="alert-modal-field">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="receiveLowTier" style="width: 18px; height: 18px;">
+                                <span>Receive Low Tier Alerts</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="alert-modal-actions">
+                <button class="alert-modal-btn alert-modal-btn-primary" id="saveAccountSettingsBtn">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-outline" id="cancelAccountSettingsBtn">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script>
+        // Access control - check if user is admin
+        (function() {
+            const user = apiClient.getCurrentUserSync();
+            if (!user) {
+                window.location.href = 'index.html';
+            } else if (user.role !== 'Admin') {
+                window.location.href = 'reports.html';
+            }
+        })();
+    </script>
+    <script src="../js/admin-dashboard.js"></script>
+    <script src="../js/audit-log.js"></script>
+    <script src="../js/conversations.js?v=3"></script>
     <script>
         // Page Navigation
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Live Date and Clock Update
             function updateDateTime() {
                 const now = new Date();
                 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                
+
                 // Format date: "Monday, November 3"
                 const dayName = days[now.getDay()];
                 const monthName = months[now.getMonth()];
                 const day = now.getDate();
                 const dateString = `${dayName}, ${monthName} ${day}`;
-                
+
                 // Format time: "02:45:30 PM"
                 let hours = now.getHours();
                 const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -1750,14 +1899,14 @@
                 hours = hours ? hours : 12; // the hour '0' should be '12'
                 const hoursStr = String(hours).padStart(2, '0');
                 const timeString = `${hoursStr}:${minutes}:${seconds} ${ampm}`;
-                
+
                 // Update DOM
                 const dateDisplay = document.getElementById('dateDisplay');
                 const clockDisplay = document.getElementById('clockDisplay');
                 if (dateDisplay) dateDisplay.textContent = dateString;
                 if (clockDisplay) clockDisplay.textContent = timeString;
             }
-            
+
             // Update immediately and then every second
             updateDateTime();
             setInterval(updateDateTime, 1000);
@@ -1768,7 +1917,7 @@
             const auditLogPage = document.getElementById('audit-log-page');
 
             navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
+                link.addEventListener('click', function (e) {
                     e.preventDefault();
                     const page = this.getAttribute('data-page');
 
@@ -1781,10 +1930,21 @@
                         homePage.classList.remove('hidden');
                         conversationsPage.classList.remove('active');
                         auditLogPage.classList.remove('active');
+                        // Refresh incoming alerts when navigating to home page
+                        if (typeof loadIncomingAlerts === 'function') {
+                            loadIncomingAlerts();
+                        }
+                        if (typeof loadDashboardStats === 'function') {
+                            loadDashboardStats();
+                        }
                     } else if (page === 'conversations') {
                         homePage.classList.add('hidden');
                         conversationsPage.classList.add('active');
                         auditLogPage.classList.remove('active');
+                        // Load conversations when page is shown
+                        if (typeof loadConversations === 'function') {
+                            loadConversations();
+                        }
                     }
                 });
             });
@@ -1798,23 +1958,32 @@
 
             // Toggle settings dropdown
             if (settingsBtn && settingsDropdown) {
-                settingsBtn.addEventListener('click', function(e) {
+                settingsBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     settingsDropdown.classList.toggle('active');
                 });
 
                 // Close dropdown when clicking outside
                 if (settingsContainer) {
-                    document.addEventListener('click', function(e) {
+                    document.addEventListener('click', function (e) {
                         if (!settingsContainer.contains(e.target)) {
                             settingsDropdown.classList.remove('active');
                         }
                     });
                 }
 
+                // Open account settings modal
+                const accountSettingsMenuItem = document.getElementById('accountSettingsMenuItem');
+                if (accountSettingsMenuItem) {
+                    accountSettingsMenuItem.addEventListener('click', async function () {
+                        settingsDropdown.classList.remove('active');
+                        await openAccountSettingsModal();
+                    });
+                }
+
                 // Open audit log page
                 if (auditLogMenuItem) {
-                    auditLogMenuItem.addEventListener('click', function() {
+                    auditLogMenuItem.addEventListener('click', function () {
                         homePage.classList.add('hidden');
                         conversationsPage.classList.remove('active');
                         auditLogPage.classList.add('active');
@@ -1823,37 +1992,107 @@
                 }
             }
 
-            // Download PDF from audit log page button
-            const downloadPdfDropdown = document.getElementById('downloadPdfDropdown');
-            const downloadPdfContainer = downloadPdfBtn?.parentElement;
-            if (downloadPdfBtn && downloadPdfDropdown && downloadPdfContainer) {
-                downloadPdfBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    downloadPdfDropdown.classList.toggle('active');
-                });
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!downloadPdfContainer.contains(e.target)) {
-                        downloadPdfDropdown.classList.remove('active');
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async function() {
+                    try {
+                        await apiClient.logout();
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        console.error('Error logging out:', error);
+                        // Still redirect even if logout API call fails
+                        window.location.href = 'index.html';
                     }
                 });
+            }
 
-                // Handle download option clicks
-                const downloadPdfOptions = downloadPdfDropdown.querySelectorAll('.download-pdf-option');
-                downloadPdfOptions.forEach(option => {
-                    option.addEventListener('click', function() {
-                        const hours = parseInt(this.getAttribute('data-hours'));
-                        downloadAuditLogPDF(hours);
-                        downloadPdfDropdown.classList.remove('active');
-                    });
+            // Create Alert button handler
+            const createAlertBtn = document.getElementById('createAlertBtn');
+            if (createAlertBtn) {
+                createAlertBtn.addEventListener('click', async function() {
+                    const title = document.getElementById('alertTitle')?.value?.trim();
+                    const description = document.getElementById('alertDescription')?.value?.trim();
+                    const priority = document.getElementById('alertPriority')?.value;
+                    const industry = document.getElementById('alertIndustry')?.value;
+                    const incidentType = document.getElementById('alertIncidentType')?.value;
+
+                    // Validate required fields
+                    if (!title) {
+                        alert('Please enter an alert title');
+                        return;
+                    }
+                    if (!description) {
+                        alert('Please enter a description');
+                        return;
+                    }
+                    if (!incidentType) {
+                        alert('Please select an incident type');
+                        return;
+                    }
+
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+                    try {
+                        // Build description with additional info
+                        let fullDescription = description;
+                        if (industry) {
+                            fullDescription += `\n\nIndustry: ${industry}`;
+                        }
+                        if (priority) {
+                            fullDescription += `\n\nPriority: ${priority}`;
+                        }
+
+                        // Submit as threat
+                        const threatData = {
+                            title: title,
+                            description: fullDescription.trim(),
+                            category: incidentType,
+                            source: 'Admin Alert Creation',
+                            dateObserved: new Date(),
+                            impactLevel: priority || 'Medium'
+                        };
+
+                        const response = await apiClient.submitThreat(threatData);
+                        
+                        alert('Alert created successfully! Threat ID: ' + response.id);
+                        
+                        // Reset form
+                        document.getElementById('alertTitle').value = '';
+                        document.getElementById('alertDescription').value = '';
+                        document.getElementById('alertPriority').value = 'Low';
+                        document.getElementById('alertIndustry').value = '';
+                        document.getElementById('alertIncidentType').value = '';
+                        
+                        // Refresh incoming alerts to show the new alert
+                        if (typeof loadIncomingAlerts === 'function') {
+                            await loadIncomingAlerts();
+                        }
+                        // Also refresh dashboard stats
+                        if (typeof loadDashboardStats === 'function') {
+                            await loadDashboardStats();
+                        }
+                    } catch (error) {
+                        console.error('Error creating alert:', error);
+                        alert('Error creating alert: ' + (error.message || 'Unknown error'));
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
                 });
             }
+
+            // Download PDF from audit log page button
+            // NOTE: The click handlers for the Download PDF button and dropdown
+            // are managed in `audit-log.js` to keep all audit-log logic in one place.
 
             // Conversation item click handler
             const conversationItems = document.querySelectorAll('.conversation-item');
             conversationItems.forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function () {
                     conversationItems.forEach(i => i.classList.remove('active'));
                     this.classList.add('active');
                     // Here you would load the conversation messages
@@ -1864,7 +2103,7 @@
             // Auto-resize textarea
             const messageInput = document.querySelector('.message-input');
             if (messageInput) {
-                messageInput.addEventListener('input', function() {
+                messageInput.addEventListener('input', function () {
                     this.style.height = 'auto';
                     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
                 });
@@ -1873,7 +2112,7 @@
             // Send button handler
             const sendBtn = document.querySelector('.send-btn');
             if (sendBtn) {
-                sendBtn.addEventListener('click', function() {
+                sendBtn.addEventListener('click', function () {
                     const input = document.querySelector('.message-input');
                     if (input.value.trim()) {
                         // Here you would send the message
@@ -1886,7 +2125,7 @@
 
             // Enter key to send (Shift+Enter for new line)
             if (messageInput) {
-                messageInput.addEventListener('keydown', function(e) {
+                messageInput.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         sendBtn.click();
@@ -1905,7 +2144,7 @@
 
             // Open modal when clicking on an alert item
             alertItems.forEach(item => {
-                item.addEventListener('click', function(e) {
+                item.addEventListener('click', function (e) {
                     e.preventDefault();
                     const alertId = this.getAttribute('data-alert-id');
                     const alertTitle = this.getAttribute('data-alert-title');
@@ -1965,14 +2204,14 @@
             }
 
             // Close modal when clicking outside
-            alertModal.addEventListener('click', function(e) {
+            alertModal.addEventListener('click', function (e) {
                 if (e.target === alertModal) {
                     closeModal();
                 }
             });
 
             // Close modal with Escape key
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape' && alertModal.classList.contains('active')) {
                     closeModal();
                 }
@@ -1980,29 +2219,90 @@
 
             // Save/Update button
             if (saveAlertBtn) {
-                saveAlertBtn.addEventListener('click', function() {
+                saveAlertBtn.addEventListener('click', async function () {
+                    const alertIdEl = document.getElementById('modalAlertId');
+                    if (!alertIdEl) {
+                        alert('Error: Alert ID not found');
+                        return;
+                    }
+                    
+                    const alertId = parseInt(alertIdEl.textContent.replace('#', '').trim());
+                    if (!alertId) {
+                        alert('Error: Invalid alert ID');
+                        return;
+                    }
+
+                    const titleEl = document.getElementById('modalAlertTitle');
+                    const descEl = document.getElementById('modalAlertDesc');
                     const selectedPriority = document.querySelector('input[name="priority"]:checked');
-                    if (selectedPriority) {
-                        const priority = selectedPriority.value;
-                        const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
+                    
+                    if (!titleEl || !descEl) {
+                        alert('Error: Form fields not found');
+                        return;
+                    }
+
+                    // Get value from input/textarea or textContent from div
+                    const title = titleEl.tagName === 'INPUT' || titleEl.tagName === 'TEXTAREA' 
+                        ? titleEl.value 
+                        : (titleEl.textContent || titleEl.innerText || '');
+                    const description = descEl.tagName === 'TEXTAREA' || descEl.tagName === 'INPUT'
+                        ? descEl.value
+                        : (descEl.textContent || descEl.innerText || '');
+                    const priority = selectedPriority ? selectedPriority.value : 'Medium';
+                    const category = document.getElementById('modalAlertType')?.textContent || 'Other';
+
+                    if (!title.trim()) {
+                        alert('Please enter a title');
+                        return;
+                    }
+
+                    if (!description.trim()) {
+                        alert('Please enter a description');
+                        return;
+                    }
+
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                    try {
+                        // Update threat via API
+                        await apiClient.updateThreat(alertId, {
+                            title: title.trim(),
+                            description: description.trim(),
+                            category: category,
+                            impactLevel: priority
+                        });
+
+                        alert('Alert updated successfully!');
                         
-                        // Update the alert item's data attribute
-                        const alertItem = document.querySelector(`[data-alert-id="${alertId}"]`);
-                        if (alertItem) {
-                            alertItem.setAttribute('data-alert-priority', priority);
-                            // Here you would typically send the update to the server
-                            console.log('Updating alert', alertId, 'with priority', priority);
+                        // Refresh the alerts list
+                        if (typeof loadIncomingAlerts === 'function') {
+                            await loadIncomingAlerts();
+                        }
+                        if (typeof loadMyAlerts === 'function') {
+                            await loadMyAlerts();
                         }
                         
-                        alert('Alert updated successfully!');
-                        closeModal();
+                        // Close modal
+                        const modal = document.getElementById('alertModal');
+                        if (modal) {
+                            modal.classList.remove('active');
+                        }
+                    } catch (error) {
+                        console.error('Error updating alert:', error);
+                        alert('Error updating alert: ' + (error.message || 'Unknown error'));
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
                     }
                 });
             }
 
             // Assign to Industry button
             if (assignIndustryBtn) {
-                assignIndustryBtn.addEventListener('click', function() {
+                assignIndustryBtn.addEventListener('click', function () {
                     const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
                     // Here you would typically open an industry assignment dialog or update
                     console.log('Assigning alert', alertId, 'to industry');
@@ -2012,7 +2312,7 @@
 
             // Mark as Resolved button
             if (markResolvedBtn) {
-                markResolvedBtn.addEventListener('click', function() {
+                markResolvedBtn.addEventListener('click', function () {
                     const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
                     const alertItem = document.querySelector(`[data-alert-id="${alertId}"]`);
                     const statusElement = document.getElementById('modalAlertStatus');
@@ -2028,252 +2328,56 @@
                 });
             }
 
-            // Sample Audit Log Data
-            const sampleAuditLogs = [
-                {
-                    timestamp: 'Nov 2, 2024 7:15 PM',
-                    action: 'created',
-                    alertId: '00801',
-                    user: 'System',
-                    changes: 'Alert created: Malware Detection Alert'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 6:45 PM',
-                    action: 'status-changed',
-                    alertId: '00800',
-                    user: 'Sarah Miller',
-                    changes: 'Status changed from Pending to In Progress'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 5:30 PM',
-                    action: 'created',
-                    alertId: '00800',
-                    user: 'System',
-                    changes: 'Alert created: Unauthorized Login Attempt'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 4:20 PM',
-                    action: 'updated',
-                    alertId: '00799',
-                    user: 'John Doe',
-                    changes: 'Priority changed from High to Critical'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 3:45 PM',
-                    action: 'assigned',
-                    alertId: '00799',
-                    user: 'Admin',
-                    changes: 'Alert assigned to John Doe'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 3:00 PM',
-                    action: 'created',
-                    alertId: '00799',
-                    user: 'System',
-                    changes: 'Alert created: Suspicious Network Activity'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 1:30 PM',
-                    action: 'status-changed',
-                    alertId: '00798',
-                    user: 'Robert Martinez',
-                    changes: 'Status changed from In Progress to Resolved'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 12:15 PM',
-                    action: 'updated',
-                    alertId: '00798',
-                    user: 'Robert Martinez',
-                    changes: 'Description updated with resolution details'
-                },
-                {
-                    timestamp: 'Nov 2, 2024 12:00 PM',
-                    action: 'created',
-                    alertId: '00798',
-                    user: 'System',
-                    changes: 'Alert created: Intrusion Detection Alert'
-                },
-                {
-                    timestamp: 'Nov 1, 2024 11:30 PM',
-                    action: 'status-changed',
-                    alertId: '00797',
-                    user: 'Emily Johnson',
-                    changes: 'Status changed from Pending to In Progress'
-                },
-                {
-                    timestamp: 'Nov 1, 2024 10:15 PM',
-                    action: 'assigned',
-                    alertId: '00797',
-                    user: 'Admin',
-                    changes: 'Alert assigned to Emily Johnson'
-                },
-                {
-                    timestamp: 'Nov 1, 2024 9:45 PM',
-                    action: 'updated',
-                    alertId: '00796',
-                    user: 'David Wilson',
-                    changes: 'Priority changed from Medium to High'
-                },
-                {
-                    timestamp: 'Nov 1, 2024 8:20 PM',
-                    action: 'created',
-                    alertId: '00797',
-                    user: 'System',
-                    changes: 'Alert created: Data Breach Attempt'
-                },
-                {
-                    timestamp: 'Nov 1, 2024 7:00 PM',
-                    action: 'status-changed',
-                    alertId: '00795',
-                    user: 'Sarah Miller',
-                    changes: 'Status changed from In Progress to Resolved'
-                },
-                {
-                    timestamp: 'Nov 1, 2024 6:30 PM',
-                    action: 'updated',
-                    alertId: '00795',
-                    user: 'Sarah Miller',
-                    changes: 'Industry changed from Healthcare to Biotechnology'
-                }
-            ];
-
-            // Render Audit Log
-            function renderAuditLog(auditLogs = sampleAuditLogs) {
-                const auditLogBody = document.getElementById('auditLogBody');
-                if (!auditLogBody) return;
-
-                auditLogBody.innerHTML = '';
-
-                auditLogs.forEach(log => {
-                    const row = document.createElement('tr');
-                    
-                    const actionClass = log.action.replace(' ', '-');
-                    const actionLabels = {
-                        'created': 'Created',
-                        'updated': 'Updated',
-                        'deleted': 'Deleted',
-                        'status-changed': 'Status Changed',
-                        'assigned': 'Assigned'
-                    };
-
-                    row.innerHTML = `
-                        <td>${log.timestamp}</td>
-                        <td><span class="audit-action ${actionClass}">${actionLabels[log.action] || log.action}</span></td>
-                        <td><a href="#" class="task-id">#${log.alertId}</a></td>
-                        <td>${log.user}</td>
-                        <td>
-                            ${log.changes}
-                        </td>
-                    `;
-
-                    auditLogBody.appendChild(row);
-                });
-            }
-
-            // Filter Audit Log
-            function filterAuditLog() {
-                const actionFilter = document.getElementById('auditFilterAction')?.value || '';
-                const alertFilter = document.getElementById('auditFilterAlert')?.value || '';
-                const searchTerm = document.getElementById('auditSearch')?.value.toLowerCase() || '';
-
-                let filteredLogs = sampleAuditLogs;
-
-                if (actionFilter) {
-                    filteredLogs = filteredLogs.filter(log => log.action === actionFilter);
-                }
-
-                if (alertFilter) {
-                    filteredLogs = filteredLogs.filter(log => log.alertId === alertFilter);
-                }
-
-                if (searchTerm) {
-                    filteredLogs = filteredLogs.filter(log => 
-                        log.user.toLowerCase().includes(searchTerm) ||
-                        log.changes.toLowerCase().includes(searchTerm) ||
-                        log.alertId.includes(searchTerm)
-                    );
-                }
-
-                renderAuditLog(filteredLogs);
-            }
-
-            // Initialize audit log
-            renderAuditLog();
-
-            // Add filter event listeners
-            const auditFilterAction = document.getElementById('auditFilterAction');
-            const auditFilterAlert = document.getElementById('auditFilterAlert');
-            const auditSearch = document.getElementById('auditSearch');
-
-            if (auditFilterAction) {
-                auditFilterAction.addEventListener('change', filterAuditLog);
-            }
-
-            if (auditFilterAlert) {
-                auditFilterAlert.addEventListener('change', filterAuditLog);
-            }
-
-            if (auditSearch) {
-                auditSearch.addEventListener('input', filterAuditLog);
-            }
-
-            // Helper function to parse timestamp to Date
-            function parseTimestamp(timestamp) {
-                // Format: "Nov 2, 2024 7:15 PM"
-                const months = {
-                    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-                    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-                };
-                
-                const parts = timestamp.split(' ');
-                const month = months[parts[0]];
-                const day = parseInt(parts[1].replace(',', ''));
-                const year = parseInt(parts[2]);
-                
-                let timeParts = parts.slice(3);
-                let timeStr = timeParts.join(' ');
-                const [time, period] = timeStr.split(' ');
-                const [hours, minutes] = time.split(':');
-                let hour24 = parseInt(hours);
-                if (period === 'PM' && hour24 !== 12) hour24 += 12;
-                if (period === 'AM' && hour24 === 12) hour24 = 0;
-                
-                return new Date(year, month, day, hour24, parseInt(minutes));
-            }
-
             // Download Audit Log as PDF
-            function downloadAuditLogPDF(hours) {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Calculate cutoff time
-                const now = new Date();
-                const cutoffTime = new Date(now.getTime() - (hours * 60 * 60 * 1000));
-                
-                // Filter logs by time range
-                let filteredLogs = sampleAuditLogs.filter(log => {
-                    const logDate = parseTimestamp(log.timestamp);
-                    return logDate >= cutoffTime;
-                });
+            async function downloadAuditLogPDF(hours) {
+                try {
+                    // Check if jsPDF is loaded
+                    if (typeof window.jspdf === 'undefined') {
+                        alert('PDF library not loaded. Please refresh the page.');
+                        return;
+                    }
 
-                // Sort by timestamp (newest first)
-                filteredLogs.sort((a, b) => {
-                    return parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp);
-                });
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    // Calculate cutoff time
+                    const now = new Date();
+                    const cutoffTime = new Date(now.getTime() - (hours * 60 * 60 * 1000));
+
+                    // Fetch audit logs from API
+                    let endpoint = '/admin/audit-logs?';
+                    endpoint += `startDate=${cutoffTime.toISOString()}&`;
+                    endpoint += `pageSize=10000&`;
+                    endpoint += `page=1`;
+
+                    const response = await apiClient.get(endpoint);
+                    const logs = response.logs || [];
+
+                    // Filter and sort logs
+                    let filteredLogs = logs.filter(log => {
+                        if (!log.timestamp) return false;
+                        const logDate = new Date(log.timestamp);
+                        return logDate >= cutoffTime;
+                    });
+
+                    // Sort by timestamp (newest first)
+                    filteredLogs.sort((a, b) => {
+                        return new Date(b.timestamp) - new Date(a.timestamp);
+                    });
 
                 // PDF Header
                 doc.setFontSize(18);
                 doc.setTextColor(107, 207, 143); // BIO-ISAC green
                 doc.text('BIO-ISAC Audit Log', 14, 20);
-                
+
                 // Time range info
                 doc.setFontSize(10);
                 doc.setTextColor(100, 100, 100);
                 const timeRangeText = hours === 1 ? 'Last 1 Hour' :
-                                    hours === 4 ? 'Last 4 Hours' :
-                                    hours === 24 ? 'Last 24 Hours' :
-                                    hours === 168 ? 'Last 7 Days' :
-                                    hours === 720 ? 'Last 30 Days' : 'All Logs';
+                    hours === 4 ? 'Last 4 Hours' :
+                        hours === 24 ? 'Last 24 Hours' :
+                            hours === 168 ? 'Last 7 Days' :
+                                hours === 720 ? 'Last 30 Days' : 'All Logs';
                 doc.text(`Time Range: ${timeRangeText}`, 14, 28);
                 doc.text(`Generated: ${now.toLocaleString()}`, 14, 33);
                 doc.text(`Total Entries: ${filteredLogs.length}`, 14, 38);
@@ -2319,17 +2423,36 @@
 
                     // Row data
                     doc.setFontSize(8);
-                    doc.text(log.timestamp.substring(0, 18), 16, yPos);
-                    doc.text(actionLabels[log.action] || log.action, 60, yPos);
-                    doc.text('#' + log.alertId, 90, yPos);
-                    doc.text(log.user, 120, yPos);
-                    
-                    // Wrap changes text if too long
-                    const changesText = doc.splitTextToSize(log.changes, 50);
-                    doc.text(changesText, 150, yPos);
-                    
-                    yPos += Math.max(8, changesText.length * 4);
+                    const timestamp = log.timestamp ? formatDateForPDF(log.timestamp) : 'N/A';
+                    doc.text(timestamp, 16, yPos);
+                    const actionType = log.actionType || 'Unknown';
+                    doc.text(actionLabels[actionType.toLowerCase()] || actionType, 60, yPos);
+                    const threatId = log.threatId ? `#${String(log.threatId).padStart(5, '0')}` : 'N/A';
+                    doc.text(threatId, 90, yPos);
+                    const userId = log.userId === 1 ? 'System' : `User ${log.userId}`;
+                    doc.text(userId, 120, yPos);
+
+                    // Wrap details text if too long
+                    const details = log.details || '';
+                    const detailsText = doc.splitTextToSize(details, 50);
+                    doc.text(detailsText, 150, yPos);
+
+                    yPos += Math.max(8, detailsText.length * 4);
                 });
+
+                // Helper function for date formatting
+                function formatDateForPDF(dateString) {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    return date.toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                }
 
                 // Footer
                 const pageCount = doc.internal.getNumberOfPages();
@@ -2348,17 +2471,211 @@
                 // Generate filename
                 const dateStr = now.toISOString().split('T')[0];
                 const timeStr = hours === 1 ? '1hr' :
-                              hours === 4 ? '4hrs' :
-                              hours === 24 ? '24hrs' :
-                              hours === 168 ? '7days' :
-                              hours === 720 ? '30days' : 'all';
+                    hours === 4 ? '4hrs' :
+                        hours === 24 ? '24hrs' :
+                            hours === 168 ? '7days' :
+                                hours === 720 ? '30days' : 'all';
                 const filename = `audit-log-${timeStr}-${dateStr}.pdf`;
 
                 // Save PDF
                 doc.save(filename);
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    alert('Error generating PDF: ' + error.message);
+                }
+            }
+
+            // Account Settings Modal Functions
+            async function openAccountSettingsModal() {
+                const modal = document.getElementById('accountSettingsModal');
+                if (!modal) return;
+
+                try {
+                    // Load user profile
+                    const profile = await apiClient.getProfile();
+                    
+                    // Populate profile fields
+                    document.getElementById('accountFullName').textContent = profile.fullName || '';
+                    document.getElementById('accountEmail').textContent = profile.email || '';
+                    document.getElementById('accountFacilityName').textContent = profile.facilityName || '';
+                    document.getElementById('accountFacilityType').value = profile.facilityType || 'Hospital';
+                    
+                    // Load notification preferences
+                    const preferences = await apiClient.getNotificationPreferences();
+                    
+                    document.getElementById('notificationDeliveryMode').value = preferences.deliveryMode || 'Immediate';
+                    document.getElementById('receiveHighTier').checked = preferences.receiveHighTier !== false;
+                    document.getElementById('receiveMediumTier').checked = preferences.receiveMediumTier !== false;
+                    document.getElementById('receiveLowTier').checked = preferences.receiveLowTier === true;
+                    
+                    if (preferences.dailyDigestTime) {
+                        document.getElementById('dailyDigestTime').value = preferences.dailyDigestTime;
+                    }
+                    if (preferences.weeklyDigestDay) {
+                        document.getElementById('weeklyDigestDay').value = preferences.weeklyDigestDay;
+                    }
+                    
+                    // Show/hide digest fields based on delivery mode
+                    updateDigestFields();
+                    
+                    // Show modal
+                    modal.classList.add('active');
+                } catch (error) {
+                    console.error('Error loading account settings:', error);
+                    alert('Error loading account settings: ' + error.message);
+                }
+            }
+
+            function updateDigestFields() {
+                const deliveryMode = document.getElementById('notificationDeliveryMode')?.value;
+                const dailyField = document.getElementById('dailyDigestTimeField');
+                const weeklyField = document.getElementById('weeklyDigestDayField');
+                
+                if (deliveryMode === 'DailyDigest') {
+                    if (dailyField) dailyField.style.display = 'block';
+                    if (weeklyField) weeklyField.style.display = 'none';
+                } else if (deliveryMode === 'WeeklyDigest') {
+                    if (dailyField) dailyField.style.display = 'none';
+                    if (weeklyField) weeklyField.style.display = 'block';
+                } else {
+                    if (dailyField) dailyField.style.display = 'none';
+                    if (weeklyField) weeklyField.style.display = 'none';
+                }
+            }
+
+            // Delivery mode change handler
+            const deliveryModeSelect = document.getElementById('notificationDeliveryMode');
+            if (deliveryModeSelect) {
+                deliveryModeSelect.addEventListener('change', updateDigestFields);
+            }
+
+            // Close modal handlers
+            const closeBtn = document.getElementById('closeAccountSettingsModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    const modal = document.getElementById('accountSettingsModal');
+                    if (modal) modal.classList.remove('active');
+                });
+            }
+
+            const cancelBtn = document.getElementById('cancelAccountSettingsBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    const modal = document.getElementById('accountSettingsModal');
+                    if (modal) modal.classList.remove('active');
+                });
+            }
+
+            // Save account settings
+            const saveBtn = document.getElementById('saveAccountSettingsBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', async function() {
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                    try {
+                        // Update profile (facility type)
+                        const facilityType = document.getElementById('accountFacilityType')?.value;
+                        const profile = await apiClient.getProfile();
+                        
+                        await apiClient.updateProfile({
+                            fullName: profile.fullName,
+                            facilityName: profile.facilityName,
+                            facilityType: facilityType
+                        });
+
+                        // Update notification preferences
+                        const deliveryMode = document.getElementById('notificationDeliveryMode')?.value;
+                        const preferences = {
+                            deliveryMode: deliveryMode,
+                            receiveHighTier: document.getElementById('receiveHighTier')?.checked || false,
+                            receiveMediumTier: document.getElementById('receiveMediumTier')?.checked || false,
+                            receiveLowTier: document.getElementById('receiveLowTier')?.checked || false
+                        };
+
+                        if (deliveryMode === 'DailyDigest') {
+                            preferences.dailyDigestTime = document.getElementById('dailyDigestTime')?.value;
+                        }
+                        if (deliveryMode === 'WeeklyDigest') {
+                            preferences.weeklyDigestDay = document.getElementById('weeklyDigestDay')?.value;
+                        }
+
+                        await apiClient.updateNotificationPreferences(preferences);
+
+                        alert('Account settings saved successfully!');
+                        const modal = document.getElementById('accountSettingsModal');
+                        if (modal) modal.classList.remove('active');
+                    } catch (error) {
+                        console.error('Error saving account settings:', error);
+                        alert('Error saving account settings: ' + error.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                });
             }
         });
     </script>
 </body>
-</html>
 
+</html>
+                });
+            }
+
+            // Save account settings
+            const saveBtn = document.getElementById('saveAccountSettingsBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', async function() {
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                    try {
+                        // Update profile (facility type)
+                        const facilityType = document.getElementById('accountFacilityType')?.value;
+                        const profile = await apiClient.getProfile();
+                        
+                        await apiClient.updateProfile({
+                            fullName: profile.fullName,
+                            facilityName: profile.facilityName,
+                            facilityType: facilityType
+                        });
+
+                        // Update notification preferences
+                        const deliveryMode = document.getElementById('notificationDeliveryMode')?.value;
+                        const preferences = {
+                            deliveryMode: deliveryMode,
+                            receiveHighTier: document.getElementById('receiveHighTier')?.checked || false,
+                            receiveMediumTier: document.getElementById('receiveMediumTier')?.checked || false,
+                            receiveLowTier: document.getElementById('receiveLowTier')?.checked || false
+                        };
+
+                        if (deliveryMode === 'DailyDigest') {
+                            preferences.dailyDigestTime = document.getElementById('dailyDigestTime')?.value;
+                        }
+                        if (deliveryMode === 'WeeklyDigest') {
+                            preferences.weeklyDigestDay = document.getElementById('weeklyDigestDay')?.value;
+                        }
+
+                        await apiClient.updateNotificationPreferences(preferences);
+
+                        alert('Account settings saved successfully!');
+                        const modal = document.getElementById('accountSettingsModal');
+                        if (modal) modal.classList.remove('active');
+                    } catch (error) {
+                        console.error('Error saving account settings:', error);
+                        alert('Error saving account settings: ' + error.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

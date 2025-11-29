@@ -3,6 +3,11 @@ using api.DataAccess;
 
 namespace MyApp.Namespace.Services
 {
+    public class DatabaseQuotaExceededException : Exception
+    {
+        public DatabaseQuotaExceededException(string message) : base(message) { }
+    }
+
     public class DatabaseService
     {
         private readonly string _connectionString;
@@ -13,15 +18,27 @@ namespace MyApp.Namespace.Services
                 ?? throw new InvalidOperationException("Connection string not found in Database class.");
         }
 
+        private void HandleMySqlException(MySqlException ex)
+        {
+            if (ex.Message.Contains("exceeded the 'max_questions' resource"))
+            {
+                throw new DatabaseQuotaExceededException(
+                    "Database query quota exceeded. Please wait for the hourly limit to reset.");
+            }
+            // If it's not a quota exception, let it propagate (will be rethrown in catch block)
+        }
+
         /// <summary>
         /// Execute a query that returns data (SELECT statements)
         /// </summary>
         public async Task<List<Dictionary<string, object>>> QueryAsync(string sql, params object[] parameters)
         {
-            var results = new List<Dictionary<string, object>>();
+            try
+            {
+                var results = new List<Dictionary<string, object>>();
 
-            using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
+                using var connection = new MySqlConnection(_connectionString);
+                await connection.OpenAsync();
 
             using var command = new MySqlCommand(sql, connection);
             
@@ -31,19 +48,25 @@ namespace MyApp.Namespace.Services
                 command.Parameters.AddWithValue($"@p{i}", parameters[i]);
             }
 
-            using var reader = await command.ExecuteReaderAsync();
-            
-            while (await reader.ReadAsync())
-            {
-                var row = new Dictionary<string, object>();
-                for (int i = 0; i < reader.FieldCount; i++)
+                using var reader = await command.ExecuteReaderAsync();
+                
+                while (await reader.ReadAsync())
                 {
-                    row[reader.GetName(i)] = reader.GetValue(i);
+                    var row = new Dictionary<string, object>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        row[reader.GetName(i)] = reader.GetValue(i);
+                    }
+                    results.Add(row);
                 }
-                results.Add(row);
-            }
 
-            return results;
+                return results;
+            }
+            catch (MySqlException ex)
+            {
+                HandleMySqlException(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -51,18 +74,26 @@ namespace MyApp.Namespace.Services
         /// </summary>
         public async Task<object?> QueryScalarAsync(string sql, params object[] parameters)
         {
-            using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            using var command = new MySqlCommand(sql, connection);
-            
-            // Add parameters if provided
-            for (int i = 0; i < parameters.Length; i++)
+            try
             {
-                command.Parameters.AddWithValue($"@p{i}", parameters[i]);
-            }
+                using var connection = new MySqlConnection(_connectionString);
+                await connection.OpenAsync();
 
-            return await command.ExecuteScalarAsync();
+                using var command = new MySqlCommand(sql, connection);
+                
+                // Add parameters if provided
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    command.Parameters.AddWithValue($"@p{i}", parameters[i]);
+                }
+
+                return await command.ExecuteScalarAsync();
+            }
+            catch (MySqlException ex)
+            {
+                HandleMySqlException(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -70,18 +101,26 @@ namespace MyApp.Namespace.Services
         /// </summary>
         public async Task<int> ExecuteAsync(string sql, params object[] parameters)
         {
-            using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            using var command = new MySqlCommand(sql, connection);
-            
-            // Add parameters if provided
-            for (int i = 0; i < parameters.Length; i++)
+            try
             {
-                command.Parameters.AddWithValue($"@p{i}", parameters[i]);
-            }
+                using var connection = new MySqlConnection(_connectionString);
+                await connection.OpenAsync();
 
-            return await command.ExecuteNonQueryAsync();
+                using var command = new MySqlCommand(sql, connection);
+                
+                // Add parameters if provided
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    command.Parameters.AddWithValue($"@p{i}", parameters[i]);
+                }
+
+                return await command.ExecuteNonQueryAsync();
+            }
+            catch (MySqlException ex)
+            {
+                HandleMySqlException(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -90,6 +129,24 @@ namespace MyApp.Namespace.Services
         public MySqlConnection GetConnection()
         {
             return new MySqlConnection(_connectionString);
+        }
+
+        /// <summary>
+        /// Get a raw connection asynchronously for advanced scenarios
+        /// </summary>
+        public async Task<MySqlConnection> GetConnectionAsync()
+        {
+            try
+            {
+                var connection = new MySqlConnection(_connectionString);
+                await connection.OpenAsync();
+                return connection;
+            }
+            catch (MySqlException ex)
+            {
+                HandleMySqlException(ex);
+                throw;
+            }
         }
     }
 }

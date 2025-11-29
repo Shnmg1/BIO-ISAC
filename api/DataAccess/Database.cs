@@ -1,4 +1,3 @@
-using api.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +15,7 @@ namespace api.DataAccess
         public string connectionString {get; set;}
 
         public Database(){
+            // HOSTED DATABASE
             host = "e11wl4mksauxgu1w.cbetxkdyhwsb.us-east-1.rds.amazonaws.com";
             database = "h06zjyj5jaxgvfe1";
             username = "dbix45lycgaqo0zi";
