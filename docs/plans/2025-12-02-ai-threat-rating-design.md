@@ -192,3 +192,41 @@ _aiRatingTimer = new Timer(
 - 95%+ successful classification rate (vs default placeholders)
 - No ingestion slowdown from AI processing
 - No rate limit errors under normal load
+
+## Implementation Notes
+
+**Completed:** 2025-12-02
+
+**Changes Made:**
+1. Enhanced AIService.cs with Google Search Grounding
+2. Added background AI rating timer to ThreatIngestionBackgroundService
+3. Implemented ProcessAIRatingsAsync with rate limiting and exponential backoff
+4. Created ThreatRatingController with 3 endpoints
+5. Added AIRating configuration section to appsettings.json
+
+**Files Modified:**
+- api/Services/AIService.cs
+- api/Services/ThreatIngestionBackgroundService.cs
+- api/appsettings.json
+
+**Files Created:**
+- api/Controllers/ThreatRatingController.cs
+
+**Configuration:**
+- Default batch size: 10 threats
+- Default interval: 15 minutes
+- Rate limiting: 4 seconds between requests (~15 RPM)
+- Retry strategy: 3 attempts with exponential backoff (30s, 60s, 120s)
+
+**Testing:**
+- Manual API endpoint testing completed
+- Background service verified running on schedule
+- Rate limiting confirmed working
+
+**Commit History:**
+- 245c7fa: feat: add Google Search Grounding to threat classification
+- 1a55a16: feat: add AI rating timer infrastructure
+- bed353e: feat: implement AI rating with rate limiting and retries
+- 5682ed9: feat: add threat rating API endpoints
+- 9c00ba5: feat: add AI rating configuration
+- 7f1d96f: docs: add comprehensive testing documentation for Task 6
