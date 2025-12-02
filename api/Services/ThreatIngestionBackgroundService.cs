@@ -15,6 +15,7 @@ namespace MyApp.Namespace.Services
         private Timer? _otxTimer;
         private Timer? _nvdTimer;
         private Timer? _cisaTimer;
+        private Timer? _aiRatingTimer;
         private bool _isRunning = false;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -71,6 +72,21 @@ namespace MyApp.Namespace.Services
             {
                 _cisaTimer = new Timer(async _ => await SyncCISAAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(cisaInterval));
                 _logger.LogInformation($"CISA sync scheduled every {cisaInterval} minutes");
+            }
+
+            var aiRatingEnabled = _configuration.GetValue<bool>("ThreatIngestion:AIRating:Enabled", true);
+            var aiRatingInterval = _configuration.GetValue<int>("ThreatIngestion:AIRating:IntervalMinutes", 15);
+
+            if (aiRatingEnabled)
+            {
+                // Start after 1 minute delay to let initial ingestion complete
+                _aiRatingTimer = new Timer(
+                    async _ => await ProcessAIRatingsAsync(),
+                    null,
+                    TimeSpan.FromMinutes(1),
+                    TimeSpan.FromMinutes(aiRatingInterval)
+                );
+                _logger.LogInformation($"AI rating scheduled every {aiRatingInterval} minutes");
             }
 
             while (!stoppingToken.IsCancellationRequested && _isRunning)
@@ -253,6 +269,7 @@ namespace MyApp.Namespace.Services
             _otxTimer?.Dispose();
             _nvdTimer?.Dispose();
             _cisaTimer?.Dispose();
+            _aiRatingTimer?.Dispose();
             _cancellationTokenSource.Cancel();
             _logger.LogInformation("Threat Ingestion Background Service stopped");
         }
@@ -262,6 +279,7 @@ namespace MyApp.Namespace.Services
             _otxTimer?.Dispose();
             _nvdTimer?.Dispose();
             _cisaTimer?.Dispose();
+            _aiRatingTimer?.Dispose();
             _cancellationTokenSource.Dispose();
             base.Dispose();
         }
