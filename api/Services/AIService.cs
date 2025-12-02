@@ -67,10 +67,6 @@ public class AIService
                     topP = 0.95,
                     maxOutputTokens = 4096,
                     responseMimeType = "application/json"
-                },
-                tools = new[]
-                {
-                    new { google_search_retrieval = new { } }
                 }
             };
 
@@ -258,8 +254,8 @@ Respond ONLY with valid JSON in this exact format:
         try
         {
             using var connection = await _dbService.GetConnectionAsync();
-            var query = @"INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, created_at) 
-                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, NOW())";
+            var query = @"INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions) 
+                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions)";
 
             using var command = new MySqlConnector.MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@threat_id", threatId);
