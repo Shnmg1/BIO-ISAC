@@ -55,3 +55,8 @@ nunit-*.xml
 
 # Git worktrees
 .worktrees/
+
+# Secrets - Keep appsettings.json as template only
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json

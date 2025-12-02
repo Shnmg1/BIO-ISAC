@@ -27,8 +27,8 @@ builder.Services.AddHttpClient<NISTService>();
 // Register HttpClient for CISA service
 builder.Services.AddHttpClient<CISAService>();
 
-// Register AI service
-builder.Services.AddScoped<api.Services.AIService>();
+// Register AI service with HttpClient
+builder.Services.AddHttpClient<api.Services.AIService>();
 
 // Register API validation service
 builder.Services.AddScoped<ApiValidationService>();
@@ -39,16 +39,16 @@ builder.Services.AddScoped<ThreatDeduplicationService>();
 builder.Services.AddScoped<ApiSourceService>();
 builder.Services.AddScoped<AuditLogService>();
 
-// Register background service for threat ingestion (DISABLED - causing database quota issues)
-// builder.Services.AddSingleton<ThreatIngestionBackgroundService>();
-// builder.Services.AddHostedService(provider => provider.GetRequiredService<ThreatIngestionBackgroundService>());
+// Register background service for threat ingestion and AI rating
+builder.Services.AddSingleton<ThreatIngestionBackgroundService>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<ThreatIngestionBackgroundService>());
 
 // Add CORS for frontend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.SetIsOriginAllowed(origin => 
+        policy.SetIsOriginAllowed(origin =>
         {
             if (string.IsNullOrEmpty(origin) || origin == "null")
                 return true;
