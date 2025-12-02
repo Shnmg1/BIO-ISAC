@@ -67,6 +67,10 @@ public class AIService
                     topP = 0.95,
                     maxOutputTokens = 4096,
                     responseMimeType = "application/json"
+                },
+                tools = new[]
+                {
+                    new { google_search_retrieval = new { } }
                 }
             };
 
@@ -130,6 +134,14 @@ Category: {threat.category}
 Source: {threat.source}
 Impact Level: {threat.impact_level}
 Date Observed: {threat.date_observed:yyyy-MM-dd}
+
+VERIFICATION INSTRUCTIONS:
+Use web search to verify if this threat has been reported by reputable sources (security vendors, CERT teams, government advisories).
+Adjust your confidence score based on:
+- Multiple independent sources confirming the threat: Higher confidence (80-100%)
+- Single source or unverified claims: Medium confidence (50-79%)
+- No corroborating sources found or conflicting information: Lower confidence (0-49%)
+- Include source references in your reasoning when available
 
 RISK MATRIX CRITERIA:
 
