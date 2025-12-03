@@ -302,6 +302,133 @@
             color: var(--bio-bright-green);
         }
 
+        .settings-dropdown-divider {
+            height: 1px;
+            background-color: var(--bio-medium-green);
+            margin: 4px 0;
+        }
+
+        /* Accessibility Modal Styles */
+        .accessibility-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .accessibility-modal.active {
+            display: flex;
+        }
+
+        .accessibility-modal-content {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .accessibility-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bio-medium-green);
+        }
+
+        .accessibility-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--bio-text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accessibility-modal-title i {
+            color: var(--bio-bright-green);
+        }
+
+        .accessibility-modal-close {
+            background: none;
+            border: none;
+            color: var(--bio-text-light);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .accessibility-modal-close:hover {
+            color: var(--bio-bright-green);
+        }
+
+        .accessibility-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .accessibility-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background-color: rgba(74, 173, 106, 0.05);
+            border: 1px solid var(--bio-medium-green);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .accessibility-option:hover {
+            background-color: rgba(74, 173, 106, 0.15);
+            border-color: var(--bio-light-green);
+        }
+
+        .accessibility-option.selected {
+            background-color: rgba(74, 173, 106, 0.2);
+            border-color: var(--bio-bright-green);
+        }
+
+        .accessibility-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--bio-bright-green);
+            margin: 0;
+        }
+
+        .accessibility-option-label {
+            flex: 1;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .accessibility-option-description {
+            font-size: 12px;
+            color: var(--bio-text-light);
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
         .alert-modal-value.readonly {
             background-color: rgba(74, 173, 106, 0.05);
             opacity: 0.8;
@@ -465,6 +592,11 @@
                     <div class="settings-dropdown-item" id="accountSettingsMenuItem">
                         <i class="fas fa-user-cog"></i>
                         <span>Account Settings</span>
+                    </div>
+                    <div class="settings-dropdown-divider"></div>
+                    <div class="settings-dropdown-item" id="accessibilityMenuItem">
+                        <i class="fas fa-universal-access"></i>
+                        <span>Accessibility</span>
                     </div>
                 </div>
             </div>
@@ -1633,6 +1765,53 @@
             document.removeEventListener('mouseup', stopContentResize);
         }
     </script>
+
+    <!-- Accessibility Modal -->
+    <div class="accessibility-modal" id="accessibilityModal">
+        <div class="accessibility-modal-content">
+            <div class="accessibility-modal-header">
+                <h2 class="accessibility-modal-title">
+                    <i class="fas fa-universal-access"></i>
+                    Accessibility Settings
+                </h2>
+                <button class="accessibility-modal-close" id="accessibilityModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="accessibility-options">
+                <div class="accessibility-option" data-mode="normal">
+                    <input type="radio" name="colorblindMode" id="modeNormal" value="normal" checked>
+                    <label for="modeNormal" class="accessibility-option-label">
+                        <div>Normal Vision</div>
+                        <div class="accessibility-option-description">Default color scheme</div>
+                    </label>
+                </div>
+                <div class="accessibility-option" data-mode="protanopia">
+                    <input type="radio" name="colorblindMode" id="modeProtanopia" value="protanopia">
+                    <label for="modeProtanopia" class="accessibility-option-label">
+                        <div>Protanopia</div>
+                        <div class="accessibility-option-description">Red-blind (red-green colorblindness)</div>
+                    </label>
+                </div>
+                <div class="accessibility-option" data-mode="deuteranopia">
+                    <input type="radio" name="colorblindMode" id="modeDeuteranopia" value="deuteranopia">
+                    <label for="modeDeuteranopia" class="accessibility-option-label">
+                        <div>Deuteranopia</div>
+                        <div class="accessibility-option-description">Green-blind (red-green colorblindness)</div>
+                    </label>
+                </div>
+                <div class="accessibility-option" data-mode="tritanopia">
+                    <input type="radio" name="colorblindMode" id="modeTritanopia" value="tritanopia">
+                    <label for="modeTritanopia" class="accessibility-option-label">
+                        <div>Tritanopia</div>
+                        <div class="accessibility-option-description">Blue-blind (blue-yellow colorblindness)</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/accessibility.js"></script>
 </body>
 </html>
 

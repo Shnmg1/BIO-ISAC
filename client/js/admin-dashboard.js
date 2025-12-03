@@ -61,12 +61,23 @@ async function loadIncomingAlerts() {
                 const alertItem = document.createElement('li');
                 alertItem.className = 'task-item alert-item';
 
-                // Map priority to color class
-                const priority = (threat.impactLevel || 'Medium').toLowerCase();
-                const validPriorities = ['low', 'medium', 'high', 'critical'];
-                const statusClass = validPriorities.includes(priority) 
-                    ? `status-priority-${priority}` 
-                    : 'status-priority-medium';
+                // Map impactLevel/urgency to color class
+                // Normalize the priority value to handle various formats
+                const priorityValue = (threat.impactLevel || 'Medium').toString().trim().toLowerCase();
+                
+                // Map various possible values to standard priority levels
+                let normalizedPriority = 'medium'; // default
+                if (priorityValue === 'low' || priorityValue === '1' || priorityValue === 'lowest') {
+                    normalizedPriority = 'low';
+                } else if (priorityValue === 'medium' || priorityValue === '2' || priorityValue === 'moderate') {
+                    normalizedPriority = 'medium';
+                } else if (priorityValue === 'high' || priorityValue === '3' || priorityValue === 'urgent') {
+                    normalizedPriority = 'high';
+                } else if (priorityValue === 'critical' || priorityValue === '4' || priorityValue === 'highest' || priorityValue === 'severe') {
+                    normalizedPriority = 'critical';
+                }
+                
+                const statusClass = `status-priority-${normalizedPriority}`;
 
                 alertItem.innerHTML = `
                     <div class="task-status ${statusClass}"></div>
@@ -160,12 +171,23 @@ async function loadMyAlerts() {
                 const item = document.createElement('div');
                 item.className = 'task-item';
 
-                // Map priority to color class
-                const priority = (alert.impactLevel || 'Medium').toLowerCase();
-                const validPriorities = ['low', 'medium', 'high', 'critical'];
-                const statusClass = validPriorities.includes(priority) 
-                    ? `status-priority-${priority}` 
-                    : 'status-priority-medium';
+                // Map impactLevel/urgency to color class
+                // Normalize the priority value to handle various formats
+                const priorityValue = (alert.impactLevel || 'Medium').toString().trim().toLowerCase();
+                
+                // Map various possible values to standard priority levels
+                let normalizedPriority = 'medium'; // default
+                if (priorityValue === 'low' || priorityValue === '1' || priorityValue === 'lowest') {
+                    normalizedPriority = 'low';
+                } else if (priorityValue === 'medium' || priorityValue === '2' || priorityValue === 'moderate') {
+                    normalizedPriority = 'medium';
+                } else if (priorityValue === 'high' || priorityValue === '3' || priorityValue === 'urgent') {
+                    normalizedPriority = 'high';
+                } else if (priorityValue === 'critical' || priorityValue === '4' || priorityValue === 'highest' || priorityValue === 'severe') {
+                    normalizedPriority = 'critical';
+                }
+                
+                const statusClass = `status-priority-${normalizedPriority}`;
 
                 item.innerHTML = `
                     <div class="task-status ${statusClass}"></div>
@@ -417,11 +439,21 @@ function setupModalActions() {
                         const baseClasses = currentClasses.filter(cls => !cls.startsWith('status-priority-'));
                         
                         // Normalize priority value and determine new class
-                        const normalizedPriority = priority.toLowerCase().trim();
-                        const validPriorities = ['low', 'medium', 'high', 'critical'];
-                        const newPriorityClass = validPriorities.includes(normalizedPriority) 
-                            ? `status-priority-${normalizedPriority}` 
-                            : 'status-priority-medium';
+                        const priorityValue = priority.toString().trim().toLowerCase();
+                        
+                        // Map various possible values to standard priority levels
+                        let normalizedPriority = 'medium'; // default
+                        if (priorityValue === 'low' || priorityValue === '1' || priorityValue === 'lowest') {
+                            normalizedPriority = 'low';
+                        } else if (priorityValue === 'medium' || priorityValue === '2' || priorityValue === 'moderate') {
+                            normalizedPriority = 'medium';
+                        } else if (priorityValue === 'high' || priorityValue === '3' || priorityValue === 'urgent') {
+                            normalizedPriority = 'high';
+                        } else if (priorityValue === 'critical' || priorityValue === '4' || priorityValue === 'highest' || priorityValue === 'severe') {
+                            normalizedPriority = 'critical';
+                        }
+                        
+                        const newPriorityClass = `status-priority-${normalizedPriority}`;
                         
                         // Replace all classes with base classes + new priority class
                         statusDiv.className = [...baseClasses, newPriorityClass].join(' ');
