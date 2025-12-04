@@ -320,23 +320,23 @@ namespace MyApp.Namespace
                     await updateCmd.ExecuteNonQueryAsync();
                 }
 
-                // Update or create classification
-                var checkClassQuery = "SELECT id FROM classifications WHERE threat_id = @threat_id";
-                int? classificationId = null;
+                // Update or create threat_analysis record
+                var checkClassQuery = "SELECT id FROM threat_analysis WHERE threat_id = @threat_id";
+                int? analysisId = null;
                 using (var checkCmd = new MySqlConnector.MySqlCommand(checkClassQuery, connection))
                 {
                     checkCmd.Parameters.AddWithValue("@threat_id", id);
                     var result = await checkCmd.ExecuteScalarAsync();
                     if (result != null)
                     {
-                        classificationId = Convert.ToInt32(result);
+                        analysisId = Convert.ToInt32(result);
                     }
                 }
 
-                if (classificationId.HasValue)
+                if (analysisId.HasValue)
                 {
                     var updateClassQuery = @"
-                        UPDATE classifications 
+                        UPDATE threat_analysis 
                         SET human_decision = 'Approved',
                             human_justification = @justification,
                             reviewed_by = @reviewed_by,
@@ -344,7 +344,7 @@ namespace MyApp.Namespace
                         WHERE id = @id";
                     using (var updateCmd = new MySqlConnector.MySqlCommand(updateClassQuery, connection))
                     {
-                        updateCmd.Parameters.AddWithValue("@id", classificationId.Value);
+                        updateCmd.Parameters.AddWithValue("@id", analysisId.Value);
                         updateCmd.Parameters.AddWithValue("@justification", request.Justification ?? "Approved by admin");
                         updateCmd.Parameters.AddWithValue("@reviewed_by", userId);
                         await updateCmd.ExecuteNonQueryAsync();
@@ -353,7 +353,7 @@ namespace MyApp.Namespace
                 else
                 {
                     var insertClassQuery = @"
-                        INSERT INTO classifications (threat_id, human_decision, human_justification, reviewed_by, reviewed_at, created_at)
+                        INSERT INTO threat_analysis (threat_id, human_decision, human_justification, reviewed_by, reviewed_at, created_at)
                         VALUES (@threat_id, 'Approved', @justification, @reviewed_by, NOW(), NOW())";
                     using (var insertCmd = new MySqlConnector.MySqlCommand(insertClassQuery, connection))
                     {
@@ -414,23 +414,23 @@ namespace MyApp.Namespace
                     await updateCmd.ExecuteNonQueryAsync();
                 }
 
-                // Update or create classification
-                var checkClassQuery = "SELECT id FROM classifications WHERE threat_id = @threat_id";
-                int? classificationId = null;
+                // Update or create threat_analysis record
+                var checkClassQuery = "SELECT id FROM threat_analysis WHERE threat_id = @threat_id";
+                int? analysisId = null;
                 using (var checkCmd = new MySqlConnector.MySqlCommand(checkClassQuery, connection))
                 {
                     checkCmd.Parameters.AddWithValue("@threat_id", id);
                     var result = await checkCmd.ExecuteScalarAsync();
                     if (result != null)
                     {
-                        classificationId = Convert.ToInt32(result);
+                        analysisId = Convert.ToInt32(result);
                     }
                 }
 
-                if (classificationId.HasValue)
+                if (analysisId.HasValue)
                 {
                     var updateClassQuery = @"
-                        UPDATE classifications 
+                        UPDATE threat_analysis 
                         SET human_decision = 'False_Positive',
                             human_justification = @justification,
                             reviewed_by = @reviewed_by,
@@ -438,7 +438,7 @@ namespace MyApp.Namespace
                         WHERE id = @id";
                     using (var updateCmd = new MySqlConnector.MySqlCommand(updateClassQuery, connection))
                     {
-                        updateCmd.Parameters.AddWithValue("@id", classificationId.Value);
+                        updateCmd.Parameters.AddWithValue("@id", analysisId.Value);
                         updateCmd.Parameters.AddWithValue("@justification", request.Justification ?? "Rejected by admin");
                         updateCmd.Parameters.AddWithValue("@reviewed_by", userId);
                         await updateCmd.ExecuteNonQueryAsync();
@@ -447,7 +447,7 @@ namespace MyApp.Namespace
                 else
                 {
                     var insertClassQuery = @"
-                        INSERT INTO classifications (threat_id, human_decision, human_justification, reviewed_by, reviewed_at, created_at)
+                        INSERT INTO threat_analysis (threat_id, human_decision, human_justification, reviewed_by, reviewed_at, created_at)
                         VALUES (@threat_id, 'False_Positive', @justification, @reviewed_by, NOW(), NOW())";
                     using (var insertCmd = new MySqlConnector.MySqlCommand(insertClassQuery, connection))
                     {
@@ -508,23 +508,23 @@ namespace MyApp.Namespace
                     await updateCmd.ExecuteNonQueryAsync();
                 }
 
-                // Update or create classification with override
-                var checkClassQuery = "SELECT id FROM classifications WHERE threat_id = @threat_id";
-                int? classificationId = null;
+                // Update or create threat_analysis record with override
+                var checkClassQuery = "SELECT id FROM threat_analysis WHERE threat_id = @threat_id";
+                int? analysisId = null;
                 using (var checkCmd = new MySqlConnector.MySqlCommand(checkClassQuery, connection))
                 {
                     checkCmd.Parameters.AddWithValue("@threat_id", id);
                     var result = await checkCmd.ExecuteScalarAsync();
                     if (result != null)
                     {
-                        classificationId = Convert.ToInt32(result);
+                        analysisId = Convert.ToInt32(result);
                     }
                 }
 
-                if (classificationId.HasValue)
+                if (analysisId.HasValue)
                 {
                     var updateClassQuery = @"
-                        UPDATE classifications 
+                        UPDATE threat_analysis 
                         SET human_tier = @human_tier,
                             human_decision = 'Override',
                             human_justification = @justification,
@@ -533,7 +533,7 @@ namespace MyApp.Namespace
                         WHERE id = @id";
                     using (var updateCmd = new MySqlConnector.MySqlCommand(updateClassQuery, connection))
                     {
-                        updateCmd.Parameters.AddWithValue("@id", classificationId.Value);
+                        updateCmd.Parameters.AddWithValue("@id", analysisId.Value);
                         updateCmd.Parameters.AddWithValue("@human_tier", request.Tier ?? "Medium");
                         updateCmd.Parameters.AddWithValue("@justification", request.Justification ?? "Overridden by admin");
                         updateCmd.Parameters.AddWithValue("@reviewed_by", userId);
@@ -543,7 +543,7 @@ namespace MyApp.Namespace
                 else
                 {
                     var insertClassQuery = @"
-                        INSERT INTO classifications (threat_id, human_tier, human_decision, human_justification, reviewed_by, reviewed_at, created_at)
+                        INSERT INTO threat_analysis (threat_id, human_tier, human_decision, human_justification, reviewed_by, reviewed_at, created_at)
                         VALUES (@threat_id, @human_tier, 'Override', @justification, @reviewed_by, NOW(), NOW())";
                     using (var insertCmd = new MySqlConnector.MySqlCommand(insertClassQuery, connection))
                     {

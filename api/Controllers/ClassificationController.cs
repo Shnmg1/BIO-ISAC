@@ -72,6 +72,7 @@ public class ClassificationController : ControllerBase
                     confidence = classification.Confidence,
                     reasoning = classification.Reasoning,
                     recommendedActions = classification.RecommendedActions,
+                    nextSteps = classification.NextSteps,
                     keywords = classification.Keywords,
                     bioSectorRelevance = classification.BioSectorRelevance
                 }

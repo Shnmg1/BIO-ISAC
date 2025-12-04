@@ -8,6 +8,7 @@ public class Classification
     public decimal? AiConfidence { get; set; }
     public string? AiReasoning { get; set; }
     public string? AiActions { get; set; }
+    public string? AiNextSteps { get; set; }  // JSON array of next steps
     public ThreatTier? HumanTier { get; set; }
     public HumanDecision? HumanDecision { get; set; }
     public string? HumanJustification { get; set; }

@@ -35,6 +35,12 @@ public class AIService
                     Confidence = 50,
                     Reasoning = "AI classification pending - API key not configured. Manual review recommended.",
                     RecommendedActions = "Review threat manually and assign appropriate tier.",
+                    NextSteps = new List<string> 
+                    { 
+                        "1. Review threat details manually - Security Team",
+                        "2. Assign appropriate tier classification - Security Analyst",
+                        "3. Configure AI API key for automated classification - IT Admin"
+                    },
                     Keywords = new List<string>(),
                     BioSectorRelevance = 50,
                     RawResponse = "Default classification - API not configured"
@@ -110,6 +116,12 @@ public class AIService
                 Confidence = 50,
                 Reasoning = $"AI classification error: {ex.Message}. Manual review required.",
                 RecommendedActions = "Review threat manually and assign appropriate tier.",
+                NextSteps = new List<string> 
+                { 
+                    "1. Review threat details manually - Security Team",
+                    "2. Investigate AI service error - IT Admin",
+                    "3. Assign appropriate tier classification - Security Analyst"
+                },
                 Keywords = new List<string>(),
                 BioSectorRelevance = 50,
                 RawResponse = $"Error: {ex.Message}"
@@ -167,12 +179,28 @@ HUMAN/BIOLOGICAL IMPACT SCORING:
 - Operational disruption: Medium tier
 - Informational: Low tier
 
+NEXT STEPS REQUIREMENTS:
+- Provide 3-6 specific, actionable steps the company should take IMMEDIATELY
+- Each step should be a discrete task that can be checked off
+- Include responsible party when applicable (SOC, IT, Security Team, Management, Legal)
+- All steps are immediate priority actions
+- Order steps by execution sequence
+- Reference standard incident response procedures where relevant
+- For Tier 1: Focus on containment, escalation, and crisis management
+- For Tier 2: Focus on investigation, patching, and monitoring
+- For Tier 3: Focus on awareness, documentation, and routine updates
+
 Respond ONLY with valid JSON in this exact format:
 {{
     ""tier"": ""High"" | ""Medium"" | ""Low"",
     ""confidence"": 0-100,
     ""reasoning"": ""Detailed explanation of classification"",
-    ""recommendedActions"": ""List of recommended actions"",
+    ""recommendedActions"": ""Brief summary of response strategy"",
+    ""nextSteps"": [
+        ""1. Action description - Responsible Party"",
+        ""2. Action description - Responsible Party"",
+        ""3. Action description - Responsible Party""
+    ],
     ""keywords"": [""keyword1"", ""keyword2""],
     ""bioSectorRelevance"": 0-100
 }}";
@@ -209,6 +237,15 @@ Respond ONLY with valid JSON in this exact format:
                 }
             }
 
+            var nextSteps = new List<string>();
+            if (root.TryGetProperty("nextSteps", out var nextStepsElement))
+            {
+                foreach (var step in nextStepsElement.EnumerateArray())
+                {
+                    nextSteps.Add(step.GetString() ?? "");
+                }
+            }
+
             var bioSectorRelevance = root.TryGetProperty("bioSectorRelevance", out var relevanceElement) 
                 ? relevanceElement.GetDecimal() 
                 : 50;
@@ -219,6 +256,7 @@ Respond ONLY with valid JSON in this exact format:
                 Confidence = confidence,
                 Reasoning = reasoning,
                 RecommendedActions = recommendedActions,
+                NextSteps = nextSteps,
                 Keywords = keywords,
                 BioSectorRelevance = bioSectorRelevance,
                 RawResponse = content
@@ -234,6 +272,7 @@ Respond ONLY with valid JSON in this exact format:
                 Confidence = 0,
                 Reasoning = "AI response parsing failed",
                 RecommendedActions = "Manual review required",
+                NextSteps = new List<string> { "1. Review threat manually - Security Team" },
                 Keywords = new List<string>(),
                 BioSectorRelevance = 0,
                 RawResponse = content
@@ -246,15 +285,16 @@ Respond ONLY with valid JSON in this exact format:
         try
         {
             using var connection = await _dbService.GetConnectionAsync();
-            var query = @"INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, created_at) 
-                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, NOW())";
+            var query = @"INSERT INTO threat_analysis (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_keywords, ai_classified_at, created_at) 
+                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_keywords, NOW(), NOW())";
 
             using var command = new MySqlConnector.MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@threat_id", threatId);
             command.Parameters.AddWithValue("@ai_tier", result.Tier.ToString());
             command.Parameters.AddWithValue("@ai_confidence", result.Confidence);
             command.Parameters.AddWithValue("@ai_reasoning", result.Reasoning);
-            command.Parameters.AddWithValue("@ai_actions", result.RecommendedActions);
+            command.Parameters.AddWithValue("@ai_actions", JsonSerializer.Serialize(result.NextSteps));
+            command.Parameters.AddWithValue("@ai_keywords", string.Join(",", result.Keywords));
 
             await command.ExecuteNonQueryAsync();
         }
@@ -272,6 +312,7 @@ public class ClassificationResult
     public decimal Confidence { get; set; }
     public string Reasoning { get; set; } = string.Empty;
     public string RecommendedActions { get; set; } = string.Empty;
+    public List<string> NextSteps { get; set; } = new();
     public List<string> Keywords { get; set; } = new();
     public decimal BioSectorRelevance { get; set; }
     public string RawResponse { get; set; } = string.Empty;

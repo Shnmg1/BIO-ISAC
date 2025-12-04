@@ -302,7 +302,7 @@ public class NotificationService
     private async Task<Classification?> GetClassificationAsync(int threatId)
     {
         using var connection = await _dbService.GetConnectionAsync();
-        var query = "SELECT ai_tier, ai_confidence, ai_reasoning, ai_actions FROM classifications WHERE threat_id = @threat_id";
+        var query = "SELECT ai_tier, ai_confidence, ai_reasoning, ai_actions FROM threat_analysis WHERE threat_id = @threat_id";
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@threat_id", threatId);
         
