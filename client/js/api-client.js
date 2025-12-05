@@ -88,6 +88,26 @@ class ApiClient {
         return response;
     }
 
+    async setup2FA(userId) {
+        return this.post('/auth/setup-2fa', { userId });
+    }
+
+    async verify2FASetup(userId, code) {
+        const response = await this.post('/auth/verify-2fa-setup', { userId, code });
+        if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        return response;
+    }
+
+    async verify2FALogin(userId, code) {
+        const response = await this.post('/auth/verify-2fa-login', { userId, code });
+        if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        return response;
+    }
+
     async register(data) {
         return this.post('/auth/register', data);
     }

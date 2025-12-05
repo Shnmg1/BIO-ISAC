@@ -20,7 +20,7 @@ public class AuthService
     public async Task<User?> GetUserByEmailAsync(string email)
     {
         using var connection = await _dbService.GetConnectionAsync();
-        var query = "SELECT id, email, password_hash, full_name, facility_name, facility_type, role, status, created_at FROM users WHERE email = @email";
+        var query = "SELECT id, email, password_hash, full_name, facility_name, facility_type, role, status, created_at, totp_secret, is_two_factor_enabled, two_factor_enabled_at FROM users WHERE email = @email";
         
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@email", email);
@@ -38,7 +38,10 @@ public class AuthService
                 FacilityType = Enum.Parse<FacilityType>(reader.GetStringByName("facility_type"), true),
                 Role = Enum.Parse<UserRole>(reader.GetStringByName("role"), true),
                 Status = Enum.Parse<UserStatus>(reader.GetStringByName("status"), true),
-                CreatedAt = reader.GetDateTimeByName("created_at")
+                CreatedAt = reader.GetDateTimeByName("created_at"),
+                TotpSecret = reader.IsDBNull(reader.GetOrdinal("totp_secret")) ? null : reader.GetString(reader.GetOrdinal("totp_secret")),
+                IsTwoFactorEnabled = !reader.IsDBNull(reader.GetOrdinal("is_two_factor_enabled")) && reader.GetBoolean(reader.GetOrdinal("is_two_factor_enabled")),
+                TwoFactorEnabledAt = reader.IsDBNull(reader.GetOrdinal("two_factor_enabled_at")) ? null : reader.GetDateTime(reader.GetOrdinal("two_factor_enabled_at"))
             };
         }
         return null;
@@ -47,7 +50,7 @@ public class AuthService
     public async Task<User?> GetUserByIdAsync(int id)
     {
         using var connection = await _dbService.GetConnectionAsync();
-        var query = "SELECT id, email, password_hash, full_name, facility_name, facility_type, role, status, created_at FROM users WHERE id = @id";
+        var query = "SELECT id, email, password_hash, full_name, facility_name, facility_type, role, status, created_at, totp_secret, is_two_factor_enabled, two_factor_enabled_at FROM users WHERE id = @id";
         
         using var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@id", id);
@@ -65,7 +68,10 @@ public class AuthService
                 FacilityType = Enum.Parse<FacilityType>(reader.GetStringByName("facility_type"), true),
                 Role = Enum.Parse<UserRole>(reader.GetStringByName("role"), true),
                 Status = Enum.Parse<UserStatus>(reader.GetStringByName("status"), true),
-                CreatedAt = reader.GetDateTimeByName("created_at")
+                CreatedAt = reader.GetDateTimeByName("created_at"),
+                TotpSecret = reader.IsDBNull(reader.GetOrdinal("totp_secret")) ? null : reader.GetString(reader.GetOrdinal("totp_secret")),
+                IsTwoFactorEnabled = !reader.IsDBNull(reader.GetOrdinal("is_two_factor_enabled")) && reader.GetBoolean(reader.GetOrdinal("is_two_factor_enabled")),
+                TwoFactorEnabledAt = reader.IsDBNull(reader.GetOrdinal("two_factor_enabled_at")) ? null : reader.GetDateTime(reader.GetOrdinal("two_factor_enabled_at"))
             };
         }
         return null;
@@ -118,6 +124,18 @@ public class AuthService
         if (!password.Any(char.IsLower)) return false;
         if (!password.Any(char.IsDigit)) return false;
         return true;
+    }
+
+    public async Task EnableTwoFactorAsync(int userId, string totpSecret)
+    {
+        using var connection = await _dbService.GetConnectionAsync();
+        var query = @"UPDATE users SET totp_secret = @totp_secret, is_two_factor_enabled = 1, two_factor_enabled_at = NOW() WHERE id = @id";
+        
+        using var command = new MySqlCommand(query, connection);
+        command.Parameters.AddWithValue("@totp_secret", totpSecret);
+        command.Parameters.AddWithValue("@id", userId);
+        
+        await command.ExecuteNonQueryAsync();
     }
 }
 

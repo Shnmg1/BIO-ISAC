@@ -1554,3 +1554,135 @@ body.login-page {
     }
 }
 
+/* Two-Factor Authentication Styles */
+.two-factor-section {
+    padding-top: 20px;
+}
+
+.two-factor-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.two-factor-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--wst-color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.two-factor-header h3 i {
+    color: #6bcf8f;
+}
+
+.btn-back {
+    background: none;
+    border: 1px solid var(--wst-color-line);
+    color: var(--wst-color-text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    border-color: #6bcf8f;
+    color: #6bcf8f;
+    background: rgba(107, 207, 143, 0.1);
+}
+
+.two-factor-description {
+    color: var(--wst-color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.two-factor-description strong {
+    color: #6bcf8f;
+}
+
+.qr-code-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.qr-code-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 8px;
+}
+
+.manual-entry {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--wst-color-fill-background-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--wst-color-line);
+}
+
+.manual-entry p {
+    color: var(--wst-color-text-secondary);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.secret-code {
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6bcf8f;
+    background: var(--wst-color-fill-background-primary);
+    padding: 10px 16px;
+    border-radius: 6px;
+    letter-spacing: 2px;
+    word-break: break-all;
+    user-select: all;
+}
+
+.totp-input {
+    text-align: center;
+    font-size: 28px !important;
+    font-weight: 600;
+    letter-spacing: 12px;
+    padding: 16px 20px !important;
+    font-family: 'Courier New', monospace;
+}
+
+.totp-input::placeholder {
+    letter-spacing: 12px;
+    opacity: 0.4;
+}
+
+/* Animation for 2FA sections */
+.two-factor-section {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

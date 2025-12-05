@@ -70,6 +70,68 @@
             <div class="login-footer">
                 <p>Don't have an account? <a href="#">Contact Administrator</a></p>
             </div>
+
+            <!-- QR Code Setup Section (First-time 2FA) -->
+            <div id="setup-section" style="display: none;" class="two-factor-section">
+                <div class="two-factor-header">
+                    <button type="button" class="btn-back" onclick="backToLogin()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h3><i class="fas fa-shield-alt"></i> Set Up Two-Factor Authentication</h3>
+                </div>
+                <p class="two-factor-description">
+                    Scan this QR code with <strong>Google Authenticator</strong>
+                </p>
+                <div class="qr-code-container">
+                    <img id="qr-code" alt="QR Code" class="qr-code-image" />
+                </div>
+                <div class="form-group mt-4">
+                    <label for="setup-code" class="form-label">
+                        <i class="fas fa-key"></i> Enter 6-digit code from Google Authenticator
+                    </label>
+                    <input 
+                        type="text" 
+                        id="setup-code" 
+                        class="form-control login-input totp-input" 
+                        placeholder="000000" 
+                        maxlength="6"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                    >
+                </div>
+                <button type="button" id="confirm-setup-btn" class="btn btn-primary btn-login" onclick="verifyCode()">
+                    <i class="fas fa-check-circle"></i> Confirm & Enable 2FA
+                </button>
+            </div>
+
+            <!-- TOTP Input Section (Returning users) -->
+            <div id="totp-section" style="display: none;" class="two-factor-section">
+                <div class="two-factor-header">
+                    <button type="button" class="btn-back" onclick="backToLogin()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h3><i class="fas fa-mobile-alt"></i> Enter Authentication Code</h3>
+                </div>
+                <p class="two-factor-description">
+                    Open <strong>Google Authenticator</strong> and enter the 6-digit code
+                </p>
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="totp-code" 
+                        class="form-control login-input totp-input" 
+                        placeholder="000000" 
+                        maxlength="6"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                    >
+                </div>
+                <button type="button" id="verify-btn" class="btn btn-primary btn-login" onclick="verifyCode()">
+                    <i class="fas fa-sign-in-alt"></i> Verify & Sign In
+                </button>
+            </div>
         </div>
     </div>
 

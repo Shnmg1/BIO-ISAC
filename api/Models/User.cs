@@ -11,6 +11,11 @@ public class User
     public UserRole Role { get; set; }
     public UserStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
+    
+    // 2FA fields
+    public string? TotpSecret { get; set; }
+    public bool IsTwoFactorEnabled { get; set; }
+    public DateTime? TwoFactorEnabledAt { get; set; }
 }
 
 public enum FacilityType

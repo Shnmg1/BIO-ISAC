@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using api.Models;
 using api.Services;
 using MyApp.Namespace.Services;
@@ -13,12 +14,16 @@ public class AuthController : ControllerBase
     private readonly AuthService _authService;
     private readonly DatabaseService _dbService;
     private readonly ILogger<AuthController> _logger;
+    private readonly ITotpService _totpService;
+    private readonly IMemoryCache _cache;
 
-    public AuthController(AuthService authService, DatabaseService dbService, ILogger<AuthController> logger)
+    public AuthController(AuthService authService, DatabaseService dbService, ILogger<AuthController> logger, ITotpService totpService, IMemoryCache cache)
     {
         _authService = authService;
         _dbService = dbService;
         _logger = logger;
+        _totpService = totpService;
+        _cache = cache;
     }
 
     [HttpPost("login")]
@@ -73,22 +78,27 @@ public class AuthController : ControllerBase
             
             _logger.LogInformation($"Password verification successful for email: {request.Email}");
 
-            await LogAuditAsync(user.Id, "Login_Success", $"User logged in successfully");
-
-            return Ok(new
+            // Password is correct - now check 2FA status
+            if (!user.IsTwoFactorEnabled)
             {
-                message = "Login successful",
-                user = new
-                {
-                    id = user.Id,
-                    email = user.Email,
-                    fullName = user.FullName,
-                    facilityName = user.FacilityName,
-                    facilityType = user.FacilityType.ToString(),
-                    role = user.Role.ToString(),
-                    status = user.Status.ToString()
-                }
-            });
+                // First time login or 2FA not set up yet - need to set up 2FA
+                return Ok(new 
+                { 
+                    requiresTwoFactorSetup = true,
+                    userId = user.Id,
+                    message = "Please set up two-factor authentication"
+                });
+            }
+            else
+            {
+                // 2FA already enabled - prompt for TOTP code
+                return Ok(new 
+                { 
+                    requiresTwoFactorCode = true,
+                    userId = user.Id,
+                    message = "Please enter your authentication code"
+                });
+            }
         }
         catch (Exception ex)
         {
@@ -107,6 +117,128 @@ public class AuthController : ControllerBase
         catch
         {
             return false;
+        }
+    }
+
+    [HttpPost("setup-2fa")]
+    public async Task<IActionResult> SetupTwoFactor([FromBody] SetupTwoFactorRequest request)
+    {
+        try
+        {
+            var user = await _authService.GetUserByIdAsync(request.UserId);
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            // Generate new TOTP secret
+            var secret = _totpService.GenerateSecret();
+            
+            // Generate QR code
+            var qrCodeUri = _totpService.GenerateQrCodeUri(user.Email, secret);
+            var qrCodeImage = _totpService.GenerateQrCodeImage(qrCodeUri);
+            var qrCodeBase64 = Convert.ToBase64String(qrCodeImage);
+
+            // Store secret temporarily in cache (expires in 10 minutes)
+            _cache.Set($"TempTotpSecret_{user.Id}", secret, TimeSpan.FromMinutes(10));
+
+            return Ok(new 
+            {
+                qrCode = $"data:image/png;base64,{qrCodeBase64}",
+                message = "Scan this QR code with Google Authenticator"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting up 2FA");
+            return StatusCode(500, new { message = "An error occurred during 2FA setup" });
+        }
+    }
+
+    [HttpPost("verify-2fa-setup")]
+    public async Task<IActionResult> VerifyTwoFactorSetup([FromBody] VerifyTwoFactorRequest request)
+    {
+        try
+        {
+            var user = await _authService.GetUserByIdAsync(request.UserId);
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            // Retrieve temporary secret from cache
+            if (!_cache.TryGetValue($"TempTotpSecret_{user.Id}", out string? secret) || string.IsNullOrEmpty(secret))
+                return BadRequest(new { message = "Session expired. Please restart setup." });
+
+            // Validate the code
+            if (!_totpService.ValidateCode(secret, request.Code))
+                return BadRequest(new { message = "Invalid code. Please try again." });
+
+            // Code is valid - save secret and enable 2FA
+            await _authService.EnableTwoFactorAsync(user.Id, secret);
+
+            // Clear temporary secret
+            _cache.Remove($"TempTotpSecret_{user.Id}");
+
+            await LogAuditAsync(user.Id, "2FA_Enabled", "Two-factor authentication enabled");
+
+            // Fetch updated user
+            user = await _authService.GetUserByIdAsync(user.Id);
+
+            return Ok(new 
+            {
+                success = true,
+                message = "Two-factor authentication enabled successfully!",
+                user = new
+                {
+                    id = user!.Id,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    facilityName = user.FacilityName,
+                    facilityType = user.FacilityType.ToString(),
+                    role = user.Role.ToString(),
+                    status = user.Status.ToString()
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error verifying 2FA setup");
+            return StatusCode(500, new { message = "An error occurred during 2FA verification" });
+        }
+    }
+
+    [HttpPost("verify-2fa-login")]
+    public async Task<IActionResult> VerifyTwoFactorLogin([FromBody] VerifyTwoFactorRequest request)
+    {
+        try
+        {
+            var user = await _authService.GetUserByIdAsync(request.UserId);
+            if (user == null || !user.IsTwoFactorEnabled || string.IsNullOrEmpty(user.TotpSecret))
+                return Unauthorized(new { message = "Invalid request" });
+
+            // Validate code against stored secret
+            if (!_totpService.ValidateCode(user.TotpSecret, request.Code))
+                return BadRequest(new { message = "Invalid authentication code" });
+
+            await LogAuditAsync(user.Id, "Login_Success", "User logged in with 2FA");
+
+            return Ok(new 
+            {
+                success = true,
+                message = "Login successful",
+                user = new
+                {
+                    id = user.Id,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    facilityName = user.FacilityName,
+                    facilityType = user.FacilityType.ToString(),
+                    role = user.Role.ToString(),
+                    status = user.Status.ToString()
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error verifying 2FA login");
+            return StatusCode(500, new { message = "An error occurred during 2FA verification" });
         }
     }
 
@@ -322,5 +454,16 @@ public class ResetPasswordRequest
 {
     public string Token { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
+}
+
+public class SetupTwoFactorRequest
+{
+    public int UserId { get; set; }
+}
+
+public class VerifyTwoFactorRequest
+{
+    public int UserId { get; set; }
+    public string Code { get; set; } = string.Empty;
 }
 
