@@ -16,14 +16,25 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     private readonly ITotpService _totpService;
     private readonly IMemoryCache _cache;
+    private readonly IFileStorageService _fileStorage;
+    private readonly IDocumentVerificationService _documentVerification;
 
-    public AuthController(AuthService authService, DatabaseService dbService, ILogger<AuthController> logger, ITotpService totpService, IMemoryCache cache)
+    public AuthController(
+        AuthService authService, 
+        DatabaseService dbService, 
+        ILogger<AuthController> logger, 
+        ITotpService totpService, 
+        IMemoryCache cache,
+        IFileStorageService fileStorage,
+        IDocumentVerificationService documentVerification)
     {
         _authService = authService;
         _dbService = dbService;
         _logger = logger;
         _totpService = totpService;
         _cache = cache;
+        _fileStorage = fileStorage;
+        _documentVerification = documentVerification;
     }
 
     [HttpPost("login")]
@@ -54,10 +65,29 @@ public class AuthController : ControllerBase
                 return Unauthorized(new { message = "Invalid credentials" });
             }
 
-            // Check account status
-            if (user.Status != UserStatus.Active)
+            // Check account status BEFORE password verification for better UX
+            if (user.Status == UserStatus.Pending)
             {
-                return Unauthorized(new { message = "Account is not active. Please contact administrator." });
+                return Unauthorized(new { 
+                    message = "Your account is pending approval. You'll receive an email once approved.",
+                    status = "pending"
+                });
+            }
+
+            if (user.Status == UserStatus.Rejected)
+            {
+                return Unauthorized(new { 
+                    message = "Your account registration was not approved. Please contact support.",
+                    status = "rejected"
+                });
+            }
+
+            if (user.Status == UserStatus.Disabled)
+            {
+                return Unauthorized(new { 
+                    message = "Your account has been disabled. Please contact administrator.",
+                    status = "disabled"
+                });
             }
 
             _logger.LogInformation($"Attempting login for email: {request.Email}, User ID: {user.Id}, Status: {user.Status}");
@@ -243,69 +273,122 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Register([FromForm] RegisterWithDocumentsRequest request)
     {
         try
         {
             // Validation
             if (string.IsNullOrWhiteSpace(request.Email))
-            {
                 return BadRequest(new { message = "Email is required" });
-            }
 
             if (string.IsNullOrWhiteSpace(request.Password))
-            {
                 return BadRequest(new { message = "Password is required" });
-            }
 
             if (string.IsNullOrWhiteSpace(request.FullName))
-            {
                 return BadRequest(new { message = "Full name is required" });
-            }
 
             if (string.IsNullOrWhiteSpace(request.FacilityName))
-            {
                 return BadRequest(new { message = "Facility name is required" });
-            }
 
             if (!IsValidEmail(request.Email))
-            {
                 return BadRequest(new { message = "Invalid email format" });
-            }
 
             if (!_authService.ValidatePasswordStrength(request.Password))
-            {
                 return BadRequest(new { message = "Password must be at least 8 characters with uppercase, lowercase, and a number" });
-            }
 
             if (request.Password != request.ConfirmPassword)
-            {
                 return BadRequest(new { message = "Passwords do not match" });
+
+            // Validate required documents
+            if (request.WorkId == null)
+                return BadRequest(new { message = "Work ID document is required" });
+
+            if (request.SupervisorLetter == null)
+                return BadRequest(new { message = "Supervisor Letter is required" });
+
+            if (!_fileStorage.ValidateDocument(request.WorkId))
+                return BadRequest(new { message = "Invalid Work ID document. Must be PDF, JPG, or PNG under 10MB." });
+
+            if (!_fileStorage.ValidateDocument(request.SupervisorLetter))
+                return BadRequest(new { message = "Invalid Supervisor Letter. Must be PDF, JPG, or PNG under 10MB." });
+
+            if (request.ProfessionalLicense != null && !_fileStorage.ValidateDocument(request.ProfessionalLicense))
+                return BadRequest(new { message = "Invalid Professional License. Must be PDF, JPG, or PNG under 10MB." });
+
+            // Save documents
+            var workIdPath = await _fileStorage.SaveDocumentAsync(request.WorkId, "workids");
+            var letterPath = await _fileStorage.SaveDocumentAsync(request.SupervisorLetter, "letters");
+            string? licensePath = null;
+            
+            if (request.ProfessionalLicense != null)
+            {
+                licensePath = await _fileStorage.SaveDocumentAsync(request.ProfessionalLicense, "licenses");
             }
 
-            var user = await _authService.RegisterUserAsync(
+            // Try AI analysis if configured, otherwise skip
+            Models.DocumentAnalysisResult? analysisResult = null;
+            try
+            {
+                _logger.LogInformation($"Attempting AI analysis for {request.Email}");
+                analysisResult = await _documentVerification.AnalyzeDocumentsAsync(
+                    request.WorkId,
+                    request.ProfessionalLicense,
+                    request.SupervisorLetter
+                );
+                _logger.LogInformation($"AI analysis complete for {request.Email}. Confidence: {analysisResult.ConfidenceScore}%");
+            }
+            catch (Exception aiEx)
+            {
+                _logger.LogWarning(aiEx, $"AI analysis failed for {request.Email}, registration will require manual review");
+            }
+
+            // ALL registrations require admin approval (manual review)
+            // This ensures admins review every new user until AI auto-approval is enabled
+            var status = UserStatus.Pending;
+            var requiresManualReview = true;
+
+            // Serialize AI analysis for storage (if available)
+            string? aiAnalysisJson = null;
+            double? aiConfidenceScore = null;
+            
+            if (analysisResult != null)
+            {
+                aiConfidenceScore = analysisResult.ConfidenceScore;
+                aiAnalysisJson = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    analysisResult.Reasoning,
+                    analysisResult.ExtractedData,
+                    analysisResult.Warnings,
+                    analysisResult.IsValid
+                });
+            }
+
+            // Create user account
+            var user = await _authService.RegisterUserWithDocumentsAsync(
                 request.Email,
                 request.Password,
                 request.FullName,
                 request.FacilityName,
                 request.FacilityType,
-                request.RoleRequest
+                workIdPath,
+                licensePath,
+                letterPath,
+                aiConfidenceScore,
+                aiAnalysisJson,
+                requiresManualReview,
+                status
             );
 
-            await LogAuditAsync(user.Id, "User_Registered", $"New user registered: {request.Email}");
+            await LogAuditAsync(user.Id, "User_Registered", $"New user registered: {request.Email}, AI Score: {aiConfidenceScore?.ToString() ?? "N/A"}%, Status: {status}");
 
+            // Return appropriate response - all registrations now go to admin for review
             return Ok(new
             {
-                message = "Registration successful. Account pending approval.",
-                user = new
-                {
-                    id = user.Id,
-                    email = user.Email,
-                    fullName = user.FullName,
-                    facilityName = user.FacilityName,
-                    facilityType = user.FacilityType.ToString(),
-                    status = user.Status.ToString()
-                }
+                message = "Registration received! Your documents are under review by our team. You'll receive an email once your account is approved.",
+                status = status.ToString(),
+                confidenceScore = aiConfidenceScore,
+                userId = user.Id
             });
         }
         catch (InvalidOperationException ex)
@@ -443,6 +526,19 @@ public class RegisterRequest
     public string FacilityName { get; set; } = string.Empty;
     public FacilityType FacilityType { get; set; }
     public UserRole RoleRequest { get; set; } = UserRole.User;
+}
+
+public class RegisterWithDocumentsRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string FacilityName { get; set; } = string.Empty;
+    public FacilityType FacilityType { get; set; }
+    public IFormFile? WorkId { get; set; }
+    public IFormFile? ProfessionalLicense { get; set; }
+    public IFormFile? SupervisorLetter { get; set; }
 }
 
 public class ForgotPasswordRequest

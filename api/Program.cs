@@ -25,6 +25,12 @@ builder.Services.AddScoped<api.Services.AuthService>();
 // Register TOTP service for 2FA
 builder.Services.AddScoped<ITotpService, TotpService>();
 
+// Register file storage service for document uploads
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+// Register Gemini document verification service
+builder.Services.AddHttpClient<IDocumentVerificationService, GeminiDocumentVerificationService>();
+
 // Register HttpClient for OTX service
 builder.Services.AddHttpClient<OTXService>();
 

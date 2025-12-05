@@ -272,7 +272,7 @@ public class MessageController : ControllerBase
 }
 
 [ApiController]
-[Route("api/admin/[controller]")]
+[Route("api/admin/message")]
 public class AdminMessageController : ControllerBase
 {
     private readonly DatabaseService _dbService;

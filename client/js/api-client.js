@@ -226,6 +226,54 @@ class ApiClient {
     async replyToMessage(messageId, replyData) {
         return this.post(`/admin/message/${messageId}/reply`, replyData);
     }
+
+    // User Management (Admin)
+    async getPendingUsers() {
+        return this.get('/admin/pending-users');
+    }
+
+    async getUserDetails(userId) {
+        return this.get(`/admin/user/${userId}`);
+    }
+
+    async getUserStatistics() {
+        return this.get('/admin/user-statistics');
+    }
+
+    async approveUser(userId, notes) {
+        return this.post(`/admin/user/${userId}/approve`, { notes });
+    }
+
+    async rejectUser(userId, reason, notes) {
+        return this.post(`/admin/user/${userId}/reject`, { reason, notes });
+    }
+
+    getDocumentUrl(userId, type) {
+        return `${this.baseUrl}/admin/document/${userId}/${type}`;
+    }
+
+    // Active User Management
+    async getActiveUsers(page = 1, pageSize = 20, search = '') {
+        const params = new URLSearchParams({ page, pageSize });
+        if (search) params.append('search', search);
+        return this.get(`/admin/users?${params.toString()}`);
+    }
+
+    async promoteUser(userId) {
+        return this.post(`/admin/users/${userId}/promote`, {});
+    }
+
+    async demoteUser(userId) {
+        return this.post(`/admin/users/${userId}/demote`, {});
+    }
+
+    async editUser(userId, data) {
+        return this.put(`/admin/users/${userId}`, data);
+    }
+
+    async deleteUser(userId) {
+        return this.delete(`/admin/users/${userId}`);
+    }
 }
 
 const apiClient = new ApiClient();
