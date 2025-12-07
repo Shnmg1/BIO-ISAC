@@ -23,14 +23,14 @@ public class MessageController : ControllerBase
 
     private int GetCurrentUserId()
     {
-        // Get user ID from request header if provided, otherwise use default system user
-        if (Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) && 
+        // Get user ID from request header if provided
+        if (Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) &&
             int.TryParse(userIdHeader, out var userId))
         {
             return userId;
         }
-        // Default to system user (ID 1) if no user ID provided
-        return 1;
+        // Return 0 to indicate unauthorized/no user context
+        return 0;
     }
 
     [HttpPost]
@@ -39,7 +39,7 @@ public class MessageController : ControllerBase
         try
         {
             var fromUserId = GetCurrentUserId();
-            if (fromUserId == 0) return Unauthorized();
+            if (fromUserId == 0) return Unauthorized(new { message = "User ID header missing or invalid" });
 
             // If toUserId is not specified, send to admins
             int toUserId;
@@ -237,7 +237,7 @@ public class MessageController : ControllerBase
         using var connection = await _dbService.GetConnectionAsync();
         var query = "SELECT id, email, full_name FROM users WHERE role = 'Admin' AND status = 'Active' LIMIT 1";
         using var command = new MySqlCommand(query, connection);
-        
+
         using var reader = await command.ExecuteReaderAsync();
         if (await reader.ReadAsync())
         {
@@ -286,12 +286,79 @@ public class AdminMessageController : ControllerBase
 
     private int GetCurrentUserId()
     {
-        if (Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) && 
+        if (Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) &&
             int.TryParse(userIdHeader, out var userId))
         {
             return userId;
         }
-        return 1;
+        return 0;
+    }
+
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllAdminMessages([FromQuery] bool? unreadOnly = null, [FromQuery] string? facilityType = null)
+    {
+        try
+        {
+            var adminId = GetCurrentUserId();
+            if (adminId == 0) return Unauthorized(new { message = "User ID header missing or invalid" });
+
+            using var connection = await _dbService.GetConnectionAsync();
+            var query = @"SELECT m.id, m.from_user_id, m.to_user_id, m.subject, m.body, m.threat_id, m.read_at, m.created_at,
+                                 u1.full_name as from_user_name, u1.facility_type, u1.facility_name,
+                                 u2.full_name as to_user_name
+                          FROM messages m
+                          LEFT JOIN users u1 ON m.from_user_id = u1.id
+                          LEFT JOIN users u2 ON m.to_user_id = u2.id
+                          WHERE (m.to_user_id IN (SELECT id FROM users WHERE role = 'Admin') 
+                             OR m.from_user_id IN (SELECT id FROM users WHERE role = 'Admin'))";
+
+            if (unreadOnly == true)
+            {
+                query += " AND m.read_at IS NULL";
+            }
+
+            if (!string.IsNullOrEmpty(facilityType))
+            {
+                query += " AND (u1.facility_type = @facility_type OR u2.facility_type = @facility_type)";
+            }
+
+            query += " ORDER BY m.created_at DESC";
+
+            using var command = new MySqlConnector.MySqlCommand(query, connection);
+            if (!string.IsNullOrEmpty(facilityType))
+            {
+                command.Parameters.AddWithValue("@facility_type", facilityType);
+            }
+
+            var messages = new List<object>();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                messages.Add(new
+                {
+                    id = reader.GetInt32ByName("id"),
+                    fromUserId = reader.GetInt32ByName("from_user_id"),
+                    fromUserName = reader.IsDBNullByName("from_user_name") ? null : reader.GetStringByName("from_user_name"),
+                    toUserId = reader.GetInt32ByName("to_user_id"),
+                    toUserName = reader.IsDBNullByName("to_user_name") ? null : reader.GetStringByName("to_user_name"),
+                    facilityType = reader.IsDBNullByName("facility_type") ? null : reader.GetStringByName("facility_type"),
+                    facilityName = reader.IsDBNullByName("facility_name") ? null : reader.GetStringByName("facility_name"),
+                    subject = reader.GetStringByName("subject"),
+                    body = reader.GetStringByName("body"),
+                    threatId = reader.IsDBNullByName("threat_id") ? (int?)null : reader.GetInt32ByName("threat_id"),
+                    readAt = reader.IsDBNullByName("read_at") ? (DateTime?)null : reader.GetDateTimeByName("read_at"),
+                    createdAt = reader.GetDateTimeByName("created_at"),
+                    isRead = !reader.IsDBNullByName("read_at")
+                });
+            }
+
+            return Ok(messages);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching all admin messages");
+            return StatusCode(500, new { message = "An error occurred" });
+        }
     }
 
     [HttpGet]
@@ -370,7 +437,7 @@ public class AdminMessageController : ControllerBase
             var getMessageQuery = "SELECT from_user_id, threat_id FROM messages WHERE id = @id";
             using var getMessageCommand = new MySqlConnector.MySqlCommand(getMessageQuery, connection);
             getMessageCommand.Parameters.AddWithValue("@id", id);
-            
+
             int toUserId = 0;
             int? threatId = null;
             using var reader = await getMessageCommand.ExecuteReaderAsync();

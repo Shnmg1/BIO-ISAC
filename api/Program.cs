@@ -43,6 +43,9 @@ builder.Services.AddScoped<AuditLogService>();
 builder.Services.AddSingleton<ThreatIngestionBackgroundService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ThreatIngestionBackgroundService>());
 
+// Register VideoAsk service for user screening (singleton to persist in-memory data across requests)
+builder.Services.AddSingleton<VideoAskService>();
+
 // Add CORS for frontend
 builder.Services.AddCors(options =>
 {
