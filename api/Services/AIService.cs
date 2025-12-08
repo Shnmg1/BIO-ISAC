@@ -206,14 +206,44 @@ Respond ONLY with valid JSON in this exact format:
 
             var confidence = root.GetProperty("confidence").GetDecimal();
             var reasoning = root.GetProperty("reasoning").GetString() ?? "";
-            var recommendedActions = root.GetProperty("recommendedActions").GetString() ?? "";
 
+            // Handle recommendedActions as either string or array
+            var recommendedActions = "";
+            if (root.TryGetProperty("recommendedActions", out var actionsElement))
+            {
+                if (actionsElement.ValueKind == JsonValueKind.String)
+                {
+                    recommendedActions = actionsElement.GetString() ?? "";
+                }
+                else if (actionsElement.ValueKind == JsonValueKind.Array)
+                {
+                    var actionsList = new List<string>();
+                    foreach (var action in actionsElement.EnumerateArray())
+                    {
+                        actionsList.Add(action.GetString() ?? "");
+                    }
+                    recommendedActions = string.Join("\n• ", actionsList);
+                    if (actionsList.Count > 0)
+                        recommendedActions = "• " + recommendedActions;
+                }
+            }
+
+            // Handle keywords as either string or array
             var keywords = new List<string>();
             if (root.TryGetProperty("keywords", out var keywordsElement))
             {
-                foreach (var keyword in keywordsElement.EnumerateArray())
+                if (keywordsElement.ValueKind == JsonValueKind.Array)
                 {
-                    keywords.Add(keyword.GetString() ?? "");
+                    foreach (var keyword in keywordsElement.EnumerateArray())
+                    {
+                        keywords.Add(keyword.GetString() ?? "");
+                    }
+                }
+                else if (keywordsElement.ValueKind == JsonValueKind.String)
+                {
+                    var keywordStr = keywordsElement.GetString() ?? "";
+                    if (!string.IsNullOrEmpty(keywordStr))
+                        keywords.Add(keywordStr);
                 }
             }
 
