@@ -231,6 +231,127 @@
             margin: 4px 0;
         }
 
+        /* Accessibility Modal Styles */
+        .accessibility-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .accessibility-modal.active {
+            display: flex;
+        }
+
+        .accessibility-modal-content {
+            background-color: #000000;
+            border: 1px solid var(--bio-light-green);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .accessibility-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--bio-medium-green);
+        }
+
+        .accessibility-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--bio-text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accessibility-modal-title i {
+            color: var(--bio-bright-green);
+        }
+
+        .accessibility-modal-close {
+            background: none;
+            border: none;
+            color: var(--bio-text-light);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .accessibility-modal-close:hover {
+            color: var(--bio-bright-green);
+        }
+
+        .accessibility-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .accessibility-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background-color: rgba(74, 173, 106, 0.05);
+            border: 1px solid var(--bio-medium-green);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .accessibility-option:hover {
+            background-color: rgba(74, 173, 106, 0.15);
+            border-color: var(--bio-light-green);
+        }
+
+        .accessibility-option.selected {
+            background-color: rgba(74, 173, 106, 0.2);
+            border-color: var(--bio-bright-green);
+        }
+
+        .accessibility-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--bio-bright-green);
+            margin: 0;
+        }
+
+        .accessibility-option-label {
+            flex: 1;
+            color: var(--bio-text-light);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .accessibility-option-description {
+            font-size: 12px;
+            color: var(--bio-text-light);
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
         .download-options {
             display: none;
             flex-direction: column;
@@ -564,6 +685,31 @@
             border-left: 3px solid var(--bio-bright-green);
         }
 
+        .delete-conversation-btn {
+            background: none;
+            border: none;
+            color: var(--bio-text-light);
+            opacity: 0;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .conversation-item:hover .delete-conversation-btn {
+            opacity: 0.5;
+        }
+
+        .delete-conversation-btn:hover {
+            opacity: 1 !important;
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
         .conversation-avatar {
             width: 45px;
             height: 45px;
@@ -660,15 +806,15 @@
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 8px;
         }
 
         .message {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             max-width: 85%;
         }
 
@@ -682,8 +828,8 @@
         }
 
         .message-avatar {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background-color: var(--bio-bright-green);
             color: var(--bio-primary-green);
@@ -691,36 +837,36 @@
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             flex-shrink: 0;
         }
 
         .message-content {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
 
         .message-bubble {
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 12px;
             color: var(--bio-text-light);
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.35;
             word-wrap: break-word;
             word-break: break-word;
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
         
-        .message-subject {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 13px;
-            opacity: 0.9;
-            word-wrap: break-word;
-            word-break: break-word;
-            overflow-wrap: break-word;
+        .message-subject-header {
+            text-align: center;
+            color: var(--bio-text-light);
+            font-size: 11px;
+            opacity: 0.5;
+            margin: 8px 0 4px 0;
+            width: 100%;
+            font-style: italic;
         }
         
         .message-body {
@@ -732,19 +878,20 @@
         .message.sent .message-bubble {
             background-color: var(--bio-bright-green);
             color: var(--bio-primary-green);
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
         }
 
         .message.received .message-bubble {
             background-color: var(--bio-medium-green);
-            border-bottom-left-radius: 2px;
+            border-bottom-left-radius: 4px;
         }
 
         .message-time {
             color: var(--bio-text-light);
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0.6;
             padding: 0 4px;
+            margin-top: 2px;
         }
 
         .message.sent .message-time {
@@ -1353,6 +1500,7 @@
         <ul class="nav-links">
             <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
             <li><a href="#" class="nav-link" data-page="conversations">Conversations</a></li>
+            <li><a href="#" class="nav-link" data-page="user-management">User Management</a></li>
         </ul>
         <div class="header-icons">
             <button class="icon-btn"><i class="fas fa-comment"></i></button>
@@ -1367,6 +1515,11 @@
                     <div class="settings-dropdown-item" id="auditLogMenuItem">
                         <i class="fas fa-history"></i>
                         <span>Audit Log</span>
+                    </div>
+                    <div class="settings-dropdown-divider"></div>
+                    <div class="settings-dropdown-item" id="accessibilityMenuItem">
+                        <i class="fas fa-universal-access"></i>
+                        <span>Accessibility</span>
                     </div>
                 </div>
             </div>
@@ -1671,6 +1824,180 @@
         </div>
     </div>
 
+    <!-- User Management Page Content -->
+    <div class="dashboard-container" id="user-management-page" style="display: none;">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <i class="fas fa-users-cog"></i>
+                <span>User Management</span>
+            </div>
+        </div>
+
+        <!-- User Statistics -->
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <div class="stat-number" id="pendingUsersCount">0</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeUsersCount">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="autoApprovedCount">0</div>
+                <div class="stat-label">Auto-Approved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgConfidenceScore">0%</div>
+                <div class="stat-label">Avg AI Score</div>
+            </div>
+        </div>
+
+        <!-- Pending Users Table -->
+        <div class="widget-card" style="padding: 20px;">
+            <div class="widget-header" style="border-bottom: 1px solid var(--bio-light-green); padding-bottom: 15px; margin-bottom: 20px;">
+                <div class="widget-title" style="font-size: 18px;">Pending User Registrations</div>
+                <button class="btn btn-sm" style="background: var(--bio-bright-green); color: #000; border: none; padding: 8px 16px; border-radius: 4px;" onclick="loadPendingUsers()">
+                    <i class="fas fa-refresh"></i> Refresh
+                </button>
+            </div>
+            <table class="queue-table" id="pendingUsersTable">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Facility</th>
+                        <th>Registered</th>
+                        <th>AI Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingUsersBody">
+                    <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+            <div id="noPendingUsers" style="text-align: center; padding: 40px; color: var(--wst-color-text-secondary); display: none;">
+                <i class="fas fa-check-circle" style="font-size: 48px; color: var(--bio-bright-green); margin-bottom: 15px;"></i>
+                <p>No pending users to review</p>
+            </div>
+        </div>
+
+        <!-- Active Users Management Widget (Collapsible) -->
+        <div class="widget-card" id="activeUsersWidget" style="margin-top: 20px;">
+            <div class="widget-header" style="cursor: pointer; border-bottom: 1px solid var(--bio-light-green); padding: 15px 20px;" onclick="toggleActiveUsersWidget()">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-chevron-right" id="activeUsersChevron" style="transition: transform 0.2s; color: var(--bio-bright-green);"></i>
+                    <span class="widget-title" style="font-size: 18px;">Active Users</span>
+                    <span id="activeUsersWidgetCount" style="background: var(--bio-medium-green); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">0 users</span>
+                </div>
+            </div>
+            <div id="activeUsersContent" style="display: none; padding: 20px;">
+                <!-- Search and Refresh -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="userSearchInput" class="form-control" placeholder="Search by email or name..." style="flex: 1;" onkeyup="debounceUserSearch()">
+                    <button class="btn" style="background: var(--bio-medium-green); color: white; border: none; padding: 10px 20px; border-radius: 4px;" onclick="loadActiveUsers()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+                <!-- Users Table -->
+                <table class="queue-table" id="activeUsersTable">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Facility</th>
+                            <th>Role</th>
+                            <th>2FA</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeUsersBody">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+
+                <div id="noActiveUsers" style="text-align: center; padding: 40px; color: var(--wst-color-text-secondary); display: none;">
+                    <i class="fas fa-users" style="font-size: 48px; color: var(--bio-medium-green); margin-bottom: 15px;"></i>
+                    <p>No active users found</p>
+                </div>
+
+                <!-- Pagination -->
+                <div id="usersPagination" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
+                    <button class="btn" id="usersPrevBtn" style="background: var(--bio-medium-green); color: white; border: none; padding: 8px 16px; border-radius: 4px;" onclick="changeUsersPage(-1)">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <span id="usersPageInfo" style="color: var(--wst-color-text-secondary);">Page 1 of 1</span>
+                    <button class="btn" id="usersNextBtn" style="background: var(--bio-medium-green); color: white; border: none; padding: 8px 16px; border-radius: 4px;" onclick="changeUsersPage(1)">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="alert-modal" id="editUserModal">
+        <div class="alert-modal-content" style="max-width: 500px;">
+            <div class="alert-modal-header">
+                <h2><i class="fas fa-user-edit"></i> Edit User</h2>
+                <button class="alert-modal-close" onclick="closeEditUserModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body">
+                <input type="hidden" id="editUserId">
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Email</label>
+                    <input type="email" id="editUserEmail" class="form-control" style="width: 100%;">
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Full Name</label>
+                    <input type="text" id="editUserFullName" class="form-control" style="width: 100%;">
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Facility Name</label>
+                    <input type="text" id="editUserFacility" class="form-control" style="width: 100%;">
+                </div>
+            </div>
+            <div class="alert-modal-actions">
+                <button class="alert-modal-btn" style="background: var(--bio-bright-green); color: #000;" onclick="saveUserEdit()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-outline" onclick="closeEditUserModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Review Modal -->
+    <div class="alert-modal" id="userReviewModal">
+        <div class="alert-modal-content" style="max-width: 800px;">
+            <div class="alert-modal-header">
+                <h2><i class="fas fa-user-check"></i> Review User Registration</h2>
+                <button class="alert-modal-close" onclick="closeUserReviewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body" id="userReviewBody">
+                <!-- User details will be loaded here -->
+            </div>
+            <div class="alert-modal-actions">
+                <button class="alert-modal-btn" style="background: var(--bio-bright-green); color: #000;" onclick="approveUser()">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-danger" onclick="showRejectForm()">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-outline" onclick="closeUserReviewModal()">
+                    <i class="fas fa-arrow-left"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Alert Detail Modal -->
     <div class="alert-modal" id="alertModal">
         <div class="alert-modal-content">
@@ -1915,6 +2242,7 @@
             const homePage = document.getElementById('home-page');
             const conversationsPage = document.getElementById('conversations-page');
             const auditLogPage = document.getElementById('audit-log-page');
+            const userManagementPage = document.getElementById('user-management-page');
 
             navLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
@@ -1925,11 +2253,18 @@
                     navLinks.forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
 
+                    // Hide all pages first
+                    homePage.style.display = 'none';
+                    conversationsPage.style.display = 'none';
+                    if (auditLogPage) auditLogPage.style.display = 'none';
+                    if (userManagementPage) userManagementPage.style.display = 'none';
+
                     // Show/hide pages
                     if (page === 'home') {
+                        homePage.style.display = 'block';
                         homePage.classList.remove('hidden');
                         conversationsPage.classList.remove('active');
-                        auditLogPage.classList.remove('active');
+                        if (auditLogPage) auditLogPage.classList.remove('active');
                         // Refresh incoming alerts when navigating to home page
                         if (typeof loadIncomingAlerts === 'function') {
                             loadIncomingAlerts();
@@ -1938,13 +2273,22 @@
                             loadDashboardStats();
                         }
                     } else if (page === 'conversations') {
+                        conversationsPage.style.display = 'block';
                         homePage.classList.add('hidden');
                         conversationsPage.classList.add('active');
-                        auditLogPage.classList.remove('active');
+                        if (auditLogPage) auditLogPage.classList.remove('active');
                         // Load conversations when page is shown
                         if (typeof loadConversations === 'function') {
                             loadConversations();
                         }
+                    } else if (page === 'user-management') {
+                        userManagementPage.style.display = 'block';
+                        homePage.classList.add('hidden');
+                        conversationsPage.classList.remove('active');
+                        if (auditLogPage) auditLogPage.classList.remove('active');
+                        // Load user management data
+                        loadUserStatistics();
+                        loadPendingUsers();
                     }
                 });
             });
@@ -2617,7 +2961,536 @@
                 });
             }
         });
+
+        // ==================== USER MANAGEMENT FUNCTIONS ====================
+        let currentReviewUserId = null;
+
+        async function loadUserStatistics() {
+            try {
+                const stats = await apiClient.getUserStatistics();
+                document.getElementById('pendingUsersCount').textContent = stats.pendingCount || 0;
+                document.getElementById('activeUsersCount').textContent = stats.activeCount || 0;
+                document.getElementById('autoApprovedCount').textContent = stats.autoApprovedCount || 0;
+                document.getElementById('avgConfidenceScore').textContent = (stats.averageConfidenceScore || 0).toFixed(1) + '%';
+            } catch (error) {
+                console.error('Error loading user statistics:', error);
+            }
+        }
+
+        async function loadPendingUsers() {
+            try {
+                const response = await apiClient.getPendingUsers();
+                const tbody = document.getElementById('pendingUsersBody');
+                const noPendingDiv = document.getElementById('noPendingUsers');
+                const table = document.getElementById('pendingUsersTable');
+                
+                if (!response.users || response.users.length === 0) {
+                    tbody.innerHTML = '';
+                    table.style.display = 'none';
+                    noPendingDiv.style.display = 'block';
+                    return;
+                }
+                
+                table.style.display = 'table';
+                noPendingDiv.style.display = 'none';
+                
+                tbody.innerHTML = response.users.map(user => `
+                    <tr>
+                        <td>${user.email}</td>
+                        <td>${user.fullName}</td>
+                        <td>${user.facilityName} (${user.facilityType})</td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <span class="score-badge ${getScoreBadgeClass(user.aiConfidenceScore)}">
+                                ${(user.aiConfidenceScore || 0).toFixed(1)}%
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm" style="background: var(--bio-bright-green); color: #000; border: none; padding: 6px 12px; border-radius: 4px;" onclick="openUserReview(${user.id})">
+                                <i class="fas fa-eye"></i> Review
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading pending users:', error);
+            }
+        }
+
+        function getScoreBadgeClass(score) {
+            if (score >= 70) return 'score-high';
+            if (score >= 50) return 'score-medium';
+            return 'score-low';
+        }
+
+        async function openUserReview(userId) {
+            currentReviewUserId = userId;
+            try {
+                const user = await apiClient.getUserDetails(userId);
+                const body = document.getElementById('userReviewBody');
+                
+                let aiAnalysisHtml = '';
+                if (user.aiAnalysis) {
+                    aiAnalysisHtml = `
+                        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 15px; margin-top: 20px;">
+                            <h4 style="color: #3b82f6; margin-bottom: 15px;"><i class="fas fa-robot"></i> AI Analysis</h4>
+                            <p><strong>Reasoning:</strong> ${user.aiAnalysis.Reasoning || 'N/A'}</p>
+                            ${user.aiAnalysis.Warnings && user.aiAnalysis.Warnings.length > 0 ? `
+                                <div style="background: rgba(255, 193, 7, 0.1); padding: 10px; border-radius: 4px; margin-top: 10px;">
+                                    <strong style="color: #ffc107;">Warnings:</strong>
+                                    <ul style="margin: 10px 0 0 20px;">
+                                        ${user.aiAnalysis.Warnings.map(w => `<li>${w}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                            ${user.aiAnalysis.ExtractedData ? `
+                                <div style="margin-top: 15px;">
+                                    <strong>Extracted Data:</strong>
+                                    <ul style="margin: 10px 0 0 20px;">
+                                        ${Object.entries(user.aiAnalysis.ExtractedData).map(([k, v]) => `<li><strong>${k}:</strong> ${v || 'N/A'}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+                
+                body.innerHTML = `
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Email</label>
+                        <div class="alert-modal-value readonly">${user.email}</div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Full Name</label>
+                        <div class="alert-modal-value readonly">${user.fullName}</div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Facility</label>
+                        <div class="alert-modal-value readonly">${user.facilityName} (${user.facilityType})</div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Registration Date</label>
+                        <div class="alert-modal-value readonly">${new Date(user.createdAt).toLocaleString()}</div>
+                    </div>
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">AI Confidence Score</label>
+                        <div class="alert-modal-value readonly">
+                            <span class="score-badge ${getScoreBadgeClass(user.aiConfidenceScore)}" style="font-size: 18px; padding: 8px 16px;">
+                                ${(user.aiConfidenceScore || 0).toFixed(1)}%
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <label class="alert-modal-label">Documents</label>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            ${user.documents.workId ? `
+                                <a href="${apiClient.getDocumentUrl(userId, 'workid')}" target="_blank" class="btn" style="background: var(--bio-medium-green); color: white; border: none; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+                                    <i class="fas fa-id-card"></i> Work ID
+                                </a>
+                            ` : ''}
+                            ${user.documents.supervisorLetter ? `
+                                <a href="${apiClient.getDocumentUrl(userId, 'letter')}" target="_blank" class="btn" style="background: var(--bio-medium-green); color: white; border: none; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+                                    <i class="fas fa-file-signature"></i> Supervisor Letter
+                                </a>
+                            ` : ''}
+                            ${user.documents.license ? `
+                                <a href="${apiClient.getDocumentUrl(userId, 'license')}" target="_blank" class="btn" style="background: var(--bio-medium-green); color: white; border: none; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+                                    <i class="fas fa-certificate"></i> License
+                                </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    ${aiAnalysisHtml}
+                    
+                    <div id="rejectForm" style="display: none; margin-top: 20px; padding: 15px; background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; border-radius: 8px;">
+                        <label class="alert-modal-label" style="color: #ff4444;">Rejection Reason (Required)</label>
+                        <textarea id="rejectionReason" class="form-control" style="width: 100%; min-height: 100px; margin-top: 10px;" placeholder="Please provide a reason for rejection..."></textarea>
+                        <button class="btn" style="background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-top: 10px;" onclick="confirmReject()">
+                            <i class="fas fa-times"></i> Confirm Rejection
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('userReviewModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                alert('Error loading user details: ' + error.message);
+            }
+        }
+
+        function closeUserReviewModal() {
+            document.getElementById('userReviewModal').classList.remove('active');
+            currentReviewUserId = null;
+        }
+
+        function showRejectForm() {
+            document.getElementById('rejectForm').style.display = 'block';
+        }
+
+        async function approveUser() {
+            if (!currentReviewUserId) return;
+            
+            if (!confirm('Are you sure you want to approve this user?')) return;
+            
+            try {
+                await apiClient.approveUser(currentReviewUserId);
+                alert('User approved successfully!');
+                closeUserReviewModal();
+                loadPendingUsers();
+                loadUserStatistics();
+            } catch (error) {
+                console.error('Error approving user:', error);
+                alert('Error approving user: ' + error.message);
+            }
+        }
+
+        async function confirmReject() {
+            if (!currentReviewUserId) return;
+            
+            const reason = document.getElementById('rejectionReason').value.trim();
+            if (!reason) {
+                alert('Please provide a rejection reason');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to reject this user?')) return;
+            
+            try {
+                await apiClient.rejectUser(currentReviewUserId, reason);
+                alert('User rejected');
+                closeUserReviewModal();
+                loadPendingUsers();
+                loadUserStatistics();
+            } catch (error) {
+                console.error('Error rejecting user:', error);
+                alert('Error rejecting user: ' + error.message);
+            }
+        }
+
+        // ==================== ACTIVE USER MANAGEMENT FUNCTIONS ====================
+        let activeUsersPage = 1;
+        let activeUsersTotalPages = 1;
+        let userSearchTimeout = null;
+        let isActiveUsersExpanded = false;
+
+        function toggleActiveUsersWidget() {
+            isActiveUsersExpanded = !isActiveUsersExpanded;
+            const content = document.getElementById('activeUsersContent');
+            const chevron = document.getElementById('activeUsersChevron');
+            
+            if (isActiveUsersExpanded) {
+                content.style.display = 'block';
+                chevron.style.transform = 'rotate(90deg)';
+                loadActiveUsers();
+            } else {
+                content.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function debounceUserSearch() {
+            if (userSearchTimeout) clearTimeout(userSearchTimeout);
+            userSearchTimeout = setTimeout(() => {
+                activeUsersPage = 1;
+                loadActiveUsers();
+            }, 300);
+        }
+
+        async function loadActiveUsers() {
+            try {
+                const search = document.getElementById('userSearchInput').value.trim();
+                const response = await apiClient.getActiveUsers(activeUsersPage, 20, search);
+                
+                const tbody = document.getElementById('activeUsersBody');
+                const noUsersDiv = document.getElementById('noActiveUsers');
+                const table = document.getElementById('activeUsersTable');
+                const pagination = document.getElementById('usersPagination');
+                const countSpan = document.getElementById('activeUsersWidgetCount');
+                
+                countSpan.textContent = `${response.total} users`;
+                activeUsersTotalPages = response.totalPages;
+                
+                if (!response.users || response.users.length === 0) {
+                    tbody.innerHTML = '';
+                    table.style.display = 'none';
+                    noUsersDiv.style.display = 'block';
+                    pagination.style.display = 'none';
+                    return;
+                }
+                
+                table.style.display = 'table';
+                noUsersDiv.style.display = 'none';
+                pagination.style.display = response.totalPages > 1 ? 'flex' : 'none';
+                
+                // Update pagination info
+                document.getElementById('usersPageInfo').textContent = `Page ${activeUsersPage} of ${activeUsersTotalPages}`;
+                document.getElementById('usersPrevBtn').disabled = activeUsersPage === 1;
+                document.getElementById('usersNextBtn').disabled = activeUsersPage === activeUsersTotalPages;
+                
+                tbody.innerHTML = response.users.map(user => `
+                    <tr>
+                        <td>${user.email}</td>
+                        <td>${user.fullName}</td>
+                        <td>${user.facilityName}</td>
+                        <td>
+                            <span class="role-badge ${user.isAdmin ? 'admin' : 'user'}">
+                                ${user.isAdmin ? 'Admin' : 'User'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-2fa ${user.twoFactorEnabled ? 'enabled' : 'disabled'}">
+                                ${user.twoFactorEnabled ? 'Enabled' : 'Disabled'}
+                            </span>
+                        </td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                ${!user.isAdmin ? `
+                                    <button class="btn-action btn-promote" onclick="promoteUserAction(${user.id}, '${user.email}')" title="Promote to Admin">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                ` : `
+                                    <button class="btn-action btn-demote" onclick="demoteUserAction(${user.id}, '${user.email}')" title="Demote from Admin">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                `}
+                                <button class="btn-action btn-edit" onclick="openEditUserModal(${user.id}, '${user.email}', '${user.fullName}', '${user.facilityName}')" title="Edit User">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" onclick="deleteUserAction(${user.id}, '${user.email}')" title="Delete User">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading active users:', error);
+            }
+        }
+
+        function changeUsersPage(delta) {
+            const newPage = activeUsersPage + delta;
+            if (newPage >= 1 && newPage <= activeUsersTotalPages) {
+                activeUsersPage = newPage;
+                loadActiveUsers();
+            }
+        }
+
+        async function promoteUserAction(userId, email) {
+            if (!confirm(`Promote ${email} to Admin?`)) return;
+            
+            try {
+                await apiClient.promoteUser(userId);
+                alert(`${email} promoted to Admin`);
+                loadActiveUsers();
+                loadUserStatistics();
+            } catch (error) {
+                console.error('Error promoting user:', error);
+                alert('Error promoting user: ' + error.message);
+            }
+        }
+
+        async function demoteUserAction(userId, email) {
+            if (!confirm(`Demote ${email} from Admin?`)) return;
+            
+            try {
+                await apiClient.demoteUser(userId);
+                alert(`${email} demoted to regular user`);
+                loadActiveUsers();
+                loadUserStatistics();
+            } catch (error) {
+                console.error('Error demoting user:', error);
+                alert('Error demoting user: ' + error.message);
+            }
+        }
+
+        function openEditUserModal(userId, email, fullName, facilityName) {
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserEmail').value = email;
+            document.getElementById('editUserFullName').value = fullName;
+            document.getElementById('editUserFacility').value = facilityName;
+            document.getElementById('editUserModal').classList.add('active');
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.remove('active');
+        }
+
+        async function saveUserEdit() {
+            const userId = document.getElementById('editUserId').value;
+            const email = document.getElementById('editUserEmail').value.trim();
+            const fullName = document.getElementById('editUserFullName').value.trim();
+            const facilityName = document.getElementById('editUserFacility').value.trim();
+            
+            try {
+                await apiClient.editUser(userId, { email, fullName, facilityName });
+                alert('User updated successfully');
+                closeEditUserModal();
+                loadActiveUsers();
+            } catch (error) {
+                console.error('Error editing user:', error);
+                alert('Error editing user: ' + error.message);
+            }
+        }
+
+        async function deleteUserAction(userId, email) {
+            if (!confirm(`Are you sure you want to DELETE ${email}? This cannot be undone.`)) return;
+            
+            try {
+                await apiClient.deleteUser(userId);
+                alert(`${email} deleted successfully`);
+                loadActiveUsers();
+                loadUserStatistics();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Error deleting user: ' + error.message);
+            }
+        }
     </script>
+
+    <style>
+        .score-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .score-high {
+            background: rgba(107, 207, 143, 0.2);
+            color: #6bcf8f;
+        }
+        .score-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        .score-low {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+        
+        /* Role and Status Badges */
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .role-badge.admin {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        .role-badge.user {
+            background: rgba(107, 207, 143, 0.15);
+            color: var(--bio-bright-green);
+        }
+        .status-2fa {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-2fa.enabled {
+            background: rgba(107, 207, 143, 0.2);
+            color: #6bcf8f;
+        }
+        .status-2fa.disabled {
+            background: rgba(255, 68, 68, 0.15);
+            color: #ff6b6b;
+        }
+        
+        /* Action Buttons for User Management */
+        .btn-action {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-promote {
+            background: var(--bio-bright-green);
+        }
+        .btn-promote:hover {
+            background: var(--bio-light-green);
+        }
+        .btn-demote {
+            background: #ffc107;
+            color: #000;
+        }
+        .btn-demote:hover {
+            background: #e0a800;
+        }
+        .btn-edit {
+            background: #3b82f6;
+        }
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+        .btn-delete {
+            background: #dc3545;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+        }
+    </style>
+
+    <!-- Accessibility Modal -->
+    <div class="accessibility-modal" id="accessibilityModal">
+        <div class="accessibility-modal-content">
+            <div class="accessibility-modal-header">
+                <h2 class="accessibility-modal-title">
+                    <i class="fas fa-universal-access"></i>
+                    Accessibility Settings
+                </h2>
+                <button class="accessibility-modal-close" id="accessibilityModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="accessibility-options">
+                <div class="accessibility-option" data-mode="normal">
+                    <input type="radio" name="colorblindMode" id="modeNormal" value="normal" checked>
+                    <label for="modeNormal" class="accessibility-option-label">
+                        <div>Normal Vision</div>
+                        <div class="accessibility-option-description">Default color scheme</div>
+                    </label>
+                </div>
+                <div class="accessibility-option" data-mode="protanopia">
+                    <input type="radio" name="colorblindMode" id="modeProtanopia" value="protanopia">
+                    <label for="modeProtanopia" class="accessibility-option-label">
+                        <div>Protanopia</div>
+                        <div class="accessibility-option-description">Red-blind (red-green colorblindness)</div>
+                    </label>
+                </div>
+                <div class="accessibility-option" data-mode="deuteranopia">
+                    <input type="radio" name="colorblindMode" id="modeDeuteranopia" value="deuteranopia">
+                    <label for="modeDeuteranopia" class="accessibility-option-label">
+                        <div>Deuteranopia</div>
+                        <div class="accessibility-option-description">Green-blind (red-green colorblindness)</div>
+                    </label>
+                </div>
+                <div class="accessibility-option" data-mode="tritanopia">
+                    <input type="radio" name="colorblindMode" id="modeTritanopia" value="tritanopia">
+                    <label for="modeTritanopia" class="accessibility-option-label">
+                        <div>Tritanopia</div>
+                        <div class="accessibility-option-description">Blue-blind (blue-yellow colorblindness)</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/accessibility.js"></script>
 </body>
 
 </html>

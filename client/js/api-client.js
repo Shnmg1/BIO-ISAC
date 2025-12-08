@@ -88,6 +88,26 @@ class ApiClient {
         return response;
     }
 
+    async setup2FA(userId) {
+        return this.post('/auth/setup-2fa', { userId });
+    }
+
+    async verify2FASetup(userId, code) {
+        const response = await this.post('/auth/verify-2fa-setup', { userId, code });
+        if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        return response;
+    }
+
+    async verify2FALogin(userId, code) {
+        const response = await this.post('/auth/verify-2fa-login', { userId, code });
+        if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        return response;
+    }
+
     async register(data) {
         return this.post('/auth/register', data);
     }
@@ -205,6 +225,54 @@ class ApiClient {
 
     async replyToMessage(messageId, replyData) {
         return this.post(`/admin/message/${messageId}/reply`, replyData);
+    }
+
+    // User Management (Admin)
+    async getPendingUsers() {
+        return this.get('/admin/pending-users');
+    }
+
+    async getUserDetails(userId) {
+        return this.get(`/admin/user/${userId}`);
+    }
+
+    async getUserStatistics() {
+        return this.get('/admin/user-statistics');
+    }
+
+    async approveUser(userId, notes) {
+        return this.post(`/admin/user/${userId}/approve`, { notes });
+    }
+
+    async rejectUser(userId, reason, notes) {
+        return this.post(`/admin/user/${userId}/reject`, { reason, notes });
+    }
+
+    getDocumentUrl(userId, type) {
+        return `${this.baseUrl}/admin/document/${userId}/${type}`;
+    }
+
+    // Active User Management
+    async getActiveUsers(page = 1, pageSize = 20, search = '') {
+        const params = new URLSearchParams({ page, pageSize });
+        if (search) params.append('search', search);
+        return this.get(`/admin/users?${params.toString()}`);
+    }
+
+    async promoteUser(userId) {
+        return this.post(`/admin/users/${userId}/promote`, {});
+    }
+
+    async demoteUser(userId) {
+        return this.post(`/admin/users/${userId}/demote`, {});
+    }
+
+    async editUser(userId, data) {
+        return this.put(`/admin/users/${userId}`, data);
+    }
+
+    async deleteUser(userId) {
+        return this.delete(`/admin/users/${userId}`);
     }
 }
 

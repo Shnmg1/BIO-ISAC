@@ -1,5 +1,6 @@
 using MyApp.Namespace.Services;
 using api.DataAccess;
+using api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Add memory cache for temporary 2FA secret storage
+builder.Services.AddMemoryCache();
+
 // Register Database class as singleton (connection info doesn't change)
 builder.Services.AddSingleton<Database>();
 
@@ -17,6 +21,15 @@ builder.Services.AddScoped<DatabaseService>();
 
 // Register auth service
 builder.Services.AddScoped<api.Services.AuthService>();
+
+// Register TOTP service for 2FA
+builder.Services.AddScoped<ITotpService, TotpService>();
+
+// Register file storage service for document uploads
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+// Register Gemini document verification service
+builder.Services.AddHttpClient<IDocumentVerificationService, GeminiDocumentVerificationService>();
 
 // Register HttpClient for OTX service
 builder.Services.AddHttpClient<OTXService>();

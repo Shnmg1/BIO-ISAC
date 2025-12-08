@@ -11,6 +11,27 @@ public class User
     public UserRole Role { get; set; }
     public UserStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
+    
+    // 2FA fields
+    public string? TotpSecret { get; set; }
+    public bool IsTwoFactorEnabled { get; set; }
+    public DateTime? TwoFactorEnabledAt { get; set; }
+    
+    // Document verification fields
+    public string? WorkIdPath { get; set; }
+    public string? ProfessionalLicensePath { get; set; }
+    public string? SupervisorLetterPath { get; set; }
+    
+    // AI Analysis
+    public double? AiConfidenceScore { get; set; }
+    public string? AiAnalysisResult { get; set; }
+    public bool RequiresManualReview { get; set; }
+    
+    // Admin review
+    public string? RejectionReason { get; set; }
+    public int? ReviewedByAdminId { get; set; }
+    public DateTime? ReviewedAt { get; set; }
+    public DateTime? ApprovedAt { get; set; }
 }
 
 public enum FacilityType
@@ -31,7 +52,8 @@ public enum UserStatus
 {
     Active,
     Pending,
-    Disabled
+    Disabled,
+    Rejected
 }
 
 

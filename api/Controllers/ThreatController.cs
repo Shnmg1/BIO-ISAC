@@ -241,10 +241,10 @@ public class ThreatController : ControllerBase
             using var connection = await _dbService.GetConnectionAsync();
             var query = @"SELECT t.id, t.user_id, t.title, t.description, t.category, t.source, t.date_observed, 
                                  t.impact_level, t.status, t.created_at,
-                                 c.id as classification_id, c.ai_tier, c.ai_confidence, c.ai_reasoning, c.ai_actions,
-                                 c.human_tier, c.human_decision, c.human_justification, c.reviewed_by, c.reviewed_at
+                                 ta.id as analysis_id, ta.ai_tier, ta.ai_confidence, ta.ai_reasoning, ta.ai_actions, ta.ai_keywords,
+                                 ta.human_tier, ta.human_decision, ta.human_justification, ta.reviewed_by, ta.reviewed_at
                           FROM threats t
-                          LEFT JOIN classifications c ON t.id = c.threat_id
+                          LEFT JOIN threat_analysis ta ON t.id = ta.threat_id
                           WHERE t.id = @id" + (isAdmin ? "" : " AND t.user_id = @user_id");
             
             _logger.LogInformation("Querying threat {ThreatId} for user {UserId} (isAdmin: {IsAdmin})", id, userId, isAdmin);
@@ -270,13 +270,14 @@ public class ThreatController : ControllerBase
                     impactLevel = reader.GetStringByName("impact_level"),
                     status = reader.GetStringByName("status"),
                     createdAt = reader.GetDateTimeByName("created_at"),
-                    classification = reader.IsDBNullByName("classification_id") ? null : new
+                    classification = reader.IsDBNullByName("analysis_id") ? null : new
                     {
-                        id = reader.GetInt32ByName("classification_id"),
+                        id = reader.GetInt32ByName("analysis_id"),
                         aiTier = reader.IsDBNullByName("ai_tier") ? null : reader.GetStringByName("ai_tier"),
                         aiConfidence = reader.IsDBNullByName("ai_confidence") ? (decimal?)null : reader.GetDecimalByName("ai_confidence"),
                         aiReasoning = reader.IsDBNullByName("ai_reasoning") ? null : reader.GetStringByName("ai_reasoning"),
                         aiActions = reader.IsDBNullByName("ai_actions") ? null : reader.GetStringByName("ai_actions"),
+                        aiKeywords = reader.IsDBNullByName("ai_keywords") ? null : reader.GetStringByName("ai_keywords"),
                         humanTier = reader.IsDBNullByName("human_tier") ? null : reader.GetStringByName("human_tier"),
                         humanDecision = reader.IsDBNullByName("human_decision") ? null : reader.GetStringByName("human_decision"),
                         humanJustification = reader.IsDBNullByName("human_justification") ? null : reader.GetStringByName("human_justification"),
@@ -422,9 +423,9 @@ public class ThreatController : ControllerBase
             using var connection = await _dbService.GetConnectionAsync();
             // Get approved threats that match user's facility type or are general
             var query = @"SELECT t.id, t.title, t.description, t.category, t.date_observed, t.created_at, 
-                                 c.human_tier, c.ai_tier
+                                 ta.human_tier, ta.ai_tier
                           FROM threats t
-                          INNER JOIN classifications c ON t.id = c.threat_id
+                          INNER JOIN threat_analysis ta ON t.id = ta.threat_id
                           WHERE t.status = 'Approved'
                           ORDER BY t.created_at DESC
                           LIMIT 50";
