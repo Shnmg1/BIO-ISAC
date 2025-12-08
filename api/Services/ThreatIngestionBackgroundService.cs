@@ -278,15 +278,25 @@ namespace MyApp.Namespace.Services
 
             // Insert classification
             var classQuery = @"
-                INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions) 
-                VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions)";
+                INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_next_steps) 
+                VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_next_steps)";
 
             using var classCmd = new MySqlConnector.MySqlCommand(classQuery, connection);
             classCmd.Parameters.AddWithValue("@threat_id", threatId);
             classCmd.Parameters.AddWithValue("@ai_tier", classification.Tier.ToString());
             classCmd.Parameters.AddWithValue("@ai_confidence", classification.Confidence);
             classCmd.Parameters.AddWithValue("@ai_reasoning", classification.Reasoning);
-            classCmd.Parameters.AddWithValue("@ai_actions", classification.RecommendedActions);
+            classCmd.Parameters.AddWithValue("@ai_actions", classification.RecommendedActions ?? (object)DBNull.Value);
+            
+            // Save NextSteps as JSON array to ai_next_steps
+            var nextStepsJson = classification.NextSteps != null && classification.NextSteps.Count > 0
+                ? System.Text.Json.JsonSerializer.Serialize(classification.NextSteps, new System.Text.Json.JsonSerializerOptions 
+                { 
+                    WriteIndented = false,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                })
+                : null;
+            classCmd.Parameters.AddWithValue("@ai_next_steps", (object?)nextStepsJson ?? DBNull.Value);
 
             await classCmd.ExecuteNonQueryAsync();
 

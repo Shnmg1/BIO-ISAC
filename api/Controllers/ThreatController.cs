@@ -78,8 +78,12 @@ public class ThreatController : ControllerBase
             try
             {
                 using var connection = await _dbService.GetConnectionAsync();
-                var query = @"INSERT INTO threats (user_id, title, description, category, source, date_observed, impact_level, status, created_at) 
-                             VALUES (@user_id, @title, @description, @category, @source, @date_observed, @impact_level, 'Pending_AI', NOW())";
+                var assignedFacilityTypesJson = request.AssignedFacilityTypes != null && request.AssignedFacilityTypes.Count > 0
+                    ? System.Text.Json.JsonSerializer.Serialize(request.AssignedFacilityTypes)
+                    : null;
+                
+                var query = @"INSERT INTO threats (user_id, title, description, category, source, date_observed, impact_level, status, assigned_facility_types, created_at) 
+                             VALUES (@user_id, @title, @description, @category, @source, @date_observed, @impact_level, 'Pending_AI', @assigned_facility_types, NOW())";
 
                 using var command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@user_id", userId);
@@ -89,6 +93,7 @@ public class ThreatController : ControllerBase
                 command.Parameters.AddWithValue("@source", request.Source ?? "Direct observation");
                 command.Parameters.AddWithValue("@date_observed", request.DateObserved ?? DateTime.UtcNow);
                 command.Parameters.AddWithValue("@impact_level", request.ImpactLevel ?? "Unknown");
+                command.Parameters.AddWithValue("@assigned_facility_types", (object?)assignedFacilityTypesJson ?? DBNull.Value);
 
                 await command.ExecuteNonQueryAsync();
                 threatId = (int)command.LastInsertedId;
@@ -241,9 +246,19 @@ public class ThreatController : ControllerBase
             using var connection = await _dbService.GetConnectionAsync();
             var query = @"SELECT t.id, t.user_id, t.title, t.description, t.category, t.source, t.date_observed, 
                                  t.impact_level, t.status, t.created_at,
-                                 ta.id as analysis_id, ta.ai_tier, ta.ai_confidence, ta.ai_reasoning, ta.ai_actions, ta.ai_keywords,
-                                 ta.human_tier, ta.human_decision, ta.human_justification, ta.reviewed_by, ta.reviewed_at
+                                 COALESCE(c.id, ta.id) as analysis_id, 
+                                 COALESCE(c.ai_tier, ta.ai_tier) as ai_tier, 
+                                 COALESCE(c.ai_confidence, ta.ai_confidence) as ai_confidence, 
+                                 COALESCE(c.ai_reasoning, ta.ai_reasoning) as ai_reasoning, 
+                                 COALESCE(c.ai_next_steps, c.ai_actions, ta.ai_actions) as ai_actions,
+                                 ta.ai_keywords,
+                                 COALESCE(ta.human_tier, c.human_tier) as human_tier, 
+                                 COALESCE(ta.human_decision, c.human_decision) as human_decision, 
+                                 COALESCE(ta.human_justification, c.human_justification) as human_justification, 
+                                 COALESCE(ta.reviewed_by, c.reviewed_by) as reviewed_by, 
+                                 COALESCE(ta.reviewed_at, c.reviewed_at) as reviewed_at
                           FROM threats t
+                          LEFT JOIN classifications c ON t.id = c.threat_id
                           LEFT JOIN threat_analysis ta ON t.id = ta.threat_id
                           WHERE t.id = @id" + (isAdmin ? "" : " AND t.user_id = @user_id");
             
@@ -259,6 +274,17 @@ public class ThreatController : ControllerBase
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
+                var hasClassification = !reader.IsDBNullByName("analysis_id");
+                _logger.LogInformation("Threat {ThreatId} has classification: {HasClassification}", id, hasClassification);
+                
+                if (hasClassification)
+                {
+                    _logger.LogInformation("Classification data - ai_confidence: {Confidence}, ai_reasoning: {Reasoning}, ai_actions: {Actions}",
+                        reader.IsDBNullByName("ai_confidence") ? "NULL" : reader.GetDecimalByName("ai_confidence").ToString(),
+                        reader.IsDBNullByName("ai_reasoning") ? "NULL" : reader.GetStringByName("ai_reasoning")?.Substring(0, Math.Min(50, reader.GetStringByName("ai_reasoning")?.Length ?? 0)) ?? "NULL",
+                        reader.IsDBNullByName("ai_actions") ? "NULL" : reader.GetStringByName("ai_actions")?.Substring(0, Math.Min(50, reader.GetStringByName("ai_actions")?.Length ?? 0)) ?? "NULL");
+                }
+                
                 var threat = new
                 {
                     id = reader.GetInt32ByName("id"),
@@ -270,7 +296,7 @@ public class ThreatController : ControllerBase
                     impactLevel = reader.GetStringByName("impact_level"),
                     status = reader.GetStringByName("status"),
                     createdAt = reader.GetDateTimeByName("created_at"),
-                    classification = reader.IsDBNullByName("analysis_id") ? null : new
+                    classification = hasClassification ? new
                     {
                         id = reader.GetInt32ByName("analysis_id"),
                         aiTier = reader.IsDBNullByName("ai_tier") ? null : reader.GetStringByName("ai_tier"),
@@ -283,7 +309,7 @@ public class ThreatController : ControllerBase
                         humanJustification = reader.IsDBNullByName("human_justification") ? null : reader.GetStringByName("human_justification"),
                         reviewedBy = reader.IsDBNullByName("reviewed_by") ? (int?)null : reader.GetInt32ByName("reviewed_by"),
                         reviewedAt = reader.IsDBNullByName("reviewed_at") ? (DateTime?)null : reader.GetDateTimeByName("reviewed_at")
-                    }
+                    } : null
                 };
 
                 _logger.LogInformation("Successfully retrieved threat {ThreatId}", id);
@@ -421,16 +447,22 @@ public class ThreatController : ControllerBase
             }
 
             using var connection = await _dbService.GetConnectionAsync();
-            // Get approved threats that match user's facility type or are general
+            // Get approved threats that match user's facility type or are general (assigned_facility_types is NULL or empty)
+            var userFacilityType = user.FacilityType.ToString();
             var query = @"SELECT t.id, t.title, t.description, t.category, t.date_observed, t.created_at, 
-                                 ta.human_tier, ta.ai_tier
+                                 COALESCE(ta.human_tier, c.ai_tier) as tier
                           FROM threats t
-                          INNER JOIN threat_analysis ta ON t.id = ta.threat_id
+                          LEFT JOIN threat_analysis ta ON t.id = ta.threat_id
+                          LEFT JOIN classifications c ON t.id = c.threat_id
                           WHERE t.status = 'Approved'
+                            AND (t.assigned_facility_types IS NULL 
+                                 OR t.assigned_facility_types = ''
+                                 OR JSON_CONTAINS(t.assigned_facility_types, JSON_QUOTE(@user_facility_type)))
                           ORDER BY t.created_at DESC
                           LIMIT 50";
 
             using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@user_facility_type", userFacilityType);
             var alerts = new List<object>();
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -442,7 +474,7 @@ public class ThreatController : ControllerBase
                     description = reader.GetStringByName("description"),
                     category = reader.GetStringByName("category"),
                     dateObserved = reader.GetDateTimeByName("date_observed"),
-                    tier = reader.IsDBNullByName("human_tier") ? reader.GetStringByName("ai_tier") : reader.GetStringByName("human_tier"),
+                    tier = reader.IsDBNullByName("tier") ? null : reader.GetStringByName("tier"),
                     createdAt = reader.GetDateTimeByName("created_at")
                 });
             }

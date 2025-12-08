@@ -19,6 +19,8 @@ public class ThreatSubmission
     public DateTime? DateObserved { get; set; }
 
     public string? ImpactLevel { get; set; }
+
+    public List<string>? AssignedFacilityTypes { get; set; }
 }
 
 

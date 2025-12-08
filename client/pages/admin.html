@@ -2061,6 +2061,42 @@
                     <label class="alert-modal-label">Assigned To</label>
                     <div class="alert-modal-value readonly" id="modalAlertAssigned"></div>
                 </div>
+                
+                <!-- AI Analysis Section -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--bio-light-green);">
+                    <h3 style="color: var(--bio-text-light); font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-robot" style="color: var(--bio-bright-green);"></i>
+                        AI Analysis
+                    </h3>
+                    
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">AI Confidence Score</label>
+                        <div class="alert-modal-value readonly" id="modalAIConfidence">
+                            <span style="color: var(--bio-text-light);">Not available</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">AI Reasoning</label>
+                        <div class="alert-modal-value readonly alert-modal-textarea" id="modalAIReasoning" style="min-height: 80px; max-height: 200px; overflow-y: auto;">
+                            <span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Next Steps</label>
+                        <div class="alert-modal-value readonly alert-modal-textarea" id="modalNextSteps" style="min-height: 100px; max-height: 250px; overflow-y: auto;">
+                            <span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-modal-field">
+                        <label class="alert-modal-label">Recommended Industry</label>
+                        <div class="alert-modal-value readonly" id="modalRecommendedIndustry">
+                            <span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="alert-modal-actions">
                 <button class="alert-modal-btn alert-modal-btn-primary" id="saveAlertBtn">
@@ -2381,24 +2417,37 @@
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
 
                     try {
-                        // Build description with additional info
-                        let fullDescription = description;
+                        // Map industry to facility types
+                        const industryToFacilityMap = {
+                            'Healthcare': 'Hospital',
+                            'Biotechnology': 'Lab',
+                            'Pharmaceutical': 'Biomanufacturing',
+                            'Agriculture': 'Agriculture',
+                            'Research': 'Lab'
+                        };
+                        
+                        let assignedFacilityTypes = [];
                         if (industry) {
-                            fullDescription += `\n\nIndustry: ${industry}`;
-                        }
-                        if (priority) {
-                            fullDescription += `\n\nPriority: ${priority}`;
+                            const facilityType = industryToFacilityMap[industry] || industry;
+                            if (facilityType && ['Hospital', 'Lab', 'Biomanufacturing', 'Agriculture'].includes(facilityType)) {
+                                assignedFacilityTypes.push(facilityType);
+                            }
                         }
 
                         // Submit as threat
                         const threatData = {
                             title: title,
-                            description: fullDescription.trim(),
+                            description: description.trim(),
                             category: incidentType,
                             source: 'Admin Alert Creation',
                             dateObserved: new Date(),
                             impactLevel: priority || 'Medium'
                         };
+                        
+                        // Only include AssignedFacilityTypes if industries were selected
+                        if (assignedFacilityTypes.length > 0) {
+                            threatData.assignedFacilityTypes = assignedFacilityTypes;
+                        }
 
                         const response = await apiClient.submitThreat(threatData);
                         
