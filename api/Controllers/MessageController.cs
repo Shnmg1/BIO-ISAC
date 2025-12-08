@@ -494,6 +494,63 @@ public class AdminMessageController : ControllerBase
         }
     }
 
+    [HttpDelete("conversation/{userId}")]
+    public async Task<IActionResult> DeleteConversation(int userId)
+    {
+        try
+        {
+            var adminId = GetCurrentUserId();
+            if (adminId == 0) return Unauthorized();
+
+            using var connection = await _dbService.GetConnectionAsync();
+            
+            // Ensure consistent ordering for conversation lookup
+            int userId1 = Math.Min(adminId, userId);
+            int userId2 = Math.Max(adminId, userId);
+
+            // Delete messages between this user and ANY admin (since admins share the inbox)
+            var deleteMessagesQuery = @"DELETE FROM messages 
+                                      WHERE (from_user_id = @userId AND to_user_id IN (SELECT id FROM users WHERE role = 'Admin')) 
+                                         OR (to_user_id = @userId AND from_user_id IN (SELECT id FROM users WHERE role = 'Admin'))";
+
+            using (var command = new MySqlConnector.MySqlCommand(deleteMessagesQuery, connection))
+            {
+                // command.Parameters.AddWithValue("@adminId", adminId); // Not needed anymore
+                command.Parameters.AddWithValue("@userId", userId);
+                await command.ExecuteNonQueryAsync();
+            }
+
+            // Delete conversation record - wrap in try/catch to be safe if table/columns don't exist
+            try 
+            {
+                // Also try to find conversations involving this user and any admin
+                var deleteConvQuery = @"DELETE FROM conversations 
+                                       WHERE (user1_id = @userId AND user2_id IN (SELECT id FROM users WHERE role = 'Admin'))
+                                          OR (user2_id = @userId AND user1_id IN (SELECT id FROM users WHERE role = 'Admin'))";
+                
+                using (var command = new MySqlConnector.MySqlCommand(deleteConvQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@userId", userId);
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log but don't fail the request since messages are deleted
+                _logger.LogWarning(ex, "Could not delete conversation record (schema mismatch?)");
+            }
+
+            await LogAuditAsync(adminId, null, "Conversation_Deleted", $"Admin deleted conversation with user {userId}");
+
+            return Ok(new { message = "Conversation deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting conversation");
+            return StatusCode(500, new { message = "An error occurred" });
+        }
+    }
+
     private async Task<int?> GetOrCreateConversationAsync(int user1Id, int user2Id)
     {
         try

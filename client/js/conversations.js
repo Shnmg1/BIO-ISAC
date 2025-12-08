@@ -155,7 +155,11 @@ async function loadConversations() {
             }
         });
 
-        renderConversationsList();
+        // Get current search query to preserve it
+        const searchInput = document.querySelector('.conversations-search .search-input');
+        const searchQuery = searchInput ? searchInput.value : '';
+        
+        renderConversationsList(searchQuery);
 
         // If a conversation is selected, re-render it to show new messages
         if (currentConversationUserId) {
@@ -167,24 +171,59 @@ async function loadConversations() {
     }
 }
 
-function renderConversationsList() {
+function renderConversationsList(searchQuery = '') {
     const container = document.querySelector('.conversations-list');
     if (!container) return;
 
     container.innerHTML = '';
 
     // Sort conversations by last message date
-    const sortedConversations = Array.from(conversations.values()).sort((a, b) => {
+    let sortedConversations = Array.from(conversations.values()).sort((a, b) => {
         const dateA = a.lastMessage ? new Date(a.lastMessage.createdAt) : new Date(0);
         const dateB = b.lastMessage ? new Date(b.lastMessage.createdAt) : new Date(0);
         return dateB - dateA;
     });
 
+    // Filter by search query if provided
+    if (searchQuery && searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        sortedConversations = sortedConversations.filter(conv => {
+            const userName = (conv.userName || '').toLowerCase();
+            const facilityName = (conv.facilityName || '').toLowerCase();
+            const facilityType = (conv.facilityType || '').toLowerCase();
+            const preview = (conv.lastMessage ? (conv.lastMessage.body || conv.lastMessage.subject || '') : '').toLowerCase();
+            return userName.includes(query) || 
+                   facilityName.includes(query) || 
+                   facilityType.includes(query) ||
+                   preview.includes(query);
+        });
+    }
+
+    // Show empty state if no conversations
+    if (sortedConversations.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'conversations-empty-state';
+        emptyState.style.cssText = 'text-align: center; padding: 40px 20px; color: var(--bio-text-light); opacity: 0.6;';
+        emptyState.innerHTML = `
+            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p style="margin: 0; font-size: 14px;">${searchQuery ? 'No conversations match your search' : 'No conversations yet'}</p>
+            ${!searchQuery ? '<p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.7;">Start a new conversation to get started</p>' : ''}
+        `;
+        container.appendChild(emptyState);
+        return;
+    }
+
     sortedConversations.forEach(conv => {
         const item = document.createElement('div');
         item.className = `conversation-item ${conv.userId === currentConversationUserId ? 'active' : ''}`;
         item.dataset.userId = conv.userId;
-        item.onclick = () => selectConversation(conv.userId);
+        
+        // Click handler for selecting conversation
+        item.addEventListener('click', (e) => {
+             // Do not select if delete button was clicked
+            if (e.target.closest('.delete-conversation-btn')) return;
+            selectConversation(conv.userId);
+        });
 
         const initials = getInitials(conv.userName);
         const time = conv.lastMessage ? formatTime(conv.lastMessage.createdAt) : '';
@@ -195,23 +234,100 @@ function renderConversationsList() {
         item.innerHTML = `
             <div class="conversation-avatar">${initials}</div>
             <div class="conversation-info">
-                <div class="conversation-name">${conv.userName}${facilityInfo}${facilityTypeInfo}</div>
-                <div class="conversation-preview">${preview}</div>
+                <div class="conversation-name">${escapeHtml(conv.userName)}${facilityInfo ? escapeHtml(facilityInfo) : ''}${facilityTypeInfo ? escapeHtml(facilityTypeInfo) : ''}</div>
+                <div class="conversation-preview">${escapeHtml(preview)}</div>
             </div>
             <div class="conversation-meta">
                 <div class="conversation-time">${time}</div>
                 ${conv.unreadCount > 0 ? `<div class="conversation-unread">${conv.unreadCount}</div>` : ''}
             </div>
+            <button class="delete-conversation-btn" title="Delete Conversation">
+                <i class="fas fa-trash"></i>
+            </button>
         `;
+
+        // Attach delete handler
+        const deleteBtn = item.querySelector('.delete-conversation-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteConversation(conv.userId);
+            });
+        }
 
         container.appendChild(item);
     });
 }
 
+async function deleteConversation(userId) {
+    if (!confirm('Are you sure you want to delete this conversation? This will delete all messages between you and this user.')) {
+        return;
+    }
+
+    try {
+        await apiClient.delete(`/admin/message/conversation/${userId}`);
+        
+        // Remove from map
+        conversations.delete(userId);
+        
+        // If it was selected, clear selection
+        if (currentConversationUserId === userId) {
+            currentConversationUserId = null;
+            
+            // Clear messages container
+            const container = document.querySelector('.messages-container');
+            if (container) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--bio-text-light); opacity: 0.6;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p style="margin: 0; font-size: 14px;">Select a conversation to start messaging</p>
+                    </div>
+                `;
+            }
+            
+            // Clear header
+            const headerName = document.querySelector('.messages-header-name');
+            const headerStatus = document.querySelector('.messages-header-status');
+            const headerAvatar = document.querySelector('.messages-header-user .conversation-avatar');
+            
+            if(headerName) headerName.textContent = 'Select a Conversation';
+            if(headerStatus) headerStatus.textContent = '';
+            if(headerAvatar) headerAvatar.textContent = '';
+            
+            // Disable input
+            const input = document.querySelector('.message-input');
+            if (input) {
+                input.disabled = true;
+                input.placeholder = 'Select a conversation to start messaging...';
+            }
+        }
+        
+        // Refresh list
+        const searchInput = document.querySelector('.conversations-search .search-input');
+        renderConversationsList(searchInput ? searchInput.value : '');
+        
+    } catch (error) {
+        console.error('Error deleting conversation:', error);
+        alert('Failed to delete conversation: ' + (error.message || 'Unknown error'));
+    }
+}
+
 function selectConversation(userId) {
     currentConversationUserId = userId;
-    renderConversationsList(); // To update 'active' class
+    
+    // Get current search query to preserve it
+    const searchInput = document.querySelector('.conversations-search .search-input');
+    const searchQuery = searchInput ? searchInput.value : '';
+    
+    renderConversationsList(searchQuery); // To update 'active' class
     renderMessages(userId);
+    
+    // Enable message input
+    const messageInput = document.querySelector('.message-input');
+    if (messageInput) {
+        messageInput.disabled = false;
+        messageInput.placeholder = 'Type a message...';
+    }
 }
 
 function renderMessages(userId) {
@@ -220,13 +336,28 @@ function renderMessages(userId) {
     const headerStatus = document.querySelector('.messages-header-status');
     const headerAvatar = document.querySelector('.messages-header-user .conversation-avatar');
 
-    if (!container || !conversations.has(userId)) return;
+    if (!container || !conversations.has(userId)) {
+        // Show empty state if conversation not found
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--bio-text-light); opacity: 0.6;">
+                    <i class="fas fa-comment-slash" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <p style="margin: 0; font-size: 14px;">Conversation not found</p>
+                </div>
+            `;
+        }
+        return;
+    }
 
     const conversation = conversations.get(userId);
 
     // Update Header
     if (headerName) headerName.textContent = conversation.userName;
-    if (headerStatus) headerStatus.textContent = 'Active'; // We don't have real status yet
+    if (headerStatus) {
+        const facilityInfo = conversation.facilityName ? ` - ${conversation.facilityName}` : '';
+        const facilityTypeInfo = conversation.facilityType ? ` (${conversation.facilityType})` : '';
+        headerStatus.textContent = facilityInfo || facilityTypeInfo || 'Active';
+    }
     if (headerAvatar) headerAvatar.textContent = getInitials(conversation.userName);
 
     container.innerHTML = '';
@@ -235,6 +366,18 @@ function renderMessages(userId) {
     const sortedMessages = conversation.messages.sort((a, b) => {
         return new Date(a.createdAt) - new Date(b.createdAt);
     });
+
+    // Show empty state if no messages
+    if (sortedMessages.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: var(--bio-text-light); opacity: 0.6;">
+                <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p style="margin: 0; font-size: 14px;">No messages yet</p>
+                <p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.7;">Start the conversation by sending a message</p>
+            </div>
+        `;
+        return;
+    }
 
     const myId = currentUser ? currentUser.id : 1;
 
@@ -253,20 +396,20 @@ function renderMessages(userId) {
         const subject = msg.subject ? msg.subject.trim() : '';
         const body = msg.body ? msg.body.trim() : '';
         
-        let messageHtml = '';
-        
-        // If we have both subject and body, and they're different, show subject as header
+        // Display subject centered if it exists and is different from body
         if (subject && body && subject !== body && !body.startsWith(subject)) {
-            messageHtml = `
-                <div class="message-subject">${escapeHtml(subject)}</div>
-                <div class="message-body">${escapeHtml(body)}</div>
-            `;
-        } else if (body) {
-            // If body exists, use it (even if same as subject, body is more complete)
+             const subjectDiv = document.createElement('div');
+             subjectDiv.className = 'message-subject-header';
+             subjectDiv.innerHTML = escapeHtml(subject);
+             container.appendChild(subjectDiv);
+        }
+        
+        let messageHtml = '';
+        if (body) {
             messageHtml = escapeHtml(body);
         } else if (subject) {
-            // Fallback to subject if no body
-            messageHtml = escapeHtml(subject);
+             // If only subject exists or matches body, put it in bubble
+             messageHtml = escapeHtml(subject);
         } else {
             messageHtml = 'No content';
         }
@@ -374,22 +517,44 @@ document.addEventListener('DOMContentLoaded', function () {
     const conversationsPage = document.getElementById('conversations-page');
 
     if (conversationsPage) {
-        // Initial load
-        if (conversationsPage.classList.contains('active')) {
+        // Function to check if page is visible
+        function isPageVisible() {
+            return conversationsPage.classList.contains('active') || 
+                   conversationsPage.style.display === 'block' ||
+                   (conversationsPage.style.display !== 'none' && conversationsPage.offsetParent !== null);
+        }
+
+        // Initial load if page is visible
+        if (isPageVisible()) {
             loadConversations();
         }
 
-        // Observer for visibility changes
+        // Observer for visibility changes (both class and style changes)
         const observer = new MutationObserver(function (mutations) {
-            if (conversationsPage.classList.contains('active')) {
+            if (isPageVisible()) {
                 loadConversations();
             }
         });
-        observer.observe(conversationsPage, { attributes: true, attributeFilter: ['class'] });
+        observer.observe(conversationsPage, { 
+            attributes: true, 
+            attributeFilter: ['class'],
+            attributeOldValue: false
+        });
+        
+        // Also observe style changes
+        const styleObserver = new MutationObserver(function (mutations) {
+            if (isPageVisible()) {
+                loadConversations();
+            }
+        });
+        styleObserver.observe(conversationsPage, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
 
-        // Poll for new messages every 10 seconds
+        // Poll for new messages every 10 seconds when page is visible
         setInterval(() => {
-            if (conversationsPage.classList.contains('active')) {
+            if (isPageVisible()) {
                 loadConversations();
             }
         }, 10000);
@@ -404,8 +569,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Bind Enter key in textarea
     const input = document.querySelector('.message-input');
     if (input) {
+        // Initially disable input until a conversation is selected
+        input.disabled = true;
+        input.placeholder = 'Select a conversation to start messaging...';
+        
         input.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !input.disabled) {
                 e.preventDefault();
                 sendMessage();
             }
@@ -417,6 +586,19 @@ document.addEventListener('DOMContentLoaded', function () {
     if (newBtn) {
         newBtn.addEventListener('click', () => {
             openNewConversationModal();
+        });
+    }
+
+    // Bind Search Input
+    const searchInput = document.querySelector('.conversations-search .search-input');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value;
+            searchTimeout = setTimeout(() => {
+                renderConversationsList(query);
+            }, 300); // Debounce search
         });
     }
 });
