@@ -58,9 +58,12 @@ public class MessageController : ControllerBase
                 toUserId = admin.Id;
             }
 
+            // Get or create conversation
+            int? conversationId = await GetOrCreateConversationAsync(fromUserId, toUserId);
+
             using var connection = await _dbService.GetConnectionAsync();
-            var query = @"INSERT INTO messages (from_user_id, to_user_id, subject, body, threat_id, created_at) 
-                         VALUES (@from_user_id, @to_user_id, @subject, @body, @threat_id, NOW())";
+            var query = @"INSERT INTO messages (from_user_id, to_user_id, subject, body, threat_id, conversation_id, created_at) 
+                         VALUES (@from_user_id, @to_user_id, @subject, @body, @threat_id, @conversation_id, NOW())";
 
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@from_user_id", fromUserId);
@@ -68,9 +71,16 @@ public class MessageController : ControllerBase
             command.Parameters.AddWithValue("@subject", request.Subject);
             command.Parameters.AddWithValue("@body", request.Body);
             command.Parameters.AddWithValue("@threat_id", request.ThreatId.HasValue ? (object)request.ThreatId.Value : DBNull.Value);
+            command.Parameters.AddWithValue("@conversation_id", conversationId.HasValue ? (object)conversationId.Value : DBNull.Value);
 
             await command.ExecuteNonQueryAsync();
             var messageId = (int)command.LastInsertedId;
+
+            // Update conversation updated_at
+            if (conversationId.HasValue)
+            {
+                await UpdateConversationTimestampAsync(conversationId.Value);
+            }
 
             await LogAuditAsync(fromUserId, null, "Message_Sent", $"Message sent to user {toUserId}");
 
@@ -80,6 +90,67 @@ public class MessageController : ControllerBase
         {
             _logger.LogError(ex, "Error sending message");
             return StatusCode(500, new { message = "An error occurred while sending the message" });
+        }
+    }
+
+    private async Task<int?> GetOrCreateConversationAsync(int user1Id, int user2Id)
+    {
+        try
+        {
+            // Ensure consistent ordering (smaller ID first)
+            int userId1 = Math.Min(user1Id, user2Id);
+            int userId2 = Math.Max(user1Id, user2Id);
+
+            using var connection = await _dbService.GetConnectionAsync();
+            
+            // Check if conversation exists
+            var checkQuery = @"SELECT id FROM conversations 
+                              WHERE (user1_id = @user1_id AND user2_id = @user2_id) 
+                                 OR (user1_id = @user2_id AND user2_id = @user1_id)
+                              LIMIT 1";
+            
+            using var checkCommand = new MySqlCommand(checkQuery, connection);
+            checkCommand.Parameters.AddWithValue("@user1_id", userId1);
+            checkCommand.Parameters.AddWithValue("@user2_id", userId2);
+            
+            using var reader = await checkCommand.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return reader.GetInt32ByName("id");
+            }
+
+            // Create new conversation
+            var insertQuery = @"INSERT INTO conversations (user1_id, user2_id, created_at, updated_at) 
+                               VALUES (@user1_id, @user2_id, NOW(), NOW())";
+            
+            using var insertCommand = new MySqlCommand(insertQuery, connection);
+            insertCommand.Parameters.AddWithValue("@user1_id", userId1);
+            insertCommand.Parameters.AddWithValue("@user2_id", userId2);
+            
+            await insertCommand.ExecuteNonQueryAsync();
+            return (int)insertCommand.LastInsertedId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error getting or creating conversation, continuing without conversation_id");
+            return null; // Return null if conversations table doesn't exist or has issues
+        }
+    }
+
+    private async Task UpdateConversationTimestampAsync(int conversationId)
+    {
+        try
+        {
+            using var connection = await _dbService.GetConnectionAsync();
+            var query = "UPDATE conversations SET updated_at = NOW() WHERE id = @id";
+            using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@id", conversationId);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error updating conversation timestamp");
+            // Don't throw - this is not critical
         }
     }
 
@@ -365,36 +436,54 @@ public class AdminMessageController : ControllerBase
             var adminId = GetCurrentUserId();
             if (adminId == 0) return Unauthorized();
 
-            // Get original message
-            using var connection = await _dbService.GetConnectionAsync();
-            var getMessageQuery = "SELECT from_user_id, threat_id FROM messages WHERE id = @id";
-            using var getMessageCommand = new MySqlConnector.MySqlCommand(getMessageQuery, connection);
-            getMessageCommand.Parameters.AddWithValue("@id", id);
-            
             int toUserId = 0;
             int? threatId = null;
-            using var reader = await getMessageCommand.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+
+            // Get original message - use separate connection or close reader first
+            using (var connection = await _dbService.GetConnectionAsync())
             {
-                toUserId = reader.GetInt32ByName("from_user_id");
-                threatId = reader.IsDBNullByName("threat_id") ? (int?)null : reader.GetInt32ByName("threat_id");
-            }
-            else
+                var getMessageQuery = "SELECT from_user_id, threat_id FROM messages WHERE id = @id";
+                using var getMessageCommand = new MySqlConnector.MySqlCommand(getMessageQuery, connection);
+                getMessageCommand.Parameters.AddWithValue("@id", id);
+                
+                using var reader = await getMessageCommand.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    toUserId = reader.GetInt32ByName("from_user_id");
+                    threatId = reader.IsDBNullByName("threat_id") ? (int?)null : reader.GetInt32ByName("threat_id");
+                }
+                else
+                {
+                    return NotFound();
+                }
+            } // Reader and connection are disposed here
+
+            // Get or create conversation for the reply
+            int? conversationId = await GetOrCreateConversationAsync(adminId, toUserId);
+
+            // Create reply - use new connection
+            using (var connection = await _dbService.GetConnectionAsync())
             {
-                return NotFound();
+                var replyQuery = @"INSERT INTO messages (from_user_id, to_user_id, subject, body, threat_id, conversation_id, created_at) 
+                                  VALUES (@from_user_id, @to_user_id, @subject, @body, @threat_id, @conversation_id, NOW())";
+                using var replyCommand = new MySqlConnector.MySqlCommand(replyQuery, connection);
+                replyCommand.Parameters.AddWithValue("@from_user_id", adminId);
+                replyCommand.Parameters.AddWithValue("@to_user_id", toUserId);
+                replyCommand.Parameters.AddWithValue("@subject", $"Re: {request.Subject}");
+                replyCommand.Parameters.AddWithValue("@body", request.Body);
+                replyCommand.Parameters.AddWithValue("@threat_id", threatId.HasValue ? (object)threatId.Value : DBNull.Value);
+                replyCommand.Parameters.AddWithValue("@conversation_id", conversationId.HasValue ? (object)conversationId.Value : DBNull.Value);
+
+                await replyCommand.ExecuteNonQueryAsync();
             }
 
-            // Create reply
-            var replyQuery = @"INSERT INTO messages (from_user_id, to_user_id, subject, body, threat_id, created_at) 
-                              VALUES (@from_user_id, @to_user_id, @subject, @body, @threat_id, NOW())";
-            using var replyCommand = new MySqlConnector.MySqlCommand(replyQuery, connection);
-            replyCommand.Parameters.AddWithValue("@from_user_id", adminId);
-            replyCommand.Parameters.AddWithValue("@to_user_id", toUserId);
-            replyCommand.Parameters.AddWithValue("@subject", $"Re: {request.Subject}");
-            replyCommand.Parameters.AddWithValue("@body", request.Body);
-            replyCommand.Parameters.AddWithValue("@threat_id", threatId.HasValue ? (object)threatId.Value : DBNull.Value);
+            // Update conversation timestamp
+            if (conversationId.HasValue)
+            {
+                await UpdateConversationTimestampAsync(conversationId.Value);
+            }
 
-            await replyCommand.ExecuteNonQueryAsync();
+            await LogAuditAsync(adminId, null, "Message_Replied", $"Admin replied to message {id}");
 
             return Ok(new { message = "Reply sent successfully" });
         }
@@ -402,6 +491,86 @@ public class AdminMessageController : ControllerBase
         {
             _logger.LogError(ex, "Error replying to message");
             return StatusCode(500, new { message = "An error occurred" });
+        }
+    }
+
+    private async Task<int?> GetOrCreateConversationAsync(int user1Id, int user2Id)
+    {
+        try
+        {
+            // Ensure consistent ordering (smaller ID first)
+            int userId1 = Math.Min(user1Id, user2Id);
+            int userId2 = Math.Max(user1Id, user2Id);
+
+            using var connection = await _dbService.GetConnectionAsync();
+            
+            // Check if conversation exists
+            var checkQuery = @"SELECT id FROM conversations 
+                              WHERE (user1_id = @user1_id AND user2_id = @user2_id) 
+                                 OR (user1_id = @user2_id AND user2_id = @user1_id)
+                              LIMIT 1";
+            
+            using var checkCommand = new MySqlConnector.MySqlCommand(checkQuery, connection);
+            checkCommand.Parameters.AddWithValue("@user1_id", userId1);
+            checkCommand.Parameters.AddWithValue("@user2_id", userId2);
+            
+            using var reader = await checkCommand.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return reader.GetInt32ByName("id");
+            }
+
+            // Create new conversation
+            var insertQuery = @"INSERT INTO conversations (user1_id, user2_id, created_at, updated_at) 
+                               VALUES (@user1_id, @user2_id, NOW(), NOW())";
+            
+            using var insertCommand = new MySqlConnector.MySqlCommand(insertQuery, connection);
+            insertCommand.Parameters.AddWithValue("@user1_id", userId1);
+            insertCommand.Parameters.AddWithValue("@user2_id", userId2);
+            
+            await insertCommand.ExecuteNonQueryAsync();
+            return (int)insertCommand.LastInsertedId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error getting or creating conversation, continuing without conversation_id");
+            return null; // Return null if conversations table doesn't exist or has issues
+        }
+    }
+
+    private async Task UpdateConversationTimestampAsync(int conversationId)
+    {
+        try
+        {
+            using var connection = await _dbService.GetConnectionAsync();
+            var query = "UPDATE conversations SET updated_at = NOW() WHERE id = @id";
+            using var command = new MySqlConnector.MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@id", conversationId);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error updating conversation timestamp");
+            // Don't throw - this is not critical
+        }
+    }
+
+    private async Task LogAuditAsync(int userId, int? threatId, string actionType, string details)
+    {
+        try
+        {
+            using var connection = await _dbService.GetConnectionAsync();
+            var query = "INSERT INTO audit_logs (threat_id, user_id, action_type, action_details, timestamp) VALUES (@threat_id, @user_id, @action_type, @action_details, NOW())";
+            using var command = new MySqlConnector.MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@threat_id", threatId.HasValue ? (object)threatId.Value : DBNull.Value);
+            command.Parameters.AddWithValue("@user_id", userId);
+            command.Parameters.AddWithValue("@action_type", actionType);
+            command.Parameters.AddWithValue("@action_details", details);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to log audit entry");
         }
     }
 }
