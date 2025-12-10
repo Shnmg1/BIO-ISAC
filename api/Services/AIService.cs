@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using api.Models;
 using MyApp.Namespace.Services;
 
@@ -35,12 +36,6 @@ public class AIService
                     Confidence = 50,
                     Reasoning = "AI classification pending - API key not configured. Manual review recommended.",
                     RecommendedActions = "Review threat manually and assign appropriate tier.",
-                    NextSteps = new List<string> 
-                    { 
-                        "1. Review threat details manually - Security Team",
-                        "2. Assign appropriate tier classification - Security Analyst",
-                        "3. Configure AI API key for automated classification - IT Admin"
-                    },
                     Keywords = new List<string>(),
                     BioSectorRelevance = 50,
                     RawResponse = "Default classification - API not configured"
@@ -116,12 +111,6 @@ public class AIService
                 Confidence = 50,
                 Reasoning = $"AI classification error: {ex.Message}. Manual review required.",
                 RecommendedActions = "Review threat manually and assign appropriate tier.",
-                NextSteps = new List<string> 
-                { 
-                    "1. Review threat details manually - Security Team",
-                    "2. Investigate AI service error - IT Admin",
-                    "3. Assign appropriate tier classification - Security Analyst"
-                },
                 Keywords = new List<string>(),
                 BioSectorRelevance = 50,
                 RawResponse = $"Error: {ex.Message}"
@@ -142,6 +131,14 @@ Category: {threat.category}
 Source: {threat.source}
 Impact Level: {threat.impact_level}
 Date Observed: {threat.date_observed:yyyy-MM-dd}
+
+VERIFICATION INSTRUCTIONS:
+Use web search to verify if this threat has been reported by reputable sources (security vendors, CERT teams, government advisories).
+Adjust your confidence score based on:
+- Multiple independent sources confirming the threat: Higher confidence (80-100%)
+- Single source or unverified claims: Medium confidence (50-79%)
+- No corroborating sources found or conflicting information: Lower confidence (0-49%)
+- Include source references in your reasoning when available
 
 RISK MATRIX CRITERIA:
 
@@ -179,28 +176,12 @@ HUMAN/BIOLOGICAL IMPACT SCORING:
 - Operational disruption: Medium tier
 - Informational: Low tier
 
-NEXT STEPS REQUIREMENTS:
-- Provide 3-6 specific, actionable steps the company should take IMMEDIATELY
-- Each step should be a discrete task that can be checked off
-- Include responsible party when applicable (SOC, IT, Security Team, Management, Legal)
-- All steps are immediate priority actions
-- Order steps by execution sequence
-- Reference standard incident response procedures where relevant
-- For Tier 1: Focus on containment, escalation, and crisis management
-- For Tier 2: Focus on investigation, patching, and monitoring
-- For Tier 3: Focus on awareness, documentation, and routine updates
-
 Respond ONLY with valid JSON in this exact format:
 {{
     ""tier"": ""High"" | ""Medium"" | ""Low"",
     ""confidence"": 0-100,
     ""reasoning"": ""Detailed explanation of classification"",
-    ""recommendedActions"": ""Brief summary of response strategy"",
-    ""nextSteps"": [
-        ""1. Action description - Responsible Party"",
-        ""2. Action description - Responsible Party"",
-        ""3. Action description - Responsible Party""
-    ],
+    ""recommendedActions"": ""List of recommended actions"",
     ""keywords"": [""keyword1"", ""keyword2""],
     ""bioSectorRelevance"": 0-100
 }}";
@@ -226,29 +207,90 @@ Respond ONLY with valid JSON in this exact format:
 
             var confidence = root.GetProperty("confidence").GetDecimal();
             var reasoning = root.GetProperty("reasoning").GetString() ?? "";
-            var recommendedActions = root.GetProperty("recommendedActions").GetString() ?? "";
 
+            // Handle recommendedActions as either string or array
+            var recommendedActions = "";
+            if (root.TryGetProperty("recommendedActions", out var actionsElement))
+            {
+                if (actionsElement.ValueKind == JsonValueKind.String)
+                {
+                    recommendedActions = actionsElement.GetString() ?? "";
+                }
+                else if (actionsElement.ValueKind == JsonValueKind.Array)
+                {
+                    var actionsList = new List<string>();
+                    foreach (var action in actionsElement.EnumerateArray())
+                    {
+                        actionsList.Add(action.GetString() ?? "");
+                    }
+                    recommendedActions = string.Join("\n• ", actionsList);
+                    if (actionsList.Count > 0)
+                        recommendedActions = "• " + recommendedActions;
+                }
+            }
+
+            // Handle keywords as either string or array
             var keywords = new List<string>();
             if (root.TryGetProperty("keywords", out var keywordsElement))
             {
-                foreach (var keyword in keywordsElement.EnumerateArray())
+                if (keywordsElement.ValueKind == JsonValueKind.Array)
                 {
-                    keywords.Add(keyword.GetString() ?? "");
+                    foreach (var keyword in keywordsElement.EnumerateArray())
+                    {
+                        keywords.Add(keyword.GetString() ?? "");
+                    }
+                }
+                else if (keywordsElement.ValueKind == JsonValueKind.String)
+                {
+                    var keywordStr = keywordsElement.GetString() ?? "";
+                    if (!string.IsNullOrEmpty(keywordStr))
+                        keywords.Add(keywordStr);
                 }
             }
 
+            // Handle nextSteps as array
             var nextSteps = new List<string>();
             if (root.TryGetProperty("nextSteps", out var nextStepsElement))
             {
-                foreach (var step in nextStepsElement.EnumerateArray())
+                if (nextStepsElement.ValueKind == JsonValueKind.Array)
                 {
-                    nextSteps.Add(step.GetString() ?? "");
+                    foreach (var step in nextStepsElement.EnumerateArray())
+                    {
+                        var stepText = step.GetString() ?? "";
+                        // Trim and clean up the step text
+                        stepText = stepText.Trim();
+                        // Remove any extra whitespace
+                        stepText = Regex.Replace(stepText, @"\s+", " ");
+                        if (!string.IsNullOrEmpty(stepText))
+                        {
+                            nextSteps.Add(stepText);
+                        }
+                    }
+                }
+                else if (nextStepsElement.ValueKind == JsonValueKind.String)
+                {
+                    // Handle case where nextSteps is a single string (shouldn't happen, but handle gracefully)
+                    var stepText = nextStepsElement.GetString() ?? "";
+                    if (!string.IsNullOrEmpty(stepText))
+                    {
+                        nextSteps.Add(stepText.Trim());
+                    }
                 }
             }
+            
+            _logger.LogInformation("Parsed {Count} next steps from AI response", nextSteps.Count);
 
-            var bioSectorRelevance = root.TryGetProperty("bioSectorRelevance", out var relevanceElement) 
-                ? relevanceElement.GetDecimal() 
+            var bioSectorRelevance = root.TryGetProperty("bioSectorRelevance", out var relevanceElement)
+                ? relevanceElement.GetDecimal()
                 : 50;
+
+            var recommendedIndustry = root.TryGetProperty("recommendedIndustry", out var industryElement)
+                ? industryElement.GetString()
+                : null;
+
+            var specificIndustry = root.TryGetProperty("specificIndustry", out var specificIndustryElement)
+                ? specificIndustryElement.GetString()
+                : null;
 
             return new ClassificationResult
             {
@@ -259,7 +301,9 @@ Respond ONLY with valid JSON in this exact format:
                 NextSteps = nextSteps,
                 Keywords = keywords,
                 BioSectorRelevance = bioSectorRelevance,
-                RawResponse = content
+                RawResponse = content,
+                RecommendedIndustry = recommendedIndustry,
+                SpecificIndustry = specificIndustry
             };
         }
         catch (Exception ex)
@@ -285,16 +329,28 @@ Respond ONLY with valid JSON in this exact format:
         try
         {
             using var connection = await _dbService.GetConnectionAsync();
-            var query = @"INSERT INTO threat_analysis (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_keywords, ai_classified_at, created_at) 
-                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_keywords, NOW(), NOW())";
+            var query = @"INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_next_steps, ai_recommended_industry)
+                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_next_steps, @ai_recommended_industry)";
 
             using var command = new MySqlConnector.MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@threat_id", threatId);
             command.Parameters.AddWithValue("@ai_tier", result.Tier.ToString());
             command.Parameters.AddWithValue("@ai_confidence", result.Confidence);
             command.Parameters.AddWithValue("@ai_reasoning", result.Reasoning);
-            command.Parameters.AddWithValue("@ai_actions", JsonSerializer.Serialize(result.NextSteps));
-            command.Parameters.AddWithValue("@ai_keywords", string.Join(",", result.Keywords));
+            command.Parameters.AddWithValue("@ai_actions", result.RecommendedActions ?? (object)DBNull.Value);
+            // Save NextSteps as JSON array to ai_next_steps
+            // Ensure proper JSON formatting with clean serialization
+            var nextStepsJson = result.NextSteps != null && result.NextSteps.Count > 0
+                ? JsonSerializer.Serialize(result.NextSteps, new JsonSerializerOptions
+                {
+                    WriteIndented = false,  // Compact format for database storage
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping  // Preserve special characters
+                })
+                : null;
+            command.Parameters.AddWithValue("@ai_next_steps", (object?)nextStepsJson ?? DBNull.Value);
+            command.Parameters.AddWithValue("@ai_recommended_industry", string.IsNullOrEmpty(result.RecommendedIndustry) ? (object)DBNull.Value : result.RecommendedIndustry);
+            
+            _logger.LogInformation("Saving next steps for threat {ThreatId}: {NextStepsJson}", threatId, nextStepsJson);
 
             await command.ExecuteNonQueryAsync();
         }
@@ -316,5 +372,7 @@ public class ClassificationResult
     public List<string> Keywords { get; set; } = new();
     public decimal BioSectorRelevance { get; set; }
     public string RawResponse { get; set; } = string.Empty;
+    public string? RecommendedIndustry { get; set; }
+    public string? SpecificIndustry { get; set; }
 }
 

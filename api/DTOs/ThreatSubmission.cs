@@ -19,6 +19,15 @@ public class ThreatSubmission
     public DateTime? DateObserved { get; set; }
 
     public string? ImpactLevel { get; set; }
+
+    public List<string>? AssignedFacilityTypes { get; set; }
+}
+
+public class AssignIndustriesRequest
+{
+    public List<string> FacilityTypes { get; set; } = new();
+    public bool IncludeNextSteps { get; set; }
+    public string? AdditionalInfo { get; set; }
 }
 
 

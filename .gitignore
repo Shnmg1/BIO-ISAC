@@ -52,3 +52,17 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Git worktrees
+.worktrees/
+
+# Secrets - Keep appsettings.json as template only
+appsettings.Development.json
+appsettings.development.json
+appsettings.*.json
+!appsettings.json
+# Explicitly ignore any config files with API keys
+**/appsettings.development.json
+**/appsettings.Development.json
+**/appsettings.*.json
+!**/appsettings.json

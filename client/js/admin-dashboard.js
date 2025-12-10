@@ -1,6 +1,13 @@
 // Admin Dashboard JavaScript
 // This file handles all API calls and DOM updates for the admin dashboard
 
+// Utility function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Utility function to format dates
 function formatDate(dateString) {
     if (!dateString) return '';
@@ -302,6 +309,198 @@ async function openAlertModal(alertId) {
         if (modalAlertStatus) modalAlertStatus.textContent = threat.status || 'Pending';
         if (modalAlertAssigned) modalAlertAssigned.textContent = 'Unassigned';
 
+        // Populate AI Analysis fields
+        const modalAIConfidence = document.getElementById('modalAIConfidence');
+        const modalAIReasoning = document.getElementById('modalAIReasoning');
+        const modalNextSteps = document.getElementById('modalNextSteps');
+        const modalRecommendedIndustry = document.getElementById('modalRecommendedIndustry');
+
+        // Debug: log the threat data to see what we're getting
+        console.log('Threat data:', threat);
+        console.log('Classification data:', threat.classification);
+
+        if (threat.classification) {
+            // AI Confidence Score
+            if (modalAIConfidence) {
+                const confidence = threat.classification.aiConfidence;
+                if (confidence !== null && confidence !== undefined) {
+                    const confidencePercent = Math.round(confidence);
+                    let confidenceColor = 'var(--bio-bright-green)';
+                    if (confidencePercent < 50) {
+                        confidenceColor = '#ffaa00';
+                    } else if (confidencePercent < 70) {
+                        confidenceColor = 'var(--bio-light-green)';
+                    }
+                    modalAIConfidence.innerHTML = `<span style="color: ${confidenceColor}; font-weight: 600; font-size: 18px;">${confidencePercent}%</span>`;
+                } else {
+                    modalAIConfidence.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+                }
+            }
+
+            // AI Reasoning
+            if (modalAIReasoning) {
+                if (threat.classification.aiReasoning) {
+                    modalAIReasoning.textContent = threat.classification.aiReasoning;
+                } else {
+                    modalAIReasoning.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+                }
+            }
+
+            // Next Steps
+            if (modalNextSteps) {
+                if (threat.classification.aiActions) {
+                    try {
+                        // Try to parse as JSON array first
+                        let nextSteps = null;
+                        const aiActionsStr = threat.classification.aiActions.trim();
+                        
+                        // Check if it starts with [ (JSON array) or is a plain string
+                        if (aiActionsStr.startsWith('[') && aiActionsStr.endsWith(']')) {
+                            nextSteps = JSON.parse(aiActionsStr);
+                        } else {
+                            // If it's not JSON, treat as plain text (could be RecommendedActions)
+                            // Try to split by newlines or bullets to create steps
+                            const lines = aiActionsStr.split(/\n|•|\d+\./).filter(line => line.trim().length > 0);
+                            if (lines.length > 0) {
+                                nextSteps = lines.map(line => line.trim());
+                            }
+                        }
+                        
+                        if (Array.isArray(nextSteps) && nextSteps.length > 0) {
+                            const stepsHtml = nextSteps.map((step, index) => {
+                                // Check if step already starts with a number (e.g., "1. Action")
+                                const trimmedStep = (step || '').trim();
+                                const hasNumber = /^\d+\.\s/.test(trimmedStep);
+                                
+                                if (hasNumber) {
+                                    // Step already has a number, display as-is with green number
+                                    const match = trimmedStep.match(/^(\d+)\.\s(.+)$/);
+                                    if (match) {
+                                        return `<div style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+                                            <span style="position: absolute; left: 0; color: var(--bio-bright-green);">${match[1]}.</span>
+                                            <span style="color: var(--bio-text-light);">${escapeHtml(match[2])}</span>
+                                        </div>`;
+                                    }
+                                }
+                                
+                                // Step doesn't have a number, add one
+                                return `<div style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+                                    <span style="position: absolute; left: 0; color: var(--bio-bright-green);">${index + 1}.</span>
+                                    <span style="color: var(--bio-text-light);">${escapeHtml(trimmedStep)}</span>
+                                </div>`;
+                            }).join('');
+                            modalNextSteps.innerHTML = stepsHtml;
+                        } else {
+                            // Fallback: display as plain text
+                            modalNextSteps.textContent = aiActionsStr;
+                        }
+                    } catch (e) {
+                        // If parsing fails, display as plain text
+                        console.warn('Error parsing aiActions:', e);
+                        modalNextSteps.textContent = threat.classification.aiActions;
+                    }
+                } else {
+                    modalNextSteps.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+                }
+            }
+
+            // Recommended Industry (from AI API)
+            if (modalRecommendedIndustry) {
+                let recommendedIndustry = 'Not available';
+                
+                // First, try to get from AI classification (recommendedIndustry field)
+                if (threat.classification.recommendedIndustry) {
+                    recommendedIndustry = threat.classification.recommendedIndustry;
+                    
+                    // If it's "Other" and we have a specificIndustry, show both
+                    if (recommendedIndustry === 'Other' && threat.classification.specificIndustry) {
+                        recommendedIndustry = `Other: ${threat.classification.specificIndustry}`;
+                    }
+                    // If stored as "Other: {specific}", use it as-is (from database)
+                    else if (recommendedIndustry.startsWith('Other:')) {
+                        // Already in the correct format from database
+                    }
+                } else {
+                    // Fallback: Try to extract from AI reasoning if available
+                    if (threat.classification.aiReasoning) {
+                        const reasoning = threat.classification.aiReasoning.toLowerCase();
+                        
+                        // Check for industry mentions in reasoning
+                        if (reasoning.includes('hospital') || reasoning.includes('healthcare') || reasoning.includes('patient')) {
+                            recommendedIndustry = 'Hospital';
+                        } else if (reasoning.includes('laboratory') || reasoning.includes('lab') || reasoning.includes('research')) {
+                            recommendedIndustry = 'Lab';
+                        } else if (reasoning.includes('biomanufacturing') || reasoning.includes('manufacturing') || reasoning.includes('production')) {
+                            recommendedIndustry = 'Biomanufacturing';
+                        } else if (reasoning.includes('agriculture') || reasoning.includes('farming') || reasoning.includes('crop')) {
+                            recommendedIndustry = 'Agriculture';
+                        }
+                    }
+                    
+                    // Fallback: Try to get from keywords if available
+                    if (recommendedIndustry === 'Not available' && threat.classification.aiKeywords) {
+                        const keywords = threat.classification.aiKeywords.split(',').map(k => k.trim().toLowerCase());
+                        
+                        // Map keywords to industries
+                        const industryKeywords = {
+                            'hospital': 'Hospital',
+                            'healthcare': 'Hospital',
+                            'medical': 'Hospital',
+                            'lab': 'Lab',
+                            'laboratory': 'Lab',
+                            'research': 'Lab',
+                            'biomanufacturing': 'Biomanufacturing',
+                            'manufacturing': 'Biomanufacturing',
+                            'production': 'Biomanufacturing',
+                            'agriculture': 'Agriculture',
+                            'farming': 'Agriculture',
+                            'crop': 'Agriculture'
+                        };
+                        
+                        for (const keyword of keywords) {
+                            for (const [key, industry] of Object.entries(industryKeywords)) {
+                                if (keyword.includes(key)) {
+                                    recommendedIndustry = industry;
+                                    break;
+                                }
+                            }
+                            if (recommendedIndustry !== 'Not available') break;
+                        }
+                    }
+                    
+                    // Fallback to category if no industry found from keywords
+                    if (recommendedIndustry === 'Not available' && threat.category) {
+                        const categoryLower = threat.category.toLowerCase();
+                        if (categoryLower.includes('hospital') || categoryLower.includes('healthcare')) {
+                            recommendedIndustry = 'Hospital';
+                        } else if (categoryLower.includes('lab') || categoryLower.includes('research')) {
+                            recommendedIndustry = 'Lab';
+                        } else if (categoryLower.includes('manufacturing') || categoryLower.includes('production')) {
+                            recommendedIndustry = 'Biomanufacturing';
+                        } else if (categoryLower.includes('agriculture') || categoryLower.includes('farming')) {
+                            recommendedIndustry = 'Agriculture';
+                        }
+                    }
+                }
+                
+                modalRecommendedIndustry.innerHTML = `<span style="color: var(--bio-bright-green); font-weight: 600;">${recommendedIndustry}</span>`;
+            }
+        } else {
+            // No classification available
+            if (modalAIConfidence) {
+                modalAIConfidence.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+            }
+            if (modalAIReasoning) {
+                modalAIReasoning.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+            }
+            if (modalNextSteps) {
+                modalNextSteps.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+            }
+            if (modalRecommendedIndustry) {
+                modalRecommendedIndustry.innerHTML = '<span style="color: var(--bio-text-light); opacity: 0.7;">Not available</span>';
+            }
+        }
+
         // Store threat ID for update operations
         modal.dataset.threatId = threat.id;
 
@@ -343,7 +542,7 @@ function setupCreateAlertForm() {
         const title = form.querySelector('input[type="text"]')?.value || '';
         const description = form.querySelector('textarea')?.value || '';
         const priority = form.querySelector('select')?.value || 'Medium';
-        const industry = form.querySelectorAll('select')[1]?.value || 'Other';
+        const industrySelect = document.getElementById('alertIndustry');
         const type = form.querySelectorAll('select')[2]?.value || 'Other';
 
         // Validation
@@ -352,20 +551,67 @@ function setupCreateAlertForm() {
             return;
         }
 
+        // Get selected industries - support both single select and checkboxes
+        let assignedFacilityTypes = [];
+        if (industrySelect) {
+            // Check if it's a select (single) or checkboxes (multiple)
+            if (industrySelect.type === 'select-one') {
+                const selectedValue = industrySelect.value;
+                if (selectedValue) {
+                    // Map industry values to facility types
+                    const industryToFacilityMap = {
+                        'Healthcare': 'Hospital',
+                        'Biotechnology': 'Lab',
+                        'Pharmaceutical': 'Biomanufacturing',
+                        'Agriculture': 'Agriculture',
+                        'Research': 'Lab'
+                    };
+                    const facilityType = industryToFacilityMap[selectedValue] || selectedValue;
+                    if (facilityType && ['Hospital', 'Lab', 'Biomanufacturing', 'Agriculture'].includes(facilityType)) {
+                        assignedFacilityTypes.push(facilityType);
+                    }
+                }
+            }
+        }
+        
+        // Also check for checkboxes if they exist
+        const industryCheckboxes = form.querySelectorAll('input[type="checkbox"][name="alertIndustry"]:checked');
+        if (industryCheckboxes.length > 0) {
+            assignedFacilityTypes = Array.from(industryCheckboxes).map(cb => {
+                const value = cb.value;
+                const industryToFacilityMap = {
+                    'Healthcare': 'Hospital',
+                    'Biotechnology': 'Lab',
+                    'Pharmaceutical': 'Biomanufacturing',
+                    'Agriculture': 'Agriculture',
+                    'Research': 'Lab'
+                };
+                return industryToFacilityMap[value] || value;
+            }).filter(ft => ['Hospital', 'Lab', 'Biomanufacturing', 'Agriculture'].includes(ft));
+        }
+
         // Show loading
         this.disabled = true;
         const originalText = this.innerHTML;
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
 
         try {
-            await apiClient.submitThreat({
+            const threatData = {
                 title: title,
                 description: description,
-                category: type || industry,
+                category: type,
                 impact_level: priority,
                 date_observed: new Date().toISOString().split('T')[0],
                 source: 'Manual'
-            });
+            };
+            
+            // Only include AssignedFacilityTypes if industries were selected
+            // If empty, threat will be visible to all users
+            if (assignedFacilityTypes.length > 0) {
+                threatData.assignedFacilityTypes = assignedFacilityTypes;
+            }
+            
+            await apiClient.submitThreat(threatData);
 
             // Clear form
             form.querySelector('input[type="text"]').value = '';
@@ -559,6 +805,89 @@ function setupModalActions() {
                 modal.classList.remove('active');
             }
         });
+    }
+
+    // Assign to Industry button
+    const assignIndustryBtn = document.getElementById('assignIndustryBtn');
+    if (assignIndustryBtn) {
+        assignIndustryBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Assign to Industry button clicked');
+            let threatId = modal.dataset.threatId;
+            console.log('Threat ID from modal:', threatId);
+            
+            if (!threatId) {
+                // Try alternative method to get threat ID
+                const modalAlertId = document.getElementById('modalAlertId');
+                if (modalAlertId && modalAlertId.textContent) {
+                    const idFromText = modalAlertId.textContent.replace('#', '').trim();
+                    console.log('Threat ID from modalAlertId:', idFromText);
+                    if (idFromText) {
+                        modal.dataset.threatId = idFromText;
+                        threatId = idFromText;
+                    }
+                }
+            }
+            
+            if (!threatId) {
+                alert('No threat selected. Please open a threat first.');
+                console.error('No threat ID found');
+                return;
+            }
+            
+            // Get threat title from modal
+            const threatTitleEl = document.getElementById('modalAlertTitle');
+            let threatTitle = 'Unknown Threat';
+            if (threatTitleEl) {
+                if (threatTitleEl.tagName === 'INPUT' || threatTitleEl.tagName === 'TEXTAREA') {
+                    threatTitle = threatTitleEl.value || 'Unknown Threat';
+                } else {
+                    threatTitle = threatTitleEl.textContent || threatTitleEl.innerText || 'Unknown Threat';
+                }
+            }
+            
+            console.log('Opening assign industry modal for threat:', threatId, 'Title:', threatTitle);
+            
+            // Open assign industry modal
+            const assignModal = document.getElementById('assignIndustryModal');
+            if (!assignModal) {
+                console.error('Assign industry modal not found in DOM');
+                alert('Error: Assign industry modal not found');
+                return;
+            }
+            
+            // Set threat title
+            const titleEl = document.getElementById('assignIndustryThreatTitle');
+            if (titleEl) {
+                titleEl.textContent = threatTitle;
+            }
+            
+            // Reset form
+            const hospitalCheck = document.getElementById('assignIndustryHospital');
+            const labCheck = document.getElementById('assignIndustryLab');
+            const bioCheck = document.getElementById('assignIndustryBiomanufacturing');
+            const agCheck = document.getElementById('assignIndustryAgriculture');
+            const nextStepsCheck = document.getElementById('assignIndustryIncludeNextSteps');
+            const additionalInfoEl = document.getElementById('assignIndustryAdditionalInfo');
+            
+            if (hospitalCheck) hospitalCheck.checked = false;
+            if (labCheck) labCheck.checked = false;
+            if (bioCheck) bioCheck.checked = false;
+            if (agCheck) agCheck.checked = false;
+            if (nextStepsCheck) nextStepsCheck.checked = false;
+            if (additionalInfoEl) additionalInfoEl.value = '';
+            
+            // Store threat ID in modal
+            assignModal.dataset.threatId = threatId;
+            
+            // Show modal
+            assignModal.classList.add('active');
+            console.log('Assign industry modal shown');
+        });
+    } else {
+        console.error('Assign to Industry button not found');
     }
 }
 

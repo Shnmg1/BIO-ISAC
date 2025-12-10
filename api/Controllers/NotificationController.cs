@@ -103,5 +103,57 @@ public class AdminNotificationController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while sending the alert" });
         }
     }
+
+    [HttpPost("send-to-industry")]
+    public async Task<IActionResult> SendIndustryAlert([FromBody] IndustryAlertRequest request)
+    {
+        try
+        {
+            if (request.Industries == null || request.Industries.Count == 0)
+            {
+                return BadRequest(new { message = "At least one industry must be specified" });
+            }
+
+            var massAlert = new MassAlertRequest
+            {
+                ThreatId = request.ThreatId,
+                Tier = request.Tier,
+                Subject = request.Subject,
+                Body = request.Body,
+                DeliveryMethod = request.DeliveryMethod,
+                Industries = request.Industries
+            };
+
+            await _notificationService.SendMassAlertAsync(massAlert);
+
+            return Ok(new
+            {
+                message = $"Alert sent successfully to {string.Join(", ", request.Industries)} industries",
+                industries = request.Industries
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending industry alert");
+            return StatusCode(500, new { message = "An error occurred while sending the industry alert" });
+        }
+    }
+
+    [HttpGet("industries")]
+    public IActionResult GetAvailableIndustries()
+    {
+        var industries = Enum.GetNames(typeof(FacilityType));
+        return Ok(new { industries });
+    }
+}
+
+public class IndustryAlertRequest
+{
+    public int? ThreatId { get; set; }
+    public ThreatTier Tier { get; set; }
+    public string Subject { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+    public DeliveryMethod DeliveryMethod { get; set; }
+    public List<string> Industries { get; set; } = new();
 }
 
