@@ -274,6 +274,14 @@ class ApiClient {
     async deleteUser(userId) {
         return this.delete(`/admin/users/${userId}`);
     }
+
+    async getUserAlerts() {
+        return this.get('/threats/user/alerts');
+    }
+
+    async assignThreatToIndustries(threatId, request) {
+        return this.post(`/threats/${threatId}/assign-industries`, request);
+    }
 }
 
 const apiClient = new ApiClient();

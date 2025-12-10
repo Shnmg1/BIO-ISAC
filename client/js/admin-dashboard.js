@@ -404,52 +404,82 @@ async function openAlertModal(alertId) {
                 }
             }
 
-            // Recommended Industry (derived from keywords or category)
+            // Recommended Industry (from AI API)
             if (modalRecommendedIndustry) {
                 let recommendedIndustry = 'Not available';
                 
-                // Try to get from keywords if available
-                if (threat.classification.aiKeywords) {
-                    const keywords = threat.classification.aiKeywords.split(',').map(k => k.trim().toLowerCase());
+                // First, try to get from AI classification (recommendedIndustry field)
+                if (threat.classification.recommendedIndustry) {
+                    recommendedIndustry = threat.classification.recommendedIndustry;
                     
-                    // Map keywords to industries
-                    const industryKeywords = {
-                        'hospital': 'Hospital',
-                        'healthcare': 'Hospital',
-                        'medical': 'Hospital',
-                        'lab': 'Lab',
-                        'laboratory': 'Lab',
-                        'research': 'Lab',
-                        'biomanufacturing': 'Biomanufacturing',
-                        'manufacturing': 'Biomanufacturing',
-                        'production': 'Biomanufacturing',
-                        'agriculture': 'Agriculture',
-                        'farming': 'Agriculture',
-                        'crop': 'Agriculture'
-                    };
-                    
-                    for (const keyword of keywords) {
-                        for (const [key, industry] of Object.entries(industryKeywords)) {
-                            if (keyword.includes(key)) {
-                                recommendedIndustry = industry;
-                                break;
-                            }
-                        }
-                        if (recommendedIndustry !== 'Not available') break;
+                    // If it's "Other" and we have a specificIndustry, show both
+                    if (recommendedIndustry === 'Other' && threat.classification.specificIndustry) {
+                        recommendedIndustry = `Other: ${threat.classification.specificIndustry}`;
                     }
-                }
-                
-                // Fallback to category if no industry found from keywords
-                if (recommendedIndustry === 'Not available' && threat.category) {
-                    const categoryLower = threat.category.toLowerCase();
-                    if (categoryLower.includes('hospital') || categoryLower.includes('healthcare')) {
-                        recommendedIndustry = 'Hospital';
-                    } else if (categoryLower.includes('lab') || categoryLower.includes('research')) {
-                        recommendedIndustry = 'Lab';
-                    } else if (categoryLower.includes('manufacturing') || categoryLower.includes('production')) {
-                        recommendedIndustry = 'Biomanufacturing';
-                    } else if (categoryLower.includes('agriculture') || categoryLower.includes('farming')) {
-                        recommendedIndustry = 'Agriculture';
+                    // If stored as "Other: {specific}", use it as-is (from database)
+                    else if (recommendedIndustry.startsWith('Other:')) {
+                        // Already in the correct format from database
+                    }
+                } else {
+                    // Fallback: Try to extract from AI reasoning if available
+                    if (threat.classification.aiReasoning) {
+                        const reasoning = threat.classification.aiReasoning.toLowerCase();
+                        
+                        // Check for industry mentions in reasoning
+                        if (reasoning.includes('hospital') || reasoning.includes('healthcare') || reasoning.includes('patient')) {
+                            recommendedIndustry = 'Hospital';
+                        } else if (reasoning.includes('laboratory') || reasoning.includes('lab') || reasoning.includes('research')) {
+                            recommendedIndustry = 'Lab';
+                        } else if (reasoning.includes('biomanufacturing') || reasoning.includes('manufacturing') || reasoning.includes('production')) {
+                            recommendedIndustry = 'Biomanufacturing';
+                        } else if (reasoning.includes('agriculture') || reasoning.includes('farming') || reasoning.includes('crop')) {
+                            recommendedIndustry = 'Agriculture';
+                        }
+                    }
+                    
+                    // Fallback: Try to get from keywords if available
+                    if (recommendedIndustry === 'Not available' && threat.classification.aiKeywords) {
+                        const keywords = threat.classification.aiKeywords.split(',').map(k => k.trim().toLowerCase());
+                        
+                        // Map keywords to industries
+                        const industryKeywords = {
+                            'hospital': 'Hospital',
+                            'healthcare': 'Hospital',
+                            'medical': 'Hospital',
+                            'lab': 'Lab',
+                            'laboratory': 'Lab',
+                            'research': 'Lab',
+                            'biomanufacturing': 'Biomanufacturing',
+                            'manufacturing': 'Biomanufacturing',
+                            'production': 'Biomanufacturing',
+                            'agriculture': 'Agriculture',
+                            'farming': 'Agriculture',
+                            'crop': 'Agriculture'
+                        };
+                        
+                        for (const keyword of keywords) {
+                            for (const [key, industry] of Object.entries(industryKeywords)) {
+                                if (keyword.includes(key)) {
+                                    recommendedIndustry = industry;
+                                    break;
+                                }
+                            }
+                            if (recommendedIndustry !== 'Not available') break;
+                        }
+                    }
+                    
+                    // Fallback to category if no industry found from keywords
+                    if (recommendedIndustry === 'Not available' && threat.category) {
+                        const categoryLower = threat.category.toLowerCase();
+                        if (categoryLower.includes('hospital') || categoryLower.includes('healthcare')) {
+                            recommendedIndustry = 'Hospital';
+                        } else if (categoryLower.includes('lab') || categoryLower.includes('research')) {
+                            recommendedIndustry = 'Lab';
+                        } else if (categoryLower.includes('manufacturing') || categoryLower.includes('production')) {
+                            recommendedIndustry = 'Biomanufacturing';
+                        } else if (categoryLower.includes('agriculture') || categoryLower.includes('farming')) {
+                            recommendedIndustry = 'Agriculture';
+                        }
                     }
                 }
                 
@@ -775,6 +805,89 @@ function setupModalActions() {
                 modal.classList.remove('active');
             }
         });
+    }
+
+    // Assign to Industry button
+    const assignIndustryBtn = document.getElementById('assignIndustryBtn');
+    if (assignIndustryBtn) {
+        assignIndustryBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Assign to Industry button clicked');
+            let threatId = modal.dataset.threatId;
+            console.log('Threat ID from modal:', threatId);
+            
+            if (!threatId) {
+                // Try alternative method to get threat ID
+                const modalAlertId = document.getElementById('modalAlertId');
+                if (modalAlertId && modalAlertId.textContent) {
+                    const idFromText = modalAlertId.textContent.replace('#', '').trim();
+                    console.log('Threat ID from modalAlertId:', idFromText);
+                    if (idFromText) {
+                        modal.dataset.threatId = idFromText;
+                        threatId = idFromText;
+                    }
+                }
+            }
+            
+            if (!threatId) {
+                alert('No threat selected. Please open a threat first.');
+                console.error('No threat ID found');
+                return;
+            }
+            
+            // Get threat title from modal
+            const threatTitleEl = document.getElementById('modalAlertTitle');
+            let threatTitle = 'Unknown Threat';
+            if (threatTitleEl) {
+                if (threatTitleEl.tagName === 'INPUT' || threatTitleEl.tagName === 'TEXTAREA') {
+                    threatTitle = threatTitleEl.value || 'Unknown Threat';
+                } else {
+                    threatTitle = threatTitleEl.textContent || threatTitleEl.innerText || 'Unknown Threat';
+                }
+            }
+            
+            console.log('Opening assign industry modal for threat:', threatId, 'Title:', threatTitle);
+            
+            // Open assign industry modal
+            const assignModal = document.getElementById('assignIndustryModal');
+            if (!assignModal) {
+                console.error('Assign industry modal not found in DOM');
+                alert('Error: Assign industry modal not found');
+                return;
+            }
+            
+            // Set threat title
+            const titleEl = document.getElementById('assignIndustryThreatTitle');
+            if (titleEl) {
+                titleEl.textContent = threatTitle;
+            }
+            
+            // Reset form
+            const hospitalCheck = document.getElementById('assignIndustryHospital');
+            const labCheck = document.getElementById('assignIndustryLab');
+            const bioCheck = document.getElementById('assignIndustryBiomanufacturing');
+            const agCheck = document.getElementById('assignIndustryAgriculture');
+            const nextStepsCheck = document.getElementById('assignIndustryIncludeNextSteps');
+            const additionalInfoEl = document.getElementById('assignIndustryAdditionalInfo');
+            
+            if (hospitalCheck) hospitalCheck.checked = false;
+            if (labCheck) labCheck.checked = false;
+            if (bioCheck) bioCheck.checked = false;
+            if (agCheck) agCheck.checked = false;
+            if (nextStepsCheck) nextStepsCheck.checked = false;
+            if (additionalInfoEl) additionalInfoEl.value = '';
+            
+            // Store threat ID in modal
+            assignModal.dataset.threatId = threatId;
+            
+            // Show modal
+            assignModal.classList.add('active');
+            console.log('Assign industry modal shown');
+        });
+    } else {
+        console.error('Assign to Industry button not found');
     }
 }
 

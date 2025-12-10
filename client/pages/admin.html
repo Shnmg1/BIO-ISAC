@@ -2119,6 +2119,71 @@
         </div>
     </div>
 
+    <!-- Assign to Industry Modal -->
+    <div class="alert-modal" id="assignIndustryModal">
+        <div class="alert-modal-content" style="max-width: 600px;">
+            <div class="alert-modal-header">
+                <h2><i class="fas fa-users"></i> Assign Threat to Industry</h2>
+                <button class="alert-modal-close" id="closeAssignIndustryModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body">
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Threat Title</label>
+                    <div class="alert-modal-value readonly" id="assignIndustryThreatTitle"></div>
+                </div>
+                
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Select Industries</label>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background-color: rgba(74, 173, 106, 0.05); border: 1px solid var(--bio-medium-green); border-radius: 4px;">
+                            <input type="checkbox" id="assignIndustryHospital" value="Hospital" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="color: var(--bio-text-light);">Hospital</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background-color: rgba(74, 173, 106, 0.05); border: 1px solid var(--bio-medium-green); border-radius: 4px;">
+                            <input type="checkbox" id="assignIndustryLab" value="Lab" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="color: var(--bio-text-light);">Lab</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background-color: rgba(74, 173, 106, 0.05); border: 1px solid var(--bio-medium-green); border-radius: 4px;">
+                            <input type="checkbox" id="assignIndustryBiomanufacturing" value="Biomanufacturing" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="color: var(--bio-text-light);">Biomanufacturing</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background-color: rgba(74, 173, 106, 0.05); border: 1px solid var(--bio-medium-green); border-radius: 4px;">
+                            <input type="checkbox" id="assignIndustryAgriculture" value="Agriculture" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="color: var(--bio-text-light);">Agriculture</span>
+                        </label>
+                    </div>
+                    <small style="color: #999; font-size: 12px; margin-top: 8px; display: block;">Select one or more industries to assign this threat to. Users in these industries will see this threat in their reports queue.</small>
+                </div>
+
+                <div class="alert-modal-field">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background-color: rgba(74, 173, 106, 0.05); border: 1px solid var(--bio-medium-green); border-radius: 4px;">
+                        <input type="checkbox" id="assignIndustryIncludeNextSteps" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="color: var(--bio-text-light); font-weight: 600;">Include Next Steps</span>
+                    </label>
+                    <small style="color: #999; font-size: 12px; margin-top: 5px; display: block; margin-left: 28px;">If checked, the AI-generated next steps will be included when sending this threat to industries.</small>
+                </div>
+
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Additional Information (Optional)</label>
+                    <textarea class="form-control" id="assignIndustryAdditionalInfo" rows="4" placeholder="Add any additional context, instructions, or notes for the assigned industries..." style="width: 100%; padding: 8px; margin-top: 5px; color: #ffffff; background-color: #000000; border: 1px solid var(--bio-light-green); resize: vertical;"></textarea>
+                    <small style="color: #999; font-size: 12px; margin-top: 5px; display: block;">This information will be appended to the threat description when sent to industries.</small>
+                </div>
+            </div>
+            <div class="alert-modal-actions">
+                <button class="alert-modal-btn alert-modal-btn-primary" id="confirmAssignIndustryBtn">
+                    <i class="fas fa-check"></i>
+                    Assign to Industries
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-outline" id="cancelAssignIndustryBtn">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Account Settings Modal -->
     <div class="alert-modal" id="accountSettingsModal">
         <div class="alert-modal-content" style="max-width: 600px;">
@@ -2693,15 +2758,7 @@
                 });
             }
 
-            // Assign to Industry button
-            if (assignIndustryBtn) {
-                assignIndustryBtn.addEventListener('click', function () {
-                    const alertId = document.getElementById('modalAlertId').textContent.replace('#', '');
-                    // Here you would typically open an industry assignment dialog or update
-                    console.log('Assigning alert', alertId, 'to industry');
-                    alert('Assigning alert to industry...');
-                });
-            }
+            // Assign to Industry button handler is now in setupModalActions() in admin-dashboard.js
 
             // Mark as Resolved button
             if (markResolvedBtn) {
@@ -3540,6 +3597,154 @@
     </div>
 
     <script src="../js/accessibility.js"></script>
+    <script>
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                background-color: var(--bio-bright-green);
+                color: var(--bio-primary-green);
+                padding: 12px 20px;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+                font-size: 14px;
+                max-width: 350px;
+                border: 1px solid var(--bio-medium-green);
+                font-weight: 500;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 10);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Setup assign industry modal
+        function setupAssignIndustryModal() {
+            const assignModal = document.getElementById('assignIndustryModal');
+            if (!assignModal) return;
+
+            // Close buttons
+            const closeBtn = document.getElementById('closeAssignIndustryModal');
+            const cancelBtn = document.getElementById('cancelAssignIndustryBtn');
+            
+            function closeModal() {
+                assignModal.classList.remove('active');
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeModal);
+            }
+            
+            // Close on outside click
+            assignModal.addEventListener('click', function(e) {
+                if (e.target === assignModal) {
+                    closeModal();
+                }
+            });
+            
+            // Confirm assign button
+            const confirmBtn = document.getElementById('confirmAssignIndustryBtn');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', async function() {
+                    const threatId = assignModal.dataset.threatId;
+                    if (!threatId) {
+                        alert('No threat selected');
+                        return;
+                    }
+                    
+                    // Get selected industries
+                    const selectedIndustries = [];
+                    if (document.getElementById('assignIndustryHospital').checked) {
+                        selectedIndustries.push('Hospital');
+                    }
+                    if (document.getElementById('assignIndustryLab').checked) {
+                        selectedIndustries.push('Lab');
+                    }
+                    if (document.getElementById('assignIndustryBiomanufacturing').checked) {
+                        selectedIndustries.push('Biomanufacturing');
+                    }
+                    if (document.getElementById('assignIndustryAgriculture').checked) {
+                        selectedIndustries.push('Agriculture');
+                    }
+                    
+                    if (selectedIndustries.length === 0) {
+                        alert('Please select at least one industry');
+                        return;
+                    }
+                    
+                    // Get additional info
+                    const additionalInfo = document.getElementById('assignIndustryAdditionalInfo').value.trim();
+                    const includeNextSteps = document.getElementById('assignIndustryIncludeNextSteps').checked;
+                    
+                    // Disable button
+                    this.disabled = true;
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
+                    
+                    try {
+                        await apiClient.assignThreatToIndustries(threatId, {
+                            facilityTypes: selectedIndustries,
+                            includeNextSteps: includeNextSteps,
+                            additionalInfo: additionalInfo || null
+                        });
+                        
+                        // Show notification on the right side
+                        showToast('Notification has been sent');
+                        
+                        // Close modals
+                        closeModal();
+                        const alertModal = document.getElementById('alertModal');
+                        if (alertModal) {
+                            alertModal.classList.remove('active');
+                        }
+                        
+                        // Refresh alerts if loadIncomingAlerts function exists
+                        if (typeof loadIncomingAlerts === 'function') {
+                            await loadIncomingAlerts();
+                        }
+                        if (typeof loadDashboardStats === 'function') {
+                            await loadDashboardStats();
+                        }
+                    } catch (error) {
+                        alert('Error assigning threat to industries: ' + (error.message || 'Unknown error'));
+                        console.error('Error:', error);
+                    } finally {
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                    }
+                });
+            }
+        }
+
+        // Initialize assign industry modal on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAssignIndustryModal();
+        });
+    </script>
 </body>
 
 </html>

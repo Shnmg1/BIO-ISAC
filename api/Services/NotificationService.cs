@@ -116,10 +116,16 @@ public class NotificationService
         try
         {
             List<User> recipients;
+            string? industryFilter = null;
 
             if (request.SendToAll)
             {
                 recipients = await GetAllActiveUsersAsync();
+            }
+            else if (request.Industries != null && request.Industries.Count > 0)
+            {
+                recipients = await GetUsersByIndustriesAsync(request.Industries);
+                industryFilter = string.Join(", ", request.Industries);
             }
             else if (request.FacilityTypes != null && request.FacilityTypes.Count > 0)
             {
@@ -144,7 +150,8 @@ public class NotificationService
                     false,
                     request.Subject,
                     request.Body,
-                    request.DeliveryMethod
+                    request.DeliveryMethod,
+                    industryFilter
                 );
             }
 
@@ -165,12 +172,13 @@ public class NotificationService
         bool sentToAll,
         string subject,
         string body,
-        DeliveryMethod deliveryMethod)
+        DeliveryMethod deliveryMethod,
+        string? sentToIndustry = null)
     {
         using var connection = await _dbService.GetConnectionAsync();
-        var query = @"INSERT INTO notifications (threat_id, tier, sent_to, sent_to_facility_type, sent_to_all, 
-                         subject, body, delivery_method, delivery_status, created_at) 
-                      VALUES (@threat_id, @tier, @sent_to, @sent_to_facility_type, @sent_to_all, 
+        var query = @"INSERT INTO notifications (threat_id, tier, sent_to, sent_to_facility_type, sent_to_industry, sent_to_all,
+                         subject, body, delivery_method, delivery_status, created_at)
+                      VALUES (@threat_id, @tier, @sent_to, @sent_to_facility_type, @sent_to_industry, @sent_to_all,
                          @subject, @body, @delivery_method, 'Pending', NOW())";
 
         using var command = new MySqlCommand(query, connection);
@@ -178,6 +186,7 @@ public class NotificationService
         command.Parameters.AddWithValue("@tier", tier.ToString());
         command.Parameters.AddWithValue("@sent_to", sentTo.HasValue ? (object)sentTo.Value : DBNull.Value);
         command.Parameters.AddWithValue("@sent_to_facility_type", sentToFacilityType.HasValue ? sentToFacilityType.Value.ToString() : DBNull.Value);
+        command.Parameters.AddWithValue("@sent_to_industry", string.IsNullOrEmpty(sentToIndustry) ? DBNull.Value : sentToIndustry);
         command.Parameters.AddWithValue("@sent_to_all", sentToAll);
         command.Parameters.AddWithValue("@subject", subject);
         command.Parameters.AddWithValue("@body", body);
@@ -397,6 +406,49 @@ public class NotificationService
         return allUsers.DistinctBy(u => u.Id).ToList();
     }
 
+    private async Task<List<User>> GetUsersByIndustriesAsync(List<string> industries)
+    {
+        var allUsers = new List<User>();
+        foreach (var industry in industries)
+        {
+            // Try to parse industry as FacilityType (for backward compatibility)
+            if (Enum.TryParse<FacilityType>(industry, true, out var facilityType))
+            {
+                var users = await GetUsersByFacilityTypeAsync(facilityType);
+                allUsers.AddRange(users);
+            }
+            else
+            {
+                // If not a facility type, query by industry name directly
+                var users = await GetUsersByIndustryNameAsync(industry);
+                allUsers.AddRange(users);
+            }
+        }
+        return allUsers.DistinctBy(u => u.Id).ToList();
+    }
+
+    private async Task<List<User>> GetUsersByIndustryNameAsync(string industry)
+    {
+        using var connection = await _dbService.GetConnectionAsync();
+        // Query by facility_type for now since that's the industry mapping
+        var query = "SELECT id, email, full_name FROM users WHERE facility_type = @industry AND status = 'Active'";
+        using var command = new MySqlCommand(query, connection);
+        command.Parameters.AddWithValue("@industry", industry);
+
+        var users = new List<User>();
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            users.Add(new User
+            {
+                Id = reader.GetInt32ByName("id"),
+                Email = reader.GetStringByName("email"),
+                FullName = reader.GetStringByName("full_name")
+            });
+        }
+        return users;
+    }
+
     private async Task<List<User>> GetUsersByIdsAsync(List<int> userIds)
     {
         if (userIds.Count == 0) return new List<User>();
@@ -455,6 +507,7 @@ public class MassAlertRequest
     public DeliveryMethod DeliveryMethod { get; set; }
     public bool SendToAll { get; set; }
     public List<FacilityType>? FacilityTypes { get; set; }
+    public List<string>? Industries { get; set; }
     public List<int>? UserIds { get; set; }
 }
 

@@ -23,4 +23,11 @@ public class ThreatSubmission
     public List<string>? AssignedFacilityTypes { get; set; }
 }
 
+public class AssignIndustriesRequest
+{
+    public List<string> FacilityTypes { get; set; } = new();
+    public bool IncludeNextSteps { get; set; }
+    public string? AdditionalInfo { get; set; }
+}
+
 

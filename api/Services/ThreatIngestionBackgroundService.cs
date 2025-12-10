@@ -278,8 +278,8 @@ namespace MyApp.Namespace.Services
 
             // Insert classification
             var classQuery = @"
-                INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_next_steps) 
-                VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_next_steps)";
+                INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_next_steps, ai_recommended_industry) 
+                VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_next_steps, @ai_recommended_industry)";
 
             using var classCmd = new MySqlConnector.MySqlCommand(classQuery, connection);
             classCmd.Parameters.AddWithValue("@threat_id", threatId);
@@ -297,6 +297,13 @@ namespace MyApp.Namespace.Services
                 })
                 : null;
             classCmd.Parameters.AddWithValue("@ai_next_steps", (object?)nextStepsJson ?? DBNull.Value);
+            // Build industry string: if Other, use "Other: {specificIndustry}", otherwise use recommendedIndustry
+            var industryToStore = classification.RecommendedIndustry;
+            if (industryToStore != null && industryToStore.Equals("Other", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(classification.SpecificIndustry))
+            {
+                industryToStore = $"Other: {classification.SpecificIndustry}";
+            }
+            classCmd.Parameters.AddWithValue("@ai_recommended_industry", string.IsNullOrEmpty(industryToStore) ? (object)DBNull.Value : industryToStore);
 
             await classCmd.ExecuteNonQueryAsync();
 

@@ -244,6 +244,7 @@ public class ThreatController : ControllerBase
             }
 
             using var connection = await _dbService.GetConnectionAsync();
+            // Check if ai_recommended_industry column exists, use it if available
             var query = @"SELECT t.id, t.user_id, t.title, t.description, t.category, t.source, t.date_observed, 
                                  t.impact_level, t.status, t.created_at,
                                  COALESCE(c.id, ta.id) as analysis_id, 
@@ -251,6 +252,7 @@ public class ThreatController : ControllerBase
                                  COALESCE(c.ai_confidence, ta.ai_confidence) as ai_confidence, 
                                  COALESCE(c.ai_reasoning, ta.ai_reasoning) as ai_reasoning, 
                                  COALESCE(c.ai_next_steps, c.ai_actions, ta.ai_actions) as ai_actions,
+                                 c.ai_recommended_industry,
                                  ta.ai_keywords,
                                  COALESCE(ta.human_tier, c.human_tier) as human_tier, 
                                  COALESCE(ta.human_decision, c.human_decision) as human_decision, 
@@ -304,6 +306,7 @@ public class ThreatController : ControllerBase
                         aiReasoning = reader.IsDBNullByName("ai_reasoning") ? null : reader.GetStringByName("ai_reasoning"),
                         aiActions = reader.IsDBNullByName("ai_actions") ? null : reader.GetStringByName("ai_actions"),
                         aiKeywords = reader.IsDBNullByName("ai_keywords") ? null : reader.GetStringByName("ai_keywords"),
+                        recommendedIndustry = reader.IsDBNullByName("ai_recommended_industry") ? null : reader.GetStringByName("ai_recommended_industry"),
                         humanTier = reader.IsDBNullByName("human_tier") ? null : reader.GetStringByName("human_tier"),
                         humanDecision = reader.IsDBNullByName("human_decision") ? null : reader.GetStringByName("human_decision"),
                         humanJustification = reader.IsDBNullByName("human_justification") ? null : reader.GetStringByName("human_justification"),
@@ -428,6 +431,124 @@ public class ThreatController : ControllerBase
         }
     }
 
+    [HttpPost("{id}/assign-industries")]
+    public async Task<IActionResult> AssignThreatToIndustries(int id, [FromBody] AssignIndustriesRequest request)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            if (userId == 0)
+            {
+                return Unauthorized(new { message = "Authentication required" });
+            }
+
+            // Check if user is admin - only admins can assign threats to industries
+            bool isAdmin = false;
+            try
+            {
+                var user = await _authService.GetUserByIdAsync(userId);
+                if (user != null)
+                {
+                    var roleStr = user.Role.ToString();
+                    isAdmin = roleStr.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not verify admin status for user {UserId}", userId);
+            }
+
+            if (!isAdmin)
+            {
+                return StatusCode(403, new { message = "Only admins can assign threats to industries" });
+            }
+
+            if (request.FacilityTypes == null || request.FacilityTypes.Count == 0)
+            {
+                return BadRequest(new { message = "At least one industry must be specified" });
+            }
+
+            // Validate facility types
+            var validFacilityTypes = new[] { "Hospital", "Lab", "Biomanufacturing", "Agriculture" };
+            foreach (var facilityType in request.FacilityTypes)
+            {
+                if (!validFacilityTypes.Contains(facilityType, StringComparer.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { message = $"Invalid facility type: {facilityType}" });
+                }
+            }
+
+            // Serialize facility types as JSON array
+            var assignedFacilityTypesJson = System.Text.Json.JsonSerializer.Serialize(request.FacilityTypes);
+
+            using var connection = await _dbService.GetConnectionAsync();
+            
+            // Check if threat exists and get current description, then update in one operation
+            string? currentDescription = null;
+            using (var checkCommand = new MySqlCommand("SELECT description FROM threats WHERE id = @id", connection))
+            {
+                checkCommand.Parameters.AddWithValue("@id", id);
+                var descriptionObj = await checkCommand.ExecuteScalarAsync();
+                if (descriptionObj == null || descriptionObj == DBNull.Value)
+                {
+                    return NotFound(new { message = "Threat not found" });
+                }
+                currentDescription = descriptionObj.ToString();
+            }
+
+            // Update description if additional info is provided
+            var updatedDescription = currentDescription ?? "";
+            if (!string.IsNullOrWhiteSpace(request.AdditionalInfo))
+            {
+                updatedDescription += "\n\n--- Additional Information from Admin ---\n" + request.AdditionalInfo.Trim();
+            }
+
+            // Update threat with assigned facility types and optionally updated description
+            var updateQuery = @"UPDATE threats 
+                               SET assigned_facility_types = @assigned_facility_types,
+                                   description = @description,
+                                   status = CASE WHEN status = 'Pending_Review' THEN 'Approved' ELSE status END
+                               WHERE id = @id";
+
+            using var command = new MySqlCommand(updateQuery, connection);
+            command.Parameters.AddWithValue("@assigned_facility_types", assignedFacilityTypesJson);
+            command.Parameters.AddWithValue("@description", updatedDescription);
+            command.Parameters.AddWithValue("@id", id);
+
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+            
+            if (rowsAffected == 0)
+            {
+                return NotFound(new { message = "Threat not found or could not be updated" });
+            }
+            
+            _logger.LogInformation("Successfully assigned threat {ThreatId} to industries: {Industries}", id, string.Join(", ", request.FacilityTypes));
+
+            // If includeNextSteps is true, we don't need to do anything special since next steps
+            // are already stored in the classifications table and will be retrieved by GetUserAlerts
+
+            await LogAuditAsync(userId, id, "Threat_Assigned_To_Industries", 
+                $"Threat assigned to industries: {string.Join(", ", request.FacilityTypes)}");
+
+            return Ok(new 
+            { 
+                message = "Threat assigned to industries successfully",
+                facilityTypes = request.FacilityTypes,
+                includeNextSteps = request.IncludeNextSteps
+            });
+        }
+        catch (MySqlException dbEx)
+        {
+            _logger.LogError(dbEx, $"Database error assigning threat {id} to industries: {dbEx.Message}");
+            return StatusCode(500, new { message = "Database error occurred while assigning the threat to industries", error = dbEx.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error assigning threat {id} to industries: {ex.Message}\n{ex.StackTrace}");
+            return StatusCode(500, new { message = "An error occurred while assigning the threat to industries", error = ex.Message });
+        }
+    }
+
     [HttpGet("user/alerts")]
     public async Task<IActionResult> GetUserAlerts()
     {
@@ -450,14 +571,16 @@ public class ThreatController : ControllerBase
             // Get approved threats that match user's facility type or are general (assigned_facility_types is NULL or empty)
             var userFacilityType = user.FacilityType.ToString();
             var query = @"SELECT t.id, t.title, t.description, t.category, t.date_observed, t.created_at, 
-                                 COALESCE(ta.human_tier, c.ai_tier) as tier
+                                 COALESCE(ta.human_tier, c.ai_tier) as tier,
+                                 COALESCE(c.ai_next_steps, c.ai_actions) as next_steps,
+                                 c.ai_confidence, c.ai_reasoning
                           FROM threats t
                           LEFT JOIN threat_analysis ta ON t.id = ta.threat_id
                           LEFT JOIN classifications c ON t.id = c.threat_id
                           WHERE t.status = 'Approved'
                             AND (t.assigned_facility_types IS NULL 
                                  OR t.assigned_facility_types = ''
-                                 OR JSON_CONTAINS(t.assigned_facility_types, JSON_QUOTE(@user_facility_type)))
+                                 OR JSON_SEARCH(t.assigned_facility_types, 'one', @user_facility_type) IS NOT NULL)
                           ORDER BY t.created_at DESC
                           LIMIT 50";
 
@@ -467,6 +590,34 @@ public class ThreatController : ControllerBase
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
+                var nextStepsStr = reader.IsDBNullByName("next_steps") ? null : reader.GetStringByName("next_steps");
+                List<string>? nextSteps = null;
+                
+                if (!string.IsNullOrEmpty(nextStepsStr))
+                {
+                    try
+                    {
+                        // Try to parse as JSON array
+                        if (nextStepsStr.Trim().StartsWith("["))
+                        {
+                            nextSteps = System.Text.Json.JsonSerializer.Deserialize<List<string>>(nextStepsStr);
+                        }
+                        else
+                        {
+                            // If not JSON, treat as plain text and split by newlines/bullets
+                            nextSteps = nextStepsStr.Split(new[] { '\n', '\r', '•' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(s => s.Trim())
+                                .Where(s => !string.IsNullOrEmpty(s))
+                                .ToList();
+                        }
+                    }
+                    catch
+                    {
+                        // If parsing fails, use as single string
+                        nextSteps = new List<string> { nextStepsStr };
+                    }
+                }
+                
                 alerts.Add(new
                 {
                     id = reader.GetInt32ByName("id"),
@@ -475,7 +626,10 @@ public class ThreatController : ControllerBase
                     category = reader.GetStringByName("category"),
                     dateObserved = reader.GetDateTimeByName("date_observed"),
                     tier = reader.IsDBNullByName("tier") ? null : reader.GetStringByName("tier"),
-                    createdAt = reader.GetDateTimeByName("created_at")
+                    createdAt = reader.GetDateTimeByName("created_at"),
+                    nextSteps = nextSteps,
+                    aiConfidence = reader.IsDBNullByName("ai_confidence") ? (decimal?)null : reader.GetDecimalByName("ai_confidence"),
+                    aiReasoning = reader.IsDBNullByName("ai_reasoning") ? null : reader.GetStringByName("ai_reasoning")
                 });
             }
 

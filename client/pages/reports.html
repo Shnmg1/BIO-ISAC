@@ -578,6 +578,88 @@
             background-color: #000000;
             color: #ffffff;
         }
+
+        /* Next Steps Modal */
+        .next-steps-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .next-steps-modal.active {
+            display: flex;
+        }
+
+        .next-steps-modal-content {
+            background-color: #000000;
+            border: 2px solid var(--bio-light-green);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+
+        .next-steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .next-steps-list li {
+            padding: 10px 15px;
+            margin: 8px 0;
+            background-color: rgba(74, 173, 106, 0.1);
+            border-left: 3px solid var(--bio-bright-green);
+            color: var(--bio-text-light);
+            border-radius: 4px;
+        }
+
+        .next-steps-list li:before {
+            content: "→ ";
+            color: var(--bio-bright-green);
+            font-weight: bold;
+        }
+
+        .queue-table tbody tr {
+            cursor: pointer;
+        }
+
+        .queue-table tbody tr:hover {
+            background-color: rgba(74, 173, 106, 0.1);
+        }
+
+        .tier-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .tier-high {
+            background-color: #ff4444;
+            color: #ffffff;
+        }
+
+        .tier-medium {
+            background-color: #ffaa00;
+            color: #000000;
+        }
+
+        .tier-low {
+            background-color: var(--bio-bright-green);
+            color: var(--bio-primary-green);
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -922,17 +1004,17 @@
                             <tr>
                                 <th>#</th>
                                 <th>Actions</th>
-                                <th>Incident ...</th>
-                                <th>Departm...</th>
-                                <th>Created By</th>
-                                <th>Dispatch...</th>
-                                <th>On Scene</th>
-                                <th>C</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Tier</th>
+                                <th>Date Observed</th>
+                                <th>Created</th>
+                                <th>Next Steps</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="reportsQueueBody">
                             <tr>
-                                <td colspan="8" class="queue-empty">No Records Found</td>
+                                <td colspan="8" class="queue-empty">Loading threats...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -957,11 +1039,11 @@
                         </div>
                     </div>
                     <div class="pagination">
-                        <span class="pagination-info">0 to 0 of 0</span>
-                        <button><i class="fas fa-sync-alt"></i></button>
+                        <span class="pagination-info" id="paginationInfo">0 to 0 of 0</span>
+                        <button id="refreshQueueBtn" title="Refresh"><i class="fas fa-sync-alt"></i></button>
                         <button><i class="fas fa-angle-double-left"></i></button>
                         <button><i class="fas fa-angle-left"></i></button>
-                        <span class="pagination-info">Page 0 of 0</span>
+                        <span class="pagination-info">Page 1 of 1</span>
                         <button><i class="fas fa-angle-right"></i></button>
                         <button><i class="fas fa-angle-double-right"></i></button>
                     </div>
@@ -1764,7 +1846,355 @@
             document.removeEventListener('mousemove', handleContentResize);
             document.removeEventListener('mouseup', stopContentResize);
         }
+
+        // Reports Queue Functionality
+        let currentThreats = [];
+
+        async function loadReportsQueue() {
+            const tbody = document.getElementById('reportsQueueBody');
+            if (!tbody) return;
+
+            try {
+                tbody.innerHTML = '<tr><td colspan="8" class="queue-empty">Loading threats...</td></tr>';
+                
+                const alerts = await apiClient.getUserAlerts();
+                currentThreats = alerts || [];
+                
+                if (currentThreats.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="queue-empty">No threats assigned to your industry</td></tr>';
+                    updatePaginationInfo(0);
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                currentThreats.forEach((threat, index) => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-threat-id', threat.id);
+                    
+                    const tier = threat.tier || 'Unknown';
+                    const tierClass = tier.toLowerCase() === 'high' ? 'tier-high' : 
+                                    tier.toLowerCase() === 'medium' ? 'tier-medium' : 'tier-low';
+                    
+                    const dateObserved = threat.dateObserved ? new Date(threat.dateObserved).toLocaleDateString() : 'N/A';
+                    const createdAt = threat.createdAt ? new Date(threat.createdAt).toLocaleDateString() : 'N/A';
+                    const hasNextSteps = threat.nextSteps && threat.nextSteps.length > 0;
+                    
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>
+                            <button class="icon-btn-small" onclick="viewThreatDetails(${threat.id})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                        <td title="${escapeHtml(threat.title)}">${truncateText(threat.title, 30)}</td>
+                        <td>${escapeHtml(threat.category || 'N/A')}</td>
+                        <td><span class="tier-badge ${tierClass}">${tier}</span></td>
+                        <td>${dateObserved}</td>
+                        <td>${createdAt}</td>
+                        <td>
+                            ${hasNextSteps ? 
+                                `<button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="viewNextSteps(${threat.id}, event)">
+                                    <i class="fas fa-list-check"></i> View Steps
+                                </button>` : 
+                                '<span style="opacity: 0.5;">No steps</span>'
+                            }
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+
+                updatePaginationInfo(currentThreats.length);
+            } catch (error) {
+                console.error('Error loading reports queue:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="queue-empty">Error loading threats: ' + escapeHtml(error.message) + '</td></tr>';
+                showToast('Error loading threats: ' + error.message);
+            }
+        }
+
+        function updatePaginationInfo(total) {
+            const paginationInfo = document.getElementById('paginationInfo');
+            if (paginationInfo) {
+                paginationInfo.textContent = `1 to ${total} of ${total}`;
+            }
+        }
+
+        function truncateText(text, maxLength) {
+            if (!text) return 'N/A';
+            if (text.length <= maxLength) return escapeHtml(text);
+            return escapeHtml(text.substring(0, maxLength)) + '...';
+        }
+
+        function viewThreatDetails(threatId) {
+            const threat = currentThreats.find(t => t.id === threatId);
+            if (!threat) {
+                showToast('Threat not found');
+                return;
+            }
+            
+            // Show next steps modal with full threat details
+            viewNextSteps(threatId, null);
+        }
+
+        function viewNextSteps(threatId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            const threat = currentThreats.find(t => t.id === threatId);
+            if (!threat) {
+                showToast('Threat not found');
+                return;
+            }
+
+            const modal = document.getElementById('nextStepsModal');
+            if (!modal) return;
+
+            document.getElementById('nextStepsThreatTitle').textContent = threat.title || 'Unknown Threat';
+            
+            const descriptionDiv = document.getElementById('nextStepsDescription');
+            const descriptionField = document.getElementById('threatDescriptionField');
+            if (threat.description) {
+                descriptionDiv.textContent = threat.description;
+                descriptionField.style.display = 'block';
+            } else {
+                descriptionField.style.display = 'none';
+            }
+            
+            const nextStepsList = document.getElementById('nextStepsList');
+            const noNextSteps = document.getElementById('noNextSteps');
+            
+            if (threat.nextSteps && threat.nextSteps.length > 0) {
+                nextStepsList.innerHTML = threat.nextSteps.map(step => `<li>${escapeHtml(step)}</li>`).join('');
+                nextStepsList.style.display = 'block';
+                noNextSteps.style.display = 'none';
+            } else {
+                nextStepsList.style.display = 'none';
+                noNextSteps.style.display = 'block';
+            }
+
+            const reasoningField = document.getElementById('aiReasoningField');
+            const reasoningDiv = document.getElementById('nextStepsReasoning');
+            if (threat.aiReasoning) {
+                reasoningDiv.textContent = threat.aiReasoning;
+                reasoningField.style.display = 'block';
+            } else {
+                reasoningField.style.display = 'none';
+            }
+
+            // Store threat ID in modal for "Mark as Completed" functionality
+            modal.dataset.threatId = threatId;
+            modal.dataset.threatTitle = threat.title || 'Unknown Threat';
+            
+            // Show/hide "Mark as Completed" button based on whether there are next steps
+            const markBtn = document.getElementById('markCompletedBtn');
+            if (markBtn) {
+                if (threat.nextSteps && threat.nextSteps.length > 0) {
+                    markBtn.style.display = 'inline-flex';
+                } else {
+                    markBtn.style.display = 'none';
+                }
+            }
+
+            modal.classList.add('active');
+        }
+        
+        // Handle "Mark as Completed" button
+        async function markNextStepsCompleted() {
+            const modal = document.getElementById('nextStepsModal');
+            if (!modal) return;
+            
+            const threatId = modal.dataset.threatId;
+            const threatTitle = modal.dataset.threatTitle || 'Unknown Threat';
+            
+            if (!threatId) {
+                showToast('Error: Threat ID not found');
+                return;
+            }
+            
+            const markBtn = document.getElementById('markCompletedBtn');
+            if (!markBtn) return;
+            
+            // Disable button and show loading state
+            const originalText = markBtn.innerHTML;
+            markBtn.disabled = true;
+            markBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            try {
+                // Get current user
+                const user = apiClient.getCurrentUserSync();
+                if (!user) {
+                    showToast('You must be logged in to mark steps as completed');
+                    markBtn.disabled = false;
+                    markBtn.innerHTML = originalText;
+                    return;
+                }
+                
+                // Create message to admin
+                const messageBody = `I have completed the recommended next steps for the following threat:\n\n` +
+                    `Threat ID: #${String(threatId).padStart(5, '0')}\n` +
+                    `Threat Title: ${threatTitle}\n\n` +
+                    `All recommended actions have been completed.`;
+                
+                await apiClient.sendMessage({
+                    subject: `Next Steps Completed - Threat #${String(threatId).padStart(5, '0')}`,
+                    body: messageBody,
+                    threatId: parseInt(threatId)
+                });
+                
+                showToast('Admin has been notified that next steps are completed');
+                
+                // Close modal after a short delay
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error marking steps as completed:', error);
+                showToast('Error sending notification: ' + (error.message || 'Unknown error'));
+                markBtn.disabled = false;
+                markBtn.innerHTML = originalText;
+            }
+        }
+        
+        // Setup "Mark as Completed" button handler
+        function setupMarkCompletedButton() {
+            const markBtn = document.getElementById('markCompletedBtn');
+            if (markBtn) {
+                markBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    markNextStepsCompleted();
+                };
+            }
+        }
+
+        // Close next steps modal - define this first so it's available
+        // Close next steps modal - setup once with flag to prevent duplicates
+        let nextStepsModalCloseSetup = false;
+        function setupNextStepsModalClose() {
+            if (nextStepsModalCloseSetup) return; // Prevent duplicate setup
+            nextStepsModalCloseSetup = true;
+            
+            const nextStepsModal = document.getElementById('nextStepsModal');
+            const closeNextStepsBtn = document.getElementById('closeNextStepsBtn');
+            const closeNextStepsModal = document.getElementById('closeNextStepsModal');
+            
+            if (!nextStepsModal) {
+                nextStepsModalCloseSetup = false; // Reset if modal not found
+                return;
+            }
+            
+            function closeNextStepsModalFunc(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                if (nextStepsModal) {
+                    nextStepsModal.classList.remove('active');
+                }
+            }
+            
+            // Close button in header - use onclick to ensure it works
+            if (closeNextStepsModal) {
+                closeNextStepsModal.onclick = closeNextStepsModalFunc;
+            }
+            
+            // Close button in footer - use onclick to ensure it works
+            if (closeNextStepsBtn) {
+                closeNextStepsBtn.onclick = closeNextStepsModalFunc;
+            }
+            
+            // Close modal when clicking outside (on the backdrop)
+            nextStepsModal.onclick = function(e) {
+                if (e.target === nextStepsModal) {
+                    closeNextStepsModalFunc(e);
+                }
+            };
+            
+            // Prevent clicks inside modal content from closing the modal
+            const modalContent = nextStepsModal.querySelector('.next-steps-modal-content');
+            if (modalContent) {
+                modalContent.onclick = function(e) {
+                    e.stopPropagation();
+                };
+            }
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && nextStepsModal && nextStepsModal.classList.contains('active')) {
+                    closeNextStepsModalFunc(e);
+                }
+            });
+        }
+        
+        // Setup close handlers and mark completed button when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setupNextStepsModalClose();
+                setupMarkCompletedButton();
+            });
+        } else {
+            setupNextStepsModalClose();
+            setupMarkCompletedButton();
+        }
+
+        // Refresh queue button
+        const refreshQueueBtn = document.getElementById('refreshQueueBtn');
+        if (refreshQueueBtn) {
+            refreshQueueBtn.addEventListener('click', () => {
+                loadReportsQueue();
+            });
+        }
+
+        // Load reports queue on page load
+        (function() {
+            loadReportsQueue();
+        })();
     </script>
+
+    <!-- Next Steps Modal -->
+    <div class="next-steps-modal" id="nextStepsModal">
+        <div class="next-steps-modal-content">
+            <div class="alert-modal-header">
+                <h2><i class="fas fa-list-check"></i> Next Steps</h2>
+                <button class="alert-modal-close" id="closeNextStepsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="alert-modal-body">
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Threat Title</label>
+                    <div class="alert-modal-value readonly" id="nextStepsThreatTitle"></div>
+                </div>
+                <div class="alert-modal-field" id="threatDescriptionField">
+                    <label class="alert-modal-label">Description</label>
+                    <div class="alert-modal-value readonly" id="nextStepsDescription" style="white-space: pre-wrap;"></div>
+                </div>
+                <div class="alert-modal-field">
+                    <label class="alert-modal-label">Recommended Actions</label>
+                    <ul class="next-steps-list" id="nextStepsList"></ul>
+                    <div id="noNextSteps" style="display: none; color: var(--bio-text-light); opacity: 0.7; padding: 15px;">
+                        No next steps available for this threat.
+                    </div>
+                </div>
+                <div class="alert-modal-field" id="aiReasoningField" style="display: none;">
+                    <label class="alert-modal-label">AI Reasoning</label>
+                    <div class="alert-modal-value readonly" id="nextStepsReasoning" style="white-space: pre-wrap;"></div>
+                </div>
+            </div>
+            <div class="alert-modal-actions">
+                <button class="alert-modal-btn alert-modal-btn-primary" id="markCompletedBtn">
+                    <i class="fas fa-check-circle"></i>
+                    Mark as Completed
+                </button>
+                <button class="alert-modal-btn alert-modal-btn-outline" id="closeNextStepsBtn">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Accessibility Modal -->
     <div class="accessibility-modal" id="accessibilityModal">

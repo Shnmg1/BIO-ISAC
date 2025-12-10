@@ -254,58 +254,16 @@ Respond ONLY with valid JSON in this exact format:
             {
                 if (nextStepsElement.ValueKind == JsonValueKind.Array)
                 {
-                    var rawSteps = new List<string>();
                     foreach (var step in nextStepsElement.EnumerateArray())
                     {
                         var stepText = step.GetString() ?? "";
+                        // Trim and clean up the step text
                         stepText = stepText.Trim();
+                        // Remove any extra whitespace
+                        stepText = Regex.Replace(stepText, @"\s+", " ");
                         if (!string.IsNullOrEmpty(stepText))
                         {
-                            rawSteps.Add(stepText);
-                        }
-                    }
-                    
-                    // Merge fragmented steps - detect when a step is a continuation of the previous one
-                    // Fragments typically don't start with a numbered pattern and the previous step suggests continuation
-                    for (int i = 0; i < rawSteps.Count; i++)
-                    {
-                        var currentStep = rawSteps[i];
-                        
-                        // Check if this step starts with a numbered pattern (e.g., "1. ", "2. Action")
-                        bool startsWithNumberedPattern = Regex.IsMatch(currentStep, @"^\d+\.\s+[A-Z]");
-                        
-                        // Check if this is a continuation fragment:
-                        // - Doesn't start with numbered pattern
-                        // - Previous step exists and doesn't end with punctuation (suggests continuation)
-                        // - OR current step starts with lowercase/number (likely continuation)
-                        bool isFragment = !startsWithNumberedPattern && nextSteps.Count > 0;
-                        
-                        if (isFragment)
-                        {
-                            var previousStep = nextSteps[nextSteps.Count - 1];
-                            // Previous step doesn't end with punctuation, or current step starts with lowercase/number
-                            bool previousIncomplete = !Regex.IsMatch(previousStep, @"[.!?]$");
-                            bool currentLooksLikeContinuation = currentStep.Length > 0 && 
-                                                               (char.IsLower(currentStep[0]) || 
-                                                                char.IsDigit(currentStep[0]) ||
-                                                                currentStep.StartsWith("(") ||
-                                                                currentStep.StartsWith(")"));
-                            
-                            if (previousIncomplete || currentLooksLikeContinuation)
-                            {
-                                // Merge with previous step
-                                nextSteps[nextSteps.Count - 1] = $"{previousStep} {currentStep}";
-                                continue;
-                            }
-                        }
-                        
-                        // Remove leading number pattern if present (we'll add our own numbering)
-                        var cleanedStep = Regex.Replace(currentStep, @"^\d+\.\s*", "");
-                        // Remove any extra whitespace
-                        cleanedStep = Regex.Replace(cleanedStep, @"\s+", " ");
-                        if (!string.IsNullOrEmpty(cleanedStep))
-                        {
-                            nextSteps.Add(cleanedStep);
+                            nextSteps.Add(stepText);
                         }
                     }
                 }
@@ -322,9 +280,17 @@ Respond ONLY with valid JSON in this exact format:
             
             _logger.LogInformation("Parsed {Count} next steps from AI response", nextSteps.Count);
 
-            var bioSectorRelevance = root.TryGetProperty("bioSectorRelevance", out var relevanceElement) 
-                ? relevanceElement.GetDecimal() 
+            var bioSectorRelevance = root.TryGetProperty("bioSectorRelevance", out var relevanceElement)
+                ? relevanceElement.GetDecimal()
                 : 50;
+
+            var recommendedIndustry = root.TryGetProperty("recommendedIndustry", out var industryElement)
+                ? industryElement.GetString()
+                : null;
+
+            var specificIndustry = root.TryGetProperty("specificIndustry", out var specificIndustryElement)
+                ? specificIndustryElement.GetString()
+                : null;
 
             return new ClassificationResult
             {
@@ -335,7 +301,9 @@ Respond ONLY with valid JSON in this exact format:
                 NextSteps = nextSteps,
                 Keywords = keywords,
                 BioSectorRelevance = bioSectorRelevance,
-                RawResponse = content
+                RawResponse = content,
+                RecommendedIndustry = recommendedIndustry,
+                SpecificIndustry = specificIndustry
             };
         }
         catch (Exception ex)
@@ -361,8 +329,8 @@ Respond ONLY with valid JSON in this exact format:
         try
         {
             using var connection = await _dbService.GetConnectionAsync();
-            var query = @"INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_next_steps) 
-                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_next_steps)";
+            var query = @"INSERT INTO classifications (threat_id, ai_tier, ai_confidence, ai_reasoning, ai_actions, ai_next_steps, ai_recommended_industry)
+                         VALUES (@threat_id, @ai_tier, @ai_confidence, @ai_reasoning, @ai_actions, @ai_next_steps, @ai_recommended_industry)";
 
             using var command = new MySqlConnector.MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@threat_id", threatId);
@@ -373,13 +341,14 @@ Respond ONLY with valid JSON in this exact format:
             // Save NextSteps as JSON array to ai_next_steps
             // Ensure proper JSON formatting with clean serialization
             var nextStepsJson = result.NextSteps != null && result.NextSteps.Count > 0
-                ? JsonSerializer.Serialize(result.NextSteps, new JsonSerializerOptions 
-                { 
+                ? JsonSerializer.Serialize(result.NextSteps, new JsonSerializerOptions
+                {
                     WriteIndented = false,  // Compact format for database storage
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping  // Preserve special characters
                 })
                 : null;
             command.Parameters.AddWithValue("@ai_next_steps", (object?)nextStepsJson ?? DBNull.Value);
+            command.Parameters.AddWithValue("@ai_recommended_industry", string.IsNullOrEmpty(result.RecommendedIndustry) ? (object)DBNull.Value : result.RecommendedIndustry);
             
             _logger.LogInformation("Saving next steps for threat {ThreatId}: {NextStepsJson}", threatId, nextStepsJson);
 
@@ -403,5 +372,7 @@ public class ClassificationResult
     public List<string> Keywords { get; set; } = new();
     public decimal BioSectorRelevance { get; set; }
     public string RawResponse { get; set; } = string.Empty;
+    public string? RecommendedIndustry { get; set; }
+    public string? SpecificIndustry { get; set; }
 }
 

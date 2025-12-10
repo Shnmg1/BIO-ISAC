@@ -54,6 +54,9 @@ namespace api.Controllers
                     ai_confidence = reader.GetDecimal("ai_confidence"),
                     ai_reasoning = reader.GetString("ai_reasoning"),
                     ai_actions = reader.GetString("ai_actions"),
+                    ai_recommended_industry = reader.IsDBNull(reader.GetOrdinal("ai_recommended_industry"))
+                        ? null
+                        : reader.GetString("ai_recommended_industry"),
                     created_at = reader.GetDateTime("created_at")
                 };
 
@@ -125,6 +128,7 @@ namespace api.Controllers
                             ai_confidence = @ai_confidence,
                             ai_reasoning = @ai_reasoning,
                             ai_actions = @ai_actions,
+                            ai_recommended_industry = @ai_recommended_industry,
                             created_at = NOW()
                         WHERE threat_id = @threat_id";
 
@@ -134,6 +138,7 @@ namespace api.Controllers
                     updateCommand.Parameters.AddWithValue("@ai_confidence", classification.Confidence);
                     updateCommand.Parameters.AddWithValue("@ai_reasoning", classification.Reasoning);
                     updateCommand.Parameters.AddWithValue("@ai_actions", classification.RecommendedActions);
+                    updateCommand.Parameters.AddWithValue("@ai_recommended_industry", string.IsNullOrEmpty(classification.RecommendedIndustry) ? (object)DBNull.Value : classification.RecommendedIndustry);
 
                     await updateCommand.ExecuteNonQueryAsync();
                     _logger.LogInformation($"Updated AI rating for threat {id}");
@@ -152,6 +157,7 @@ namespace api.Controllers
                     ai_confidence = classification.Confidence,
                     ai_reasoning = classification.Reasoning,
                     ai_actions = classification.RecommendedActions,
+                    ai_recommended_industry = classification.RecommendedIndustry,
                     created_at = DateTime.Now
                 };
 

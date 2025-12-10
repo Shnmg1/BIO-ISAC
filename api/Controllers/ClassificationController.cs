@@ -74,7 +74,9 @@ public class ClassificationController : ControllerBase
                     recommendedActions = classification.RecommendedActions,
                     nextSteps = classification.NextSteps,
                     keywords = classification.Keywords,
-                    bioSectorRelevance = classification.BioSectorRelevance
+                    bioSectorRelevance = classification.BioSectorRelevance,
+                    recommendedIndustry = classification.RecommendedIndustry,
+                    specificIndustry = classification.SpecificIndustry
                 }
             });
         }
